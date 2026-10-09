@@ -1,0 +1,192 @@
+{
+  "products": [
+    {
+      "path": "/images/products/belgian-chocolate-640.webp",
+      "bytes": 81698,
+      "sha256": "ed9f31fd429b023c86f5583685679fb955cac8aa1ae03583fdd5bd369e78e941",
+      "source": "assets/slipstream-front.webp",
+      "source_sha256": "72f99ceaf3c0e2220b2a3d4091b1b6b8927c257d82489ffc612a71aa66cb72cc",
+      "width": 640,
+      "height": 960,
+      "alpha": true
+    },
+    {
+      "path": "/images/products/belgian-chocolate-1024.webp",
+      "bytes": 218986,
+      "sha256": "72f99ceaf3c0e2220b2a3d4091b1b6b8927c257d82489ffc612a71aa66cb72cc",
+      "source": "assets/slipstream-front.webp",
+      "source_sha256": "72f99ceaf3c0e2220b2a3d4091b1b6b8927c257d82489ffc612a71aa66cb72cc",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true
+    },
+    {
+      "path": "/images/products/belgian-chocolate-back-640.webp",
+      "bytes": 109776,
+      "sha256": "5702d5f1f6302668a1e5c3da3c5738f5f79d2ba0c73f5b5c9aae8d3fe28cddb8",
+      "source": "assets/slipstream-back-concept.webp",
+      "source_sha256": "76bd7c850ecb6d3bf4184c8a76e7b58892cc0126ed24d5a83d8cce8ec7ab8a24",
+      "width": 640,
+      "height": 960,
+      "alpha": true
+    },
+    {
+      "path": "/images/products/belgian-chocolate-back-1024.webp",
+      "bytes": 267780,
+      "sha256": "76bd7c850ecb6d3bf4184c8a76e7b58892cc0126ed24d5a83d8cce8ec7ab8a24",
+      "source": "assets/slipstream-back-concept.webp",
+      "source_sha256": "76bd7c850ecb6d3bf4184c8a76e7b58892cc0126ed24d5a83d8cce8ec7ab8a24",
+      "width": 1024,
+      "height": 1536,
+      "alpha": true
+    },
+    {
+      "path": "/images/products/vanilla-creme-640.webp",
+      "bytes": 35540,
+      "sha256": "ee66fba2a8484fa930c4e52c99e4988baed6b1c783a6ffb29521108cc05f93a0",
+      "source": "new_website_3/assets/vanilla-creme.webp",
+      "source_sha256": "befb4fc062b57d9e560b4e43f1bec77d191b0d440781b8c356cef1172dc42077",
+      "width": 640,
+      "height": 960,
+      "alpha": false
+    },
+    {
+      "path": "/images/products/vanilla-creme-1024.webp",
+      "bytes": 104256,
+      "sha256": "befb4fc062b57d9e560b4e43f1bec77d191b0d440781b8c356cef1172dc42077",
+      "source": "new_website_3/assets/vanilla-creme.webp",
+      "source_sha256": "befb4fc062b57d9e560b4e43f1bec77d191b0d440781b8c356cef1172dc42077",
+      "width": 1024,
+      "height": 1536,
+      "alpha": false
+    },
+    {
+      "path": "/images/products/cafe-mocha-640.webp",
+      "bytes": 34298,
+      "sha256": "238a5b059600625dd6376ed14f666ce846ed0669268157ebf89e5ecfdeac3e64",
+      "source": "new_website_3/assets/cafe-mocha.webp",
+      "source_sha256": "924b5de5af46e202934169c95307550d980902aefa59f108a52046fcefe608e5",
+      "width": 640,
+      "height": 960,
+      "alpha": false
+    },
+    {
+      "path": "/images/products/cafe-mocha-1024.webp",
+      "bytes": 95276,
+      "sha256": "924b5de5af46e202934169c95307550d980902aefa59f108a52046fcefe608e5",
+      "source": "new_website_3/assets/cafe-mocha.webp",
+      "source_sha256": "924b5de5af46e202934169c95307550d980902aefa59f108a52046fcefe608e5",
+      "width": 1024,
+      "height": 1536,
+      "alpha": false
+    },
+    {
+      "path": "/images/products/cookies-cream-640.webp",
+      "bytes": 42286,
+      "sha256": "6265a4e22dcc0348854a49fdc0cdf1fde5ac89f903d3267b5cb1c50cf585213f",
+      "source": "new_website_3/assets/cookies-cream.webp",
+      "source_sha256": "79a22d2f6495febf5b6ca087dada93d7db11b1f07288c24e9f9e035f5730f760",
+      "width": 640,
+      "height": 960,
+      "alpha": false
+    },
+    {
+      "path": "/images/products/cookies-cream-1024.webp",
+      "bytes": 131370,
+      "sha256": "79a22d2f6495febf5b6ca087dada93d7db11b1f07288c24e9f9e035f5730f760",
+      "source": "new_website_3/assets/cookies-cream.webp",
+      "source_sha256": "79a22d2f6495febf5b6ca087dada93d7db11b1f07288c24e9f9e035f5730f760",
+      "width": 1024,
+      "height": 1536,
+      "alpha": false
+    }
+  ],
+  "brand": [
+    {
+      "path": "/images/brand/trayn-logo.webp",
+      "bytes": 41476,
+      "sha256": "456dae02a50284b33caf686e8788a88f555857bd13b3d77f18f8f936c4e01c17",
+      "source": "new_website_3/assets/package renders/revised/approved-logo.png",
+      "source_sha256": "978cdfd82a6b894f2683932d5016bd65a21b6542146d6b53c48bc1e50a71c987",
+      "width": 740,
+      "height": 440,
+      "alpha": true
+    },
+    {
+      "path": "/images/brand/trayn-logo-256.webp",
+      "bytes": 15858,
+      "sha256": "775df42336ad9b3bc18dc123d8cf3ef42eb3dcce836b64bfe33f5e134b8c07c9",
+      "source": "new_website_3/assets/package renders/revised/approved-logo.png",
+      "source_sha256": "978cdfd82a6b894f2683932d5016bd65a21b6542146d6b53c48bc1e50a71c987",
+      "width": 256,
+      "height": 152,
+      "alpha": true
+    },
+    {
+      "path": "/images/brand/favicon.png",
+      "bytes": 8860,
+      "sha256": "7f6d855770304b8f57b2df8a11b5da7e2f105c3d07fcdcfb580ce1f65e302dea",
+      "source": "new_website_3/assets/package renders/revised/approved-logo.png",
+      "width": 128,
+      "height": 128,
+      "alpha": true
+    },
+    {
+      "path": "/images/social-share.jpg",
+      "bytes": 94645,
+      "sha256": "c47015d40ff7a7c81c592dc893c0d5793db0c96a676d257efcad5b8374f243a0",
+      "source": "new_website_3/assets/package renders/revised/approved-logo.png; assets/slipstream-front.webp",
+      "width": 1200,
+      "height": 630,
+      "alpha": false
+    }
+  ],
+  "fonts": [
+    {
+      "path": "/fonts/barlow-700.woff2",
+      "bytes": 27836,
+      "sha256": "325c05af56dd6c3e3aae842c06603cbfd69c5ee732fc0d7439e69bc543cef54a",
+      "source": "new_website_3/assets/font-2.ttf",
+      "family": "Barlow Condensed",
+      "weight": 700
+    },
+    {
+      "path": "/fonts/barlow-800.woff2",
+      "bytes": 27736,
+      "sha256": "c4f4e1f2d3995027ef74c38dca2590e880c07e30c046e3186add9caac379d376",
+      "source": "new_website_3/assets/font-3.ttf",
+      "family": "Barlow Condensed",
+      "weight": 800
+    },
+    {
+      "path": "/fonts/montserrat-400.woff2",
+      "bytes": 31480,
+      "sha256": "53aa18365bdc5ea1212851cfb58e9f616e95294f08de2d0ecebb26d511c24ba4",
+      "source": "new_website_3/assets/font-4.ttf",
+      "family": "Montserrat",
+      "weight": 400
+    },
+    {
+      "path": "/fonts/montserrat-500.woff2",
+      "bytes": 31372,
+      "sha256": "67ed324ae207eaabc7fd5cdbf63d7d12540ecc88d75284ae6bee102fc57e13b5",
+      "source": "new_website_3/assets/font-5.ttf",
+      "family": "Montserrat",
+      "weight": 500
+    }
+  ],
+  "licenses": [
+    {
+      "path": "/licenses/Barlow-Condensed-OFL.txt",
+      "bytes": 4470,
+      "sha256": "b4cc842153e834885f3f9385ce26de4e1213d3ffbe473a6c0519e5522a8e3608",
+      "source": "new_website_3/assets/Barlow-Condensed-OFL.txt"
+    },
+    {
+      "path": "/licenses/Montserrat-OFL.txt",
+      "bytes": 4492,
+      "sha256": "41cbef8d8a37b9e58a3c613a8958014bfc58801569c40211dfb251f600c6d718",
+      "source": "new_website_3/assets/Montserrat-OFL.txt"
+    }
+  ]
+}

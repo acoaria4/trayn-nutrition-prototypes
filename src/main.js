@@ -1,0 +1,290 @@
+import { featuredProduct, getProduct, productUrl } from "./data/products.js";
+import { withBasePath, withoutBasePath } from "./site-paths.js";
+
+const basePath = import.meta.env.BASE_URL;
+const localUrl = (path) => withBasePath(path, basePath);
+
+document.documentElement.classList.add("js");
+
+// Disclosure navigation keeps the document scrollable and never traps focus.
+const menuButton = document.querySelector(".menu-toggle");
+const navigation = document.querySelector("#main-navigation");
+function closeMenu(returnFocus = false) {
+  menuButton.setAttribute("aria-expanded", "false");
+  menuButton.setAttribute("aria-label", "Open menu");
+  menuButton.querySelector("[data-menu-label]").textContent = "Menu";
+  navigation.classList.remove("is-open");
+  if (returnFocus) menuButton.focus();
+}
+menuButton.addEventListener("click", () => {
+  const open = menuButton.getAttribute("aria-expanded") !== "true";
+  if (!open) return closeMenu();
+  menuButton.setAttribute("aria-expanded", "true");
+  menuButton.setAttribute("aria-label", "Close menu");
+  menuButton.querySelector("[data-menu-label]").textContent = "Close";
+  navigation.classList.add("is-open");
+});
+navigation.addEventListener("click", (event) => {
+  const anchor = event.target.closest("a");
+  if (!anchor) return;
+  closeMenu();
+  const destination = new URL(anchor.href);
+  if (destination.pathname === location.pathname && destination.hash) {
+    const section = document.getElementById(destination.hash.slice(1));
+    if (section) {
+      section.setAttribute("tabindex", "-1");
+      section.focus({ preventScroll: true });
+      section.addEventListener(
+        "blur",
+        () => section.removeAttribute("tabindex"),
+        { once: true },
+      );
+    }
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    menuButton.getAttribute("aria-expanded") === "true"
+  )
+    closeMenu(true);
+});
+document.addEventListener("click", (event) => {
+  if (
+    !event.target.closest(".site-header") &&
+    menuButton.getAttribute("aria-expanded") === "true"
+  )
+    closeMenu();
+});
+const mobileQuery = matchMedia("(max-width: 600px)");
+mobileQuery.addEventListener("change", () => closeMenu());
+
+function clearImageError(image) {
+  image.hidden = false;
+  image.parentElement.classList.remove("has-image-error");
+  image.parentElement
+    .querySelector(".image-fallback, .brand-fallback")
+    ?.remove();
+}
+function imageFailed(image) {
+  if (image.hasAttribute("data-deferred-image") && !image.getAttribute("src"))
+    return;
+  image.hidden = true;
+  const parent = image.parentElement;
+  if (image.getAttribute("src")?.includes("/images/brand/")) {
+    if (parent.querySelector(".brand-fallback")) return;
+    const wordmark = document.createElement("span");
+    wordmark.className = "brand-fallback";
+    wordmark.textContent = "TRAYN";
+    parent.append(wordmark);
+    return;
+  }
+  parent.classList.add("has-image-error");
+  if (parent.querySelector(".image-fallback")) return;
+  const fallback = document.createElement("p");
+  fallback.className = "image-fallback";
+  fallback.setAttribute("role", "status");
+  fallback.textContent = `${image.alt || "Packaging concept"} — Image unavailable. Product details remain available below.`;
+  parent.append(fallback);
+}
+document.querySelectorAll("img").forEach((image) => {
+  image.addEventListener("error", () => imageFailed(image));
+  image.addEventListener("load", () => clearImageError(image));
+  if (image.complete && !image.naturalWidth && image.getAttribute("src"))
+    imageFailed(image);
+});
+
+// The source catalogue is intentionally non-selling. No price or inventory is inferred.
+const explorers = [...document.querySelectorAll("[data-product-explorer]")];
+function currentProduct() {
+  const queryFlavor = new URLSearchParams(location.search).get("flavor");
+  const pathname = withoutBasePath(location.pathname, basePath);
+  const conceptFlavor = pathname.match(/^\/concepts\/([^/]+)\/?$/)?.[1];
+  const routeFlavor = pathname.startsWith("/products/trayn-whey-rich-chocolate")
+    ? featuredProduct.id
+    : conceptFlavor;
+  return getProduct(
+    queryFlavor ?? routeFlavor ?? document.body.dataset.initialFlavor,
+  );
+}
+function setImage(image, product, view = "front") {
+  const base =
+    view === "back" && product.backImage ? product.backImage : product.image;
+  clearImageError(image);
+  image.srcset = `${localUrl(`${base}-640.webp`)} 640w, ${localUrl(`${base}-1024.webp`)} 1024w`;
+  image.src = localUrl(`${base}-640.webp`);
+  image.alt = `TRAYN ${product.flavor} 500 g whey blend ${view === "back" ? "back-label" : "pouch"} concept; not for sale`;
+}
+function setProduct(explorer, product, { announce = true } = {}) {
+  explorer.dataset.selectedFlavor = product.id;
+  explorer.dataset.selectedView = "front";
+  explorer
+    .querySelectorAll("[data-product-name], [data-product-flavor]")
+    .forEach((element) => (element.textContent = product.flavor));
+  explorer
+    .querySelectorAll("[data-product-status]")
+    .forEach((element) => (element.textContent = product.status));
+  const status = explorer.querySelector("[data-flavor-status]");
+  if (announce)
+    status.textContent = `${product.flavor} · ${product.status} · Not for sale`;
+  setImage(explorer.querySelector("[data-product-image]"), product);
+  explorer.querySelectorAll("[data-flavor]").forEach((link) => {
+    const current = link.dataset.flavor === product.id;
+    link.classList.toggle("is-active", current);
+    link.setAttribute("aria-current", String(current));
+    link.querySelector(".flavor-choice").textContent = current ? "↗" : "+";
+  });
+  const detailLink = explorer.querySelector("[data-product-link]");
+  if (detailLink) detailLink.href = localUrl(productUrl(product));
+  const enlarge = explorer.querySelector("[data-open-packaging]");
+  if (enlarge) enlarge.href = localUrl(`${product.image}-1024.webp`);
+  explorer.querySelectorAll("[data-gallery-view]").forEach((link) => {
+    const isBack = link.dataset.galleryView === "back";
+    link.hidden = isBack && !product.backImage;
+    link.href = localUrl(
+      `${isBack && product.backImage ? product.backImage : product.image}-1024.webp`,
+    );
+    link.setAttribute("aria-current", String(!isBack));
+  });
+  if (document.body.dataset.page === "product") {
+    document.title = `${product.flavor} Whey Blend Concept, 500 g | TRAYN`;
+    const description = document.querySelector('meta[name="description"]');
+    description.content = `Explore TRAYN’s ${product.flavor} whey blend packaging concept. Intended 500 g concentrate and isolate blend; not for sale.`;
+    const canonical = new URL(productUrl(product), "https://traynnutrition.com")
+      .href;
+    document.querySelector('link[rel="canonical"]').href = canonical;
+    document.querySelector('meta[property="og:title"]').content =
+      document.title;
+    document.querySelector('meta[property="og:description"]').content =
+      description.content;
+    document.querySelector('meta[property="og:url"]').content = canonical;
+  }
+}
+explorers.forEach((explorer) => {
+  const initial = currentProduct();
+  setProduct(explorer, initial);
+  explorer.addEventListener("click", (event) => {
+    const flavorLink = event.target.closest("[data-flavor]");
+    if (
+      flavorLink &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      !event.altKey
+    ) {
+      event.preventDefault();
+      const product = getProduct(flavorLink.dataset.flavor);
+      setProduct(explorer, product);
+      const url = new URL(location.href);
+      if (document.body.dataset.page === "product") {
+        url.pathname = localUrl(productUrl(product));
+        url.searchParams.delete("flavor");
+      } else if (product.id === featuredProduct.id)
+        url.searchParams.delete("flavor");
+      else url.searchParams.set("flavor", product.id);
+      history.pushState({ flavor: product.id }, "", url);
+    }
+    const viewLink = event.target.closest("[data-gallery-view]");
+    if (
+      viewLink &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      !event.altKey
+    ) {
+      event.preventDefault();
+      const product = getProduct(explorer.dataset.selectedFlavor);
+      const view = viewLink.dataset.galleryView;
+      setImage(explorer.querySelector("[data-product-image]"), product, view);
+      explorer.dataset.selectedView = view;
+      explorer
+        .querySelectorAll("[data-gallery-view]")
+        .forEach((link) =>
+          link.setAttribute("aria-current", String(link === viewLink)),
+        );
+      explorer.querySelector("[data-open-packaging]").href = viewLink.href;
+      explorer.querySelector("[data-flavor-status]").textContent =
+        `${product.flavor} · ${view === "back" ? "Back-label" : "Front"} concept · Not for sale`;
+    }
+  });
+});
+window.addEventListener("popstate", () =>
+  explorers.forEach((explorer) => setProduct(explorer, currentProduct())),
+);
+
+// The anchor remains a direct image link when JavaScript or dialog support is absent.
+const dialog = document.querySelector("#packaging-dialog");
+let dialogOpener;
+let priorBodyOverflow = "";
+if (typeof dialog.showModal === "function") {
+  document.querySelectorAll("[data-open-packaging]").forEach((link) =>
+    link.addEventListener("click", (event) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+        return;
+      event.preventDefault();
+      dialogOpener = link;
+      const image = dialog.querySelector("[data-dialog-image]");
+      const explorer = link.closest("[data-product-explorer]");
+      const product = getProduct(explorer?.dataset.selectedFlavor);
+      clearImageError(image);
+      image.src = link.href;
+      image.alt = `Enlarged TRAYN ${product.flavor} ${explorer?.dataset.selectedView === "back" ? "back-label" : "front pouch"} packaging concept; not for sale`;
+      priorBodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      dialog.showModal();
+      dialog.querySelector(".dialog-close").focus();
+    }),
+  );
+  dialog
+    .querySelector(".dialog-close")
+    .addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => {
+    const bounds = dialog.getBoundingClientRect();
+    if (
+      event.target === dialog &&
+      (event.clientX < bounds.left ||
+        event.clientX > bounds.right ||
+        event.clientY < bounds.top ||
+        event.clientY > bounds.bottom)
+    )
+      dialog.close();
+  });
+  dialog.addEventListener("close", () => {
+    document.body.style.overflow = priorBodyOverflow;
+    dialogOpener?.focus({ preventScroll: true });
+  });
+}
+
+if (document.body.dataset.page === "home" && "IntersectionObserver" in window) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        navigation.querySelectorAll("a").forEach((link) => {
+          if (link.hash === `#${entry.target.id}`)
+            link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      });
+    },
+    { rootMargin: "-15% 0px -55% 0px", threshold: 0 },
+  );
+  const observeSections = () =>
+    document
+      .querySelectorAll(".hero, #blend, #flavors, #story, #contact")
+      .forEach((section) => observer.observe(section));
+  observeSections();
+  window.addEventListener("pagehide", () => observer.disconnect());
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) observeSections();
+  });
+}
+
+// Motion is optional: interaction and readable HTML survive a blocked animation chunk.
+if (document.querySelector(".hero")) {
+  import("./motion.js")
+    .then(({ initializeMotion }) => initializeMotion())
+    .catch(() => {
+      document.documentElement.dataset.motion = "static";
+    });
+}
