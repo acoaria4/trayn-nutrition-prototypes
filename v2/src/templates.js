@@ -34,7 +34,7 @@ export function header() {
   return `<a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header"><div class="header-inner">
     <a class="brand" href="/" aria-label="TRAYN Nutrition home"><img src="/images/brand/trayn-logo-256.webp" srcset="/images/brand/trayn-logo-256.webp 256w, /images/brand/trayn-logo.webp 740w" sizes="(max-width: 800px) 88px, 107px" alt="TRAYN Nutrition" width="740" height="440"></a>
-    <nav class="main-nav" id="main-navigation" aria-label="Main navigation"><a href="/#blend">The product</a><a href="/#story">The packaging</a><a href="/#contact">Contact</a></nav>
+    <nav class="main-nav" id="main-navigation" aria-label="Main navigation"><a href="/#blend">The product</a><a href="/#story">The packaging</a><a href="/#about">Our story</a><a href="/#contact">Contact</a></nav>
     <a class="header-cta" href="${productPath}">View product ${arrow}</a>
     <button class="menu-toggle" aria-controls="main-navigation" aria-expanded="false" aria-label="Open menu"><span data-menu-label>Menu</span><span class="menu-bars" aria-hidden="true"></span></button>
   </div></header>`;
@@ -42,7 +42,7 @@ export function header() {
 
 export function footer() {
   return `<footer class="site-footer" id="contact"><div class="footer-top wrap">
-    <div class="contact-intro"><p class="eyebrow">Contact TRAYN</p><h2>LET’S TALK.</h2><a class="contact-email" href="mailto:${brand.email}">${brand.email} ${arrow}</a></div>
+    <div class="contact-intro"><p class="eyebrow">Contact TRAYN</p><h2>LET’S TALK.</h2><p class="contact-copy">Product questions or partnerships? Get in touch with TRAYN.</p><a class="contact-email" href="mailto:${brand.email}">${brand.email} ${arrow}</a></div>
     <div class="footer-links"><p class="eyebrow">Get in touch</p><a href="tel:${brand.phone}">${brand.phoneDisplay}</a><a href="${brand.instagram}" target="_blank" rel="noopener noreferrer">Instagram ${arrow}</a><a href="${productPath}">Belgian Chocolate ${arrow}</a><a href="/label-information.html">Product information ${arrow}</a><a href="/drafts/">Compare the three drafts ${arrow}</a></div>
     <a class="back-top" href="#top" aria-label="Back to top"><span aria-hidden="true">↑</span><span>Back to top</span></a>
   </div><div class="footer-bottom wrap"><a href="/" aria-label="TRAYN Nutrition home"><img src="/images/brand/trayn-logo-256.webp" width="740" height="440" alt="TRAYN Nutrition" loading="lazy"></a><p>© 2026 TRAYN Nutrition</p><p>Packaging concept. Not for sale.</p><a href="/label-information.html">Product information</a></div></footer>`;
@@ -63,15 +63,15 @@ export function home() {
       <section class="hero tension-hero" aria-labelledby="hero-heading" data-story-progress="0">
         <div class="tension-material" aria-hidden="true"><img src="/images/campaign/tension-hero-1672.webp" srcset="/images/campaign/tension-hero-960.webp 960w, /images/campaign/tension-hero-1672.webp 1672w" sizes="100vw" width="1672" height="941" alt="" fetchpriority="high"></div>
         <div class="tension-heading"><h1 id="hero-heading"><span>UNDER</span> <span>TENSION.</span></h1></div>
-        <p class="tension-statement">Whey protein concentrate.<br>Belgian Chocolate.</p>
-        <div class="tension-stage"><div class="tension-pack">${productImage(featuredProduct, { className: "hero-pouch", priority: true })}<span class="tension-sheen" aria-hidden="true"></span></div></div>
+        <p class="tension-statement">FUEL YOUR POTENTIAL.</p>
+        <div class="tension-stage"><div class="tension-pack">${productImage(featuredProduct, { className: "hero-pouch", priority: true })}<span class="tension-light" aria-hidden="true"><span class="tension-sheen"></span></span></div></div>
         <div class="tension-hero-bottom">
           <p class="tension-product-note">Belgian Chocolate.<br>Whey protein concentrate.<span>500 g packaging concept. Not for sale.</span></p>
           <a class="tension-explore" href="#blend" aria-label="Discover the product"><span>Scroll to explore</span><span aria-hidden="true">↓</span></a>
         </div>
       </section>
       <div class="tension-chapters">
-        <article class="tension-chapter" data-chapter="1"><p class="eyebrow">01 / The protein</p><h2>WHEY.<br>IN FOCUS.</h2><p>Whey protein concentrate.<br>That’s WPC.</p><span class="chapter-detail">The protein source in our Belgian Chocolate concept.</span></article>
+        <article class="tension-chapter" data-chapter="1"><p class="eyebrow">01 / The protein</p><h2>WHEY.<br>IN FOCUS.</h2><p>Whey protein concentrate.</p><span class="chapter-detail">The protein source in our Belgian Chocolate pack. Contains milk.</span></article>
         <article class="tension-chapter" data-chapter="2"><p class="eyebrow">02 / The flavour</p><h2>BELGIAN<br>CHOCOLATE.</h2><p>Whey protein concentrate · 500 g</p><a class="text-link" href="#blend">Explore the product ${arrow}</a></article>
       </div>
       <div class="story-progress" aria-hidden="true"><span>TRAYN / BELGIAN CHOCOLATE</span><div><i></i></div><span>WPC · 500 g</span></div>
@@ -79,11 +79,26 @@ export function home() {
   </section>
   <section class="wpc-product section-space wrap" id="blend" aria-labelledby="blend-heading">
     <div class="section-top"><p class="eyebrow">03 / The details</p><span class="section-caption">Belgian Chocolate / 500 g</span></div>
-    <div class="wpc-product-layout"><div><h2 id="blend-heading">BELGIAN<br>CHOCOLATE.</h2><p class="body-copy">Meet TRAYN’s Belgian Chocolate whey protein concentrate, presented in a 500 g packaging concept.</p><a class="text-link" href="${productPath}">View product details ${arrow}</a></div><div>${specificationRows(featuredProduct)}<p class="small-note">Nutrition, ingredients and serving instructions will be published when confirmed.</p></div></div>
+    <div class="wpc-product-layout"><div><h2 id="blend-heading">KNOW YOUR<br>PROTEIN.</h2><p class="body-copy">WPC stands for whey protein concentrate. It’s the protein source in our Belgian Chocolate pack.</p><p class="body-copy">The essentials are here: protein source, flavour, pack size and the known milk allergen.</p><a class="text-link" href="${productPath}">View product details ${arrow}</a></div><div>${specificationRows(featuredProduct)}<p class="small-note">Looking for nutrition values or serving directions? <a href="/label-information.html">Check the current product information.</a></p></div></div>
   </section>
   <section class="wpc-packaging wrap" id="story" aria-labelledby="packaging-heading">
     <figure class="wpc-pack-detail"><a href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging aria-label="Inspect Belgian Chocolate packaging">${productImage(featuredProduct)}<span aria-hidden="true">Inspect packaging +</span></a></figure>
-    <div class="wpc-pack-copy"><p class="eyebrow">04 / The packaging</p><h2 id="packaging-heading">MADE TO<br>STAND OUT.</h2><p class="body-copy">A black pouch with sweeping red and silver lines. A bold WHEY wordmark. Belgian Chocolate, clearly named.</p><a class="text-link" href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging>See the pack up close ${arrow}</a><p class="small-note">Packaging concept. Not for sale.</p></div>
+    <div class="wpc-pack-copy"><p class="eyebrow">04 / The packaging</p><h2 id="packaging-heading">A CLOSER<br>LOOK.</h2><p class="body-copy">Explore the front of the Belgian Chocolate pouch: the product name, flavour and 500 g pack size, together.</p><a class="text-link" href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging>See the pack up close ${arrow}</a><p class="small-note">Front packaging concept. Final label information is still to be confirmed.</p></div>
+  </section>
+  <section class="trayn-mindset section-space" id="about" aria-labelledby="mindset-heading">
+    <div class="trayn-mindset-inner wrap">
+      <div><p class="eyebrow">05 / The TRAYN mindset</p><h2 id="mindset-heading">GET<br>BUILT.</h2></div>
+      <div class="trayn-mindset-copy"><p class="eyebrow">TRAYN by gLitCh</p><h3>Built for those<br>who show up.</h3><p>Discipline. Grit. The drive to show up every day. That’s the spirit behind TRAYN.</p><p>For regular gym goers, competitive athletes and people starting their first training routine. Wherever you begin, keep showing up.</p><a class="text-link" href="#contact">Get to know TRAYN ${arrow}</a></div>
+    </div>
+  </section>
+  <section class="wpc-questions section-space wrap" id="questions" aria-labelledby="questions-heading">
+    <div><p class="eyebrow">06 / Before your next scoop</p><h2 id="questions-heading">KNOW<br>YOUR PACK.</h2><p class="body-copy">Clear product information belongs alongside the training mindset.</p><a class="text-link" href="/label-information.html">Read the product information ${arrow}</a></div>
+    <div class="faq-list">
+      <details open><summary>What does WPC mean?<span aria-hidden="true">+</span></summary><p>WPC means whey protein concentrate. The current TRAYN product direction is Belgian Chocolate WPC in a 500 g pack.</p></details>
+      <details><summary>Does this product contain milk?<span aria-hidden="true">+</span></summary><p>Yes. Milk is the known allergen for this whey product. The full ingredient and allergen information will appear with the final label.</p></details>
+      <details><summary>Where are the nutrition and serving details?<span aria-hidden="true">+</span></summary><p>Final nutrition values, ingredients, serving size and preparation instructions are still being confirmed. They will be published with the approved product information.</p></details>
+      <details><summary>Can I buy this pack?<span aria-hidden="true">+</span></summary><p>This is a product and packaging preview. Pricing, availability and a launch date have not been announced here. <a href="mailto:${brand.email}">Contact TRAYN</a> for product enquiries.</p></details>
+    </div>
   </section>
   </main>`;
 }

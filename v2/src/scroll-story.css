@@ -311,3 +311,84 @@ html.lenis {
     bottom: 16px;
   }
 }
+
+/* The product story gives way to the people and purpose behind TRAYN. */
+.trayn-mindset {
+  border-block: 1px solid #ffffff25;
+  background: #151313;
+}
+.trayn-mindset-inner {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 10%;
+  align-items: center;
+}
+.trayn-mindset h2 {
+  margin: 24px 0 0;
+  font-size: clamp(92px, 12vw, 180px);
+  line-height: 0.88;
+  letter-spacing: -0.075em;
+}
+.trayn-mindset h3 {
+  margin: 26px 0;
+  font-size: clamp(32px, 3.7vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+}
+.trayn-mindset-copy > p:not(.eyebrow) {
+  margin-bottom: 20px;
+  max-width: 42ch;
+  color: #c8c3bf;
+  font-size: 15px;
+  line-height: 1.85;
+}
+.trayn-mindset .text-link {
+  margin-top: 10px;
+}
+.wpc-questions {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 10%;
+}
+.wpc-questions h2 {
+  margin: 26px 0;
+  font-size: clamp(40px, 5vw, 70px);
+  line-height: 1;
+  letter-spacing: -0.065em;
+}
+.wpc-questions .body-copy {
+  max-width: 30ch;
+  margin-bottom: 24px;
+}
+.wpc-questions .faq-list {
+  border-top: 1px solid var(--line);
+}
+.wpc-questions .faq-list summary {
+  font-size: 15px;
+}
+.contact-copy {
+  max-width: 35ch;
+  color: #c8c3bf;
+  margin-top: 24px;
+  font-size: 13px;
+}
+@media (max-width: 800px) {
+  .trayn-mindset-inner,
+  .wpc-questions {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+  .trayn-mindset h2 {
+    font-size: clamp(100px, 22vw, 150px);
+  }
+  .trayn-mindset h3 {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+  .trayn-mindset-copy > p:not(.eyebrow) {
+    font-size: 14px;
+  }
+  .wpc-questions h2 {
+    font-size: clamp(40px, 9vw, 64px);
+  }
+}

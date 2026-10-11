@@ -302,7 +302,7 @@ if (document.body.dataset.page === "home" && "IntersectionObserver" in window) {
   );
   const observeSections = () =>
     document
-      .querySelectorAll(".hero, #blend, #flavors, #story, #contact")
+      .querySelectorAll(".hero, #blend, #flavors, #story, #about, #contact")
       .forEach((section) => observer.observe(section));
   observeSections();
   window.addEventListener("pagehide", () => observer.disconnect());

@@ -29,7 +29,7 @@ const pages = [
     type: "home",
     title: "TRAYN Nutrition — Under Tension",
     description:
-      "TRAYN Under Tension. Belgian Chocolate whey protein concentrate in a 500 g pack. Explore the product and its packaging.",
+      "Fuel your potential. Get built. Explore TRAYN Belgian Chocolate whey protein concentrate, the 500 g pack and the mindset behind the brand.",
     canonical: "/",
     content: home(),
   },

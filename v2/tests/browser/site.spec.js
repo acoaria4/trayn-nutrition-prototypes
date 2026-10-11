@@ -148,7 +148,7 @@ for (const route of routes) {
 
 test("home navigation reaches the real section destinations", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/");
   await expect(page.locator("h1")).toContainText(/UNDER\s*TENSION\./i);
   await expect(page.locator(".hero-pouch")).toHaveAttribute(
@@ -166,7 +166,7 @@ test("home navigation reaches the real section destinations", async ({
     "content",
     /wpc/,
   );
-  for (const id of ["blend", "story", "contact"]) {
+  for (const id of ["blend", "story", "about", "contact"]) {
     await expect(page.locator(`#${id}`)).toHaveCount(1);
     await expect(
       page.locator(`a[href="#${id}"], a[href="/#${id}"]`).first(),
@@ -181,6 +181,20 @@ test("home navigation reaches the real section destinations", async ({
     .click();
   await expect(page).toHaveURL(/#blend$/);
   await expect(page.locator("#flavors, main [data-flavor]")).toHaveCount(0);
+  if (await menu.isVisible()) await menu.click();
+  await page.locator('#main-navigation a[href="/#about"]').click();
+  await expect(page).toHaveURL(/#about$/);
+  await expect(page.locator("#about")).toBeInViewport();
+  await page
+    .locator("#about")
+    .screenshot({
+      path: resolve(`docs/screenshots/${testInfo.project.name}-mindset.png`),
+    });
+  const availability = page.locator("#questions details").last();
+  await availability.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(availability).toHaveAttribute("open", "");
+  await expect(availability.locator('a[href^="mailto:"]')).toBeVisible();
 });
 
 test("mobile menu works by keyboard, closes on Escape and restores focus", async ({
@@ -328,7 +342,7 @@ test("without JavaScript, content and product navigation remain useful", async (
   try {
     await page.goto("/");
     await expect(page.locator("h1")).toBeVisible();
-    for (const id of ["blend", "story", "contact"])
+    for (const id of ["blend", "story", "about", "contact"])
       await expect(page.locator(`#${id}`)).toBeVisible();
     await expectNoOverflow(page);
     await page.goto(currentProduct);
@@ -371,7 +385,9 @@ test("image failures preserve readable content and usable contact navigation", a
   ).toBeLessThanOrEqual(100);
   await expect(page.locator("h1")).toBeVisible();
   await expect(page.locator("#contact")).toBeVisible();
-  await expect(page.locator('a[href^="mailto:"]').first()).toBeVisible();
+  await expect(
+    page.locator('#contact a[href^="mailto:"]').first(),
+  ).toBeVisible();
   await expectNoOverflow(page);
   await page.goto(currentProduct);
   await expect(page.locator("html")).toHaveClass(/\bjs\b/);
@@ -407,7 +423,7 @@ test("a blocked entry module restores visible native navigation", async ({
   await expect(page.locator("h1")).toBeVisible();
   const navigation = page.locator("#main-navigation");
   await expect(navigation).toBeVisible();
-  for (const id of ["blend", "story", "contact"]) {
+  for (const id of ["blend", "story", "about", "contact"]) {
     await expect(navigation.locator(`a[href="/#${id}"]`)).toBeVisible();
   }
   await navigation.locator('a[href="/#blend"]').click();

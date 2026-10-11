@@ -5,6 +5,9 @@ import "lenis/dist/lenis.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Preserve the original 1000px desktop pacing (906px hero × 2.25), on every screen.
+const STORY_SCROLL_DISTANCE = 2040;
+
 export function initializeMotion() {
   const hero = document.querySelector(".tension-hero");
   const story = document.querySelector(".tension-story");
@@ -53,7 +56,7 @@ export function initializeMotion() {
         }
         document.documentElement.dataset.motion = "enabled";
         story.classList.add("is-story-motion");
-        if (wide && fine) {
+        if (fine) {
           lenis = new Lenis({
             autoRaf: false,
             smoothWheel: true,
@@ -90,7 +93,7 @@ export function initializeMotion() {
             trigger: story,
             pin: scene,
             start: "top top",
-            end: () => "+=" + hero.offsetHeight * (wide ? 2.25 : 1.65),
+            end: `+=${STORY_SCROLL_DISTANCE}`,
             scrub: true,
             invalidateOnRefresh: true,
             onUpdate: (self) => updateAccess(self.progress),
@@ -136,10 +139,12 @@ export function initializeMotion() {
           )
           .fromTo(
             ".tension-sheen",
-            { xPercent: -35 },
-            { xPercent: 35, duration: 1 },
-            0,
+            { xPercent: -60 },
+            { xPercent: 60, duration: 0.58 },
+            0.36,
           )
+          .to(".tension-sheen", { opacity: 0.18, duration: 0.06 }, 0.36)
+          .to(".tension-sheen", { opacity: 0, duration: 0.06 }, 0.94)
           .to(".story-progress", { autoAlpha: 1, duration: 0.12 }, 0.18)
           .fromTo(
             ".story-progress i",

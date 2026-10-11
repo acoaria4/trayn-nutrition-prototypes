@@ -168,26 +168,25 @@ input {
   object-fit: contain;
   filter: drop-shadow(0 24px 26px #0008);
 }
-.tension-sheen {
+.tension-light {
   position: absolute;
-  inset: 9% 9% 7%;
+  inset: 0;
   pointer-events: none;
   mix-blend-mode: screen;
-  opacity: 0.26;
+  mask: url("/images/products/belgian-chocolate-wpc-640.webp") center / contain
+    no-repeat;
+}
+.tension-sheen {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
   background: linear-gradient(
     112deg,
     transparent 30%,
     #fff8 50%,
     transparent 70%
   );
-  transform: translateX(-35%);
-  mask-image: linear-gradient(
-    180deg,
-    transparent,
-    #000 15%,
-    #000 85%,
-    transparent
-  );
+  transform: translateX(-60%);
 }
 .tension-hero-bottom {
   position: absolute;

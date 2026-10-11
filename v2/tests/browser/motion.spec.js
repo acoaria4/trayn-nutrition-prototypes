@@ -14,8 +14,7 @@ async function scrollStory(page, progress) {
     .poll(() =>
       page.locator(".tension-story").evaluate((story) => {
         const hero = story.querySelector(".tension-hero");
-        const multiplier = innerWidth > 800 ? 3.25 : 2.65;
-        return Math.abs(story.offsetHeight - hero.offsetHeight * multiplier);
+        return Math.abs(story.offsetHeight - hero.offsetHeight - 2040);
       }),
     )
     .toBeLessThan(3);
@@ -77,6 +76,10 @@ test("one continuous pouch scene stays pinned, advances and reverses with scroll
   const initial = await transform(stage);
   const sheen = page.locator(".tension-sheen");
   const initialLight = await transform(sheen);
+  await expect(sheen).toHaveCSS("opacity", "0");
+  await scrollStory(page, 0.34);
+  await expect(sheen).toHaveCSS("opacity", "0");
+  await expectRestoredTransform(sheen, initialLight);
   await scrollStory(page, 0.4);
   await expect
     .poll(async () => difference(await transform(stage), initial))
@@ -90,6 +93,9 @@ test("one continuous pouch scene stays pinned, advances and reverses with scroll
   const firstChapter = await transform(stage);
   const firstLight = await transform(sheen);
   expect(difference(firstLight, initialLight)).toBeGreaterThan(1);
+  expect(
+    await sheen.evaluate((el) => Number(getComputedStyle(el).opacity)),
+  ).toBeGreaterThan(0);
   await scrollStory(page, 0.8);
   await expect
     .poll(async () => difference(await transform(stage), firstChapter))
@@ -99,6 +105,7 @@ test("one continuous pouch scene stays pinned, advances and reverses with scroll
   await expectRestoredTransform(sheen, firstLight);
   await scrollStory(page, 0);
   await expectRestoredTransform(stage, initial);
+  await expect(sheen).toHaveCSS("opacity", "0");
   await expect(page.locator("h1")).toBeVisible();
 });
 
