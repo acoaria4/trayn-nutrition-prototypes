@@ -9,6 +9,17 @@ const difference = (first, second) =>
   Math.max(...first.map((value, index) => Math.abs(value - second[index])));
 
 async function scrollStory(page, progress) {
+  // ScrollTrigger refreshes after the browser's resize event settles.
+  await expect
+    .poll(() =>
+      page.locator(".tension-story").evaluate((story) => {
+        const hero = story.querySelector(".tension-hero");
+        const multiplier = innerWidth > 800 ? 3.25 : 2.65;
+        return Math.abs(story.offsetHeight - hero.offsetHeight * multiplier);
+      }),
+    )
+    .toBeLessThan(3);
+
   const position = await page
     .locator(".tension-story")
     .evaluate((story, value) => {
@@ -64,6 +75,8 @@ test("one continuous pouch scene stays pinned, advances and reverses with scroll
   // Wait for any short opening reveal before measuring a scroll-owned transform.
   await page.waitForTimeout(1000);
   const initial = await transform(stage);
+  const sheen = page.locator(".tension-sheen");
+  const initialLight = await transform(sheen);
   await scrollStory(page, 0.4);
   await expect
     .poll(async () => difference(await transform(stage), initial))
@@ -75,12 +88,15 @@ test("one continuous pouch scene stays pinned, advances and reverses with scroll
     .toBeLessThan(3);
   await page.waitForTimeout(800);
   const firstChapter = await transform(stage);
+  const firstLight = await transform(sheen);
+  expect(difference(firstLight, initialLight)).toBeGreaterThan(1);
   await scrollStory(page, 0.8);
   await expect
     .poll(async () => difference(await transform(stage), firstChapter))
     .toBeGreaterThan(0.01);
   await scrollStory(page, 0.4);
   await expectRestoredTransform(stage, firstChapter);
+  await expectRestoredTransform(sheen, firstLight);
   await scrollStory(page, 0);
   await expectRestoredTransform(stage, initial);
   await expect(page.locator("h1")).toBeVisible();
@@ -172,8 +188,8 @@ test("short viewports keep the chapters and product link in normal scroll flow",
     "Explicit short viewport coverage runs once",
   );
   for (const viewport of [
-    { width: 390, height: 600 },
-    { width: 1280, height: 720 },
+    { width: 844, height: 390 },
+    { width: 1280, height: 480 },
   ]) {
     await page.setViewportSize(viewport);
     await page.goto("/");
@@ -196,4 +212,79 @@ test("short viewports keep the chapters and product link in normal scroll flow",
     await page.keyboard.press("Enter");
     await expect(page.locator("#blend")).toBeInViewport();
   }
+});
+
+test("the opening and both scroll chapters fit the viewport", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
+  await page.evaluate(() => document.fonts.ready);
+  for (const progress of [0, 0.4, 0.8]) {
+    await scrollStory(page, progress);
+    const bounds = await page.evaluate((progress) => {
+      const selectors =
+        progress === 0
+          ? [
+              ".tension-heading",
+              ".tension-stage .hero-pouch",
+              ".tension-hero-bottom",
+            ]
+          : [
+              ".tension-stage .hero-pouch",
+              `[data-chapter="${progress < 0.7 ? 1 : 2}"]`,
+              ".story-progress",
+            ];
+      return selectors.map((selector) => {
+        const rect = document.querySelector(selector).getBoundingClientRect();
+        return {
+          selector,
+          top: rect.top,
+          bottom: rect.bottom,
+          left: rect.left,
+          right: rect.right,
+          width: innerWidth,
+          height: innerHeight,
+        };
+      });
+    }, progress);
+    for (const rect of bounds) {
+      expect(rect.top, rect.selector).toBeGreaterThanOrEqual(-1);
+      expect(rect.bottom, rect.selector).toBeLessThanOrEqual(rect.height + 1);
+      expect(rect.left, rect.selector).toBeGreaterThanOrEqual(-1);
+      expect(rect.right, rect.selector).toBeLessThanOrEqual(rect.width + 1);
+    }
+    if (["laptop", "mobile", "compact"].includes(testInfo.project.name)) {
+      await page.screenshot({
+        path: testInfo.outputPath(`hero-${progress}.png`),
+      });
+    }
+    if (progress > 0 && (await page.viewportSize()).width <= 800) {
+      const pouch = await page
+        .locator(".tension-stage .hero-pouch")
+        .boundingBox();
+      const chapter = await page
+        .locator(`[data-chapter="${progress < 0.7 ? 1 : 2}"]`)
+        .boundingBox();
+      expect(pouch.y + pouch.height).toBeLessThan(chapter.y);
+    }
+  }
+});
+
+test("resizing a laptop keeps one working scroll scene", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== "laptop",
+    "Laptop resize regression runs once",
+  );
+  await page.goto("/");
+  await scrollStory(page, 0.4);
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await expect(page.locator(".pin-spacer")).toHaveCount(1);
+  await scrollStory(page, 0.8);
+  await expect(page.locator('[data-chapter="2"]')).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await scrollStory(page, 0.4);
+  await expect(page.locator('[data-chapter="1"]')).toBeVisible();
 });

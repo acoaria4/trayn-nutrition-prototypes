@@ -81,15 +81,6 @@ html.lenis {
   background: #ee362f;
   transform-origin: left center;
 }
-.tension-sheen {
-  background: linear-gradient(
-    112deg,
-    transparent 26%,
-    #fff0 35%,
-    #fff8 calc(var(--tension-light-x, 50%) + var(--story-light, 0%)),
-    transparent 66%
-  );
-}
 .wpc-product {
   border-top: 1px solid #ffffff25;
 }
@@ -269,5 +260,54 @@ html.lenis {
 @media (prefers-reduced-motion: reduce) {
   .wpc-pack-detail img {
     transform: none;
+  }
+}
+
+/* Scale the typography with available height rather than dropping the story. */
+@media (min-width: 801px) and (max-height: 789px) {
+  .hero.tension-hero .tension-heading h1 {
+    font-size: clamp(64px, 13svh, 110px);
+  }
+  .tension-heading {
+    padding-top: 20px;
+  }
+  .tension-statement {
+    margin-top: 16px;
+  }
+  .is-story-motion .tension-chapter {
+    top: 22%;
+  }
+  .tension-chapter h2 {
+    font-size: clamp(38px, 8svh, 62px);
+    margin: 16px 0 20px;
+  }
+  .tension-chapter > p:not(.eyebrow) {
+    font-size: 20px;
+  }
+  .tension-chapter .text-link {
+    margin-top: 18px;
+  }
+  .tension-hero-bottom {
+    bottom: 24px;
+  }
+}
+@media (max-width: 800px) and (max-height: 700px) {
+  .tension-chapter h2 {
+    font-size: clamp(32px, 6svh, 42px);
+    margin: 10px 0 12px;
+  }
+  .tension-chapter > p:not(.eyebrow) {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  .chapter-detail {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .tension-chapter .text-link {
+    margin-top: 12px;
+  }
+  .is-story-motion .story-progress {
+    bottom: 16px;
   }
 }

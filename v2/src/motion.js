@@ -10,6 +10,7 @@ export function initializeMotion() {
   const story = document.querySelector(".tension-story");
   if (!hero || !story) return;
   const scene = story.querySelector(".tension-scene");
+  const stage = hero.querySelector(".tension-stage");
   const chapters = [...story.querySelectorAll(".tension-chapter")];
   const bottom = hero.querySelector(".tension-hero-bottom");
   const forcedReduction =
@@ -41,20 +42,12 @@ export function initializeMotion() {
       {
         wide: "(min-width: 801px)",
         fine: "(pointer: fine)",
-        desktopRoom: "(min-width: 801px) and (min-height: 790px)",
-        tabletRoom:
-          "(min-width: 601px) and (max-width: 800px) and (min-height: 745px)",
-        phoneRoom: "(max-width: 600px) and (min-height: 640px)",
+        room: "(min-height: 520px)",
         motion: "(prefers-reduced-motion: no-preference)",
       },
       (context) => {
-        const { wide, fine, desktopRoom, tabletRoom, phoneRoom, motion } =
-          context.conditions;
-        if (
-          forcedReduction ||
-          !motion ||
-          !(desktopRoom || tabletRoom || phoneRoom)
-        ) {
+        const { wide, fine, room, motion } = context.conditions;
+        if (forcedReduction || !motion || !room) {
           document.documentElement.dataset.motion = "reduced";
           return resetStory;
         }
@@ -70,6 +63,11 @@ export function initializeMotion() {
           lenis.on("scroll", ScrollTrigger.update);
           gsap.ticker.add(tick);
         }
+        const chapterScale = () =>
+          Math.min(
+            window.innerWidth > 600 ? 0.72 : 0.88,
+            (chapters[0].offsetTop - 60) / stage.offsetHeight,
+          );
         const updateAccess = (progress) => {
           hero.dataset.storyProgress = progress.toFixed(4);
           const introVisible = progress < 0.18;
@@ -109,15 +107,23 @@ export function initializeMotion() {
             0.02,
           )
           .to(bottom, { autoAlpha: 0, y: 20, duration: 0.16 }, 0.04)
-          .to(".tension-word", { autoAlpha: 0.025, duration: 0.24 }, 0.06)
           .to(
             ".tension-stage",
             {
               x: () => (wide ? -window.innerWidth * 0.225 : 0),
-              y: () =>
-                wide ? -hero.offsetHeight * 0.015 : -hero.offsetHeight * 0.19,
-              scale: () =>
-                wide ? 1.12 : window.innerWidth > 600 ? 0.72 : 0.88,
+              y: () => {
+                if (wide) return -hero.offsetHeight * 0.015;
+                const scale = chapterScale();
+                const chapterTop = chapters[0].offsetTop;
+                // Fit the pouch above the chapter, including shorter phone windows.
+                return (
+                  chapterTop -
+                  30 -
+                  (stage.offsetHeight * scale) / 2 -
+                  (stage.offsetTop + stage.offsetHeight / 2)
+                );
+              },
+              scale: () => (wide ? 1.12 : chapterScale()),
               rotation: -2,
               duration: 0.3,
             },
@@ -129,9 +135,9 @@ export function initializeMotion() {
             0,
           )
           .fromTo(
-            hero,
-            { "--story-light": "-18%" },
-            { "--story-light": "24%", duration: 1 },
+            ".tension-sheen",
+            { xPercent: -35 },
+            { xPercent: 35, duration: 1 },
             0,
           )
           .to(".story-progress", { autoAlpha: 1, duration: 0.12 }, 0.18)
@@ -147,8 +153,7 @@ export function initializeMotion() {
             ".tension-stage",
             {
               rotation: 1,
-              scale: () =>
-                wide ? 1.04 : window.innerWidth > 600 ? 0.69 : 0.84,
+              scale: () => (wide ? 1.04 : chapterScale() * 0.95),
               duration: 0.36,
             },
             0.58,
@@ -203,7 +208,7 @@ export function initializeMotion() {
             { once: true },
           );
           if (lenis) lenis.scrollTo(top);
-        else window.scrollTo({ top, behavior: "instant" });
+          else window.scrollTo({ top, behavior: "instant" });
         };
         document.addEventListener("click", navigateSection);
         return () => {

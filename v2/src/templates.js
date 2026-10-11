@@ -42,7 +42,7 @@ export function header() {
 
 export function footer() {
   return `<footer class="site-footer" id="contact"><div class="footer-top wrap">
-    <div class="contact-intro"><p class="eyebrow">Contact TRAYN</p><h2>LET’S TALK<br>TRAYN.</h2><a class="contact-email" href="mailto:${brand.email}">${brand.email} ${arrow}</a></div>
+    <div class="contact-intro"><p class="eyebrow">Contact TRAYN</p><h2>LET’S TALK.</h2><a class="contact-email" href="mailto:${brand.email}">${brand.email} ${arrow}</a></div>
     <div class="footer-links"><p class="eyebrow">Get in touch</p><a href="tel:${brand.phone}">${brand.phoneDisplay}</a><a href="${brand.instagram}" target="_blank" rel="noopener noreferrer">Instagram ${arrow}</a><a href="${productPath}">Belgian Chocolate ${arrow}</a><a href="/label-information.html">Product information ${arrow}</a><a href="/drafts/">Compare the three drafts ${arrow}</a></div>
     <a class="back-top" href="#top" aria-label="Back to top"><span aria-hidden="true">↑</span><span>Back to top</span></a>
   </div><div class="footer-bottom wrap"><a href="/" aria-label="TRAYN Nutrition home"><img src="/images/brand/trayn-logo-256.webp" width="740" height="440" alt="TRAYN Nutrition" loading="lazy"></a><p>© 2026 TRAYN Nutrition</p><p>Packaging concept. Not for sale.</p><a href="/label-information.html">Product information</a></div></footer>`;
@@ -64,16 +64,15 @@ export function home() {
         <div class="tension-material" aria-hidden="true"><img src="/images/campaign/tension-hero-1672.webp" srcset="/images/campaign/tension-hero-960.webp 960w, /images/campaign/tension-hero-1672.webp 1672w" sizes="100vw" width="1672" height="941" alt="" fetchpriority="high"></div>
         <div class="tension-heading"><h1 id="hero-heading"><span>UNDER</span> <span>TENSION.</span></h1></div>
         <p class="tension-statement">Whey protein concentrate.<br>Belgian Chocolate.</p>
-        <div class="tension-stage"><span class="tension-word" aria-hidden="true">WHEY</span><div class="tension-pack">${productImage(featuredProduct, { className: "hero-pouch", priority: true })}<span class="tension-sheen" aria-hidden="true"></span></div></div>
+        <div class="tension-stage"><div class="tension-pack">${productImage(featuredProduct, { className: "hero-pouch", priority: true })}<span class="tension-sheen" aria-hidden="true"></span></div></div>
         <div class="tension-hero-bottom">
           <p class="tension-product-note">Belgian Chocolate.<br>Whey protein concentrate.<span>500 g packaging concept. Not for sale.</span></p>
           <a class="tension-explore" href="#blend" aria-label="Discover the product"><span>Scroll to explore</span><span aria-hidden="true">↓</span></a>
-          <div class="tension-light-control" hidden><div class="tension-light-label"><label for="tension-light">Move the light</label><output for="tension-light">Centre</output></div><input type="range" id="tension-light" min="0" max="100" value="50" step="1" aria-valuetext="Light centred"><div class="tension-light-ticks" aria-hidden="true"><span>Left</span><span>Right</span></div></div>
         </div>
       </section>
       <div class="tension-chapters">
         <article class="tension-chapter" data-chapter="1"><p class="eyebrow">01 / The protein</p><h2>WHEY.<br>IN FOCUS.</h2><p>Whey protein concentrate.<br>That’s WPC.</p><span class="chapter-detail">The protein source in our Belgian Chocolate concept.</span></article>
-        <article class="tension-chapter" data-chapter="2"><p class="eyebrow">02 / The flavour</p><h2>BELGIAN<br>CHOCOLATE.</h2><p>One flavour. A 500 g pack.</p><span class="chapter-detail">Black foil. Silver lettering. TRAYN’s signature red.</span><a class="text-link" href="#blend">Explore the product ${arrow}</a></article>
+        <article class="tension-chapter" data-chapter="2"><p class="eyebrow">02 / The flavour</p><h2>BELGIAN<br>CHOCOLATE.</h2><p>Whey protein concentrate · 500 g</p><a class="text-link" href="#blend">Explore the product ${arrow}</a></article>
       </div>
       <div class="story-progress" aria-hidden="true"><span>TRAYN / BELGIAN CHOCOLATE</span><div><i></i></div><span>WPC · 500 g</span></div>
     </div>

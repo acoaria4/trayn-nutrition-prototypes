@@ -86,16 +86,13 @@ input {
   letter-spacing: -0.07em;
 }
 
-/* One continuous material scene. The slider controls the authored light plane. */
+/* One continuous material scene, with lighting driven by the scroll timeline. */
 .hero.tension-hero {
-  --tension-light-x: 50%;
-  --tension-turn: 0deg;
-  --tension-lean: 0deg;
   display: block;
   width: 100%;
   max-width: none;
   height: calc(100svh - 94px);
-  min-height: 790px;
+  min-height: 0;
   max-height: 1200px;
   padding: 0;
   position: relative;
@@ -149,27 +146,14 @@ input {
 }
 .tension-stage {
   position: absolute;
-  inset: 178px 25% 182px;
+  inset: clamp(130px, 20svh, 190px) 25% clamp(112px, 18svh, 182px);
   z-index: 2;
   perspective: 1100px;
   display: grid;
   grid-template-rows: minmax(0, 1fr);
   place-items: center;
 }
-.tension-word {
-  position: absolute;
-  left: 50%;
-  top: 48%;
-  transform: translate(-50%, -50%) scaleX(1.12);
-  font: 800 clamp(210px, 33vw, 560px)/0.8 var(--display);
-  letter-spacing: -0.085em;
-  color: #e9e8e3;
-  opacity: 0.08;
-  z-index: -1;
-  pointer-events: none;
-  user-select: none;
-  white-space: nowrap;
-}
+
 .tension-pack {
   position: relative;
   height: 100%;
@@ -177,9 +161,6 @@ input {
   max-width: 460px;
   min-height: 0;
   aspect-ratio: 2 / 3;
-  transform: rotateY(var(--tension-turn)) rotateZ(var(--tension-lean));
-  transform-style: preserve-3d;
-  transition: transform 0.18s ease-out;
 }
 .tension-pack .hero-pouch {
   width: 100%;
@@ -194,11 +175,12 @@ input {
   mix-blend-mode: screen;
   opacity: 0.26;
   background: linear-gradient(
-    105deg,
-    transparent calc(var(--tension-light-x) - 16%),
-    #fff2e999 var(--tension-light-x),
-    transparent calc(var(--tension-light-x) + 17%)
+    112deg,
+    transparent 30%,
+    #fff8 50%,
+    transparent 70%
   );
+  transform: translateX(-35%);
   mask-image: linear-gradient(
     180deg,
     transparent,
@@ -259,72 +241,6 @@ input {
 .tension-explore:hover .tension-down {
   background: var(--red);
   border-color: var(--red);
-}
-.tension-light-control {
-  width: 260px;
-  max-width: 100%;
-  justify-self: end;
-  padding-top: 12px;
-}
-.tension-light-control label,
-.tension-light-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.tension-light-control output {
-  color: #d5d0cc;
-  font-size: 11px;
-}
-.tension-light-control input {
-  display: block;
-  appearance: none;
-  width: 100%;
-  height: 44px;
-  margin: 5px 0 0;
-  padding: 0;
-  background: transparent;
-  cursor: ew-resize;
-  touch-action: pan-y;
-  border: 0;
-  border-radius: 0;
-}
-.tension-light-control input::-webkit-slider-runnable-track {
-  height: 2px;
-  background: linear-gradient(90deg, #77716d, #f4f1ed);
-}
-.tension-light-control input::-moz-range-track {
-  height: 2px;
-  background: #aaa;
-}
-.tension-light-control input::-webkit-slider-thumb {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--red);
-  border: 3px solid #0b0b0b;
-  outline: 1px solid var(--red);
-  margin-top: -9px;
-}
-.tension-light-control input::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--red);
-  border: 3px solid #0b0b0b;
-  outline: 1px solid var(--red);
-}
-.tension-light-ticks,
-.tension-light-limits {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  font-size: 11px;
-  color: #c5bfba;
 }
 
 /* The pale product chapter changes the reading pace after the hero. */
@@ -843,8 +759,8 @@ input {
     padding-top: 35px;
   }
   .tension-stage {
-    top: 214px;
-    bottom: 150px;
+    top: clamp(130px, 20svh, 190px);
+    bottom: clamp(112px, 18svh, 150px);
   }
 }
 @media (max-width: 1100px) {
@@ -854,11 +770,8 @@ input {
   .header-cta {
     gap: 18px;
   }
-  .hero.tension-hero {
-    min-height: 770px;
-  }
   .tension-stage {
-    inset: 184px 21% 150px;
+    inset: clamp(130px, 20svh, 184px) 21% clamp(112px, 18svh, 150px);
   }
   .tension-statement {
     font-size: 13px;
@@ -868,9 +781,7 @@ input {
     grid-template-columns: 1fr 130px 1fr;
     gap: 20px;
   }
-  .tension-light-control {
-    width: 225px;
-  }
+
   .tension-product-note {
     font-size: 13px;
   }
@@ -954,7 +865,7 @@ input {
   }
   .hero.tension-hero {
     height: calc(100svh - 82px);
-    min-height: 745px;
+    min-height: 0;
     max-height: none;
   }
   .tension-heading {
@@ -970,11 +881,9 @@ input {
     font-size: 12px;
   }
   .tension-stage {
-    inset: 178px 17% 169px;
+    inset: clamp(150px, 22svh, 178px) 17% clamp(100px, 15svh, 140px);
   }
-  .tension-word {
-    font-size: 36vw;
-  }
+
   .tension-hero-bottom {
     bottom: 27px;
     grid-template-columns: 1fr 90px 1fr;
@@ -987,13 +896,7 @@ input {
   .tension-product-note > small {
     margin-top: 9px;
   }
-  .tension-light-control {
-    width: 205px;
-  }
-  .tension-light-control label,
-  .tension-light-label {
-    font-size: 11px;
-  }
+
   .tension-explore {
     font-size: 11px;
   }
@@ -1234,7 +1137,7 @@ input {
   .hero.tension-hero {
     display: block;
     height: calc(100svh - 76px);
-    min-height: 640px;
+    min-height: 0;
     max-height: none;
     padding: 0;
   }
@@ -1269,17 +1172,12 @@ input {
     margin-inline: var(--gutter);
   }
   .tension-stage {
-    inset: 200px 8% 188px;
+    inset: clamp(170px, 24svh, 200px) 8% clamp(96px, 15svh, 130px);
   }
   .tension-pack {
     max-width: 310px;
   }
-  .tension-word {
-    top: 46%;
-    font-size: 45vw;
-    transform: translate(-50%, -50%) scaleX(1.2);
-    opacity: 0.085;
-  }
+
   .tension-hero-bottom {
     bottom: 20px;
     left: var(--gutter);
@@ -1288,26 +1186,7 @@ input {
     gap: 13px 15px;
     align-items: center;
   }
-  .tension-light-control {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    width: 100%;
-    padding-top: 0;
-    justify-self: stretch;
-  }
-  .tension-light-control label,
-  .tension-light-label {
-    font-size: 12px;
-  }
-  .tension-light-control output,
-  .tension-light-ticks,
-  .tension-light-limits {
-    font-size: 11px;
-  }
-  .tension-light-control input {
-    margin-top: 1px;
-    height: 40px;
-  }
+
   .tension-product-note {
     font-size: 12px;
     line-height: 1.5;
@@ -1729,9 +1608,6 @@ input {
     padding-left: 3px;
     gap: 7px;
   }
-  .hero.tension-hero {
-    min-height: 640px;
-  }
   .tension-heading {
     padding-top: 18px;
   }
@@ -1744,7 +1620,7 @@ input {
     margin-top: 15px;
   }
   .tension-stage {
-    inset: 177px 6% 190px;
+    inset: clamp(150px, 24svh, 177px) 6% clamp(96px, 15svh, 120px);
   }
   .tension-hero-bottom {
     bottom: 18px;
@@ -1755,15 +1631,7 @@ input {
   .tension-product-note > small {
     font-size: 11px;
   }
-  .tension-light-control label,
-  .tension-light-label {
-    font-size: 11px;
-  }
-  .tension-light-control output,
-  .tension-light-ticks,
-  .tension-light-limits {
-    font-size: 10px;
-  }
+
   .detail-crop {
     height: 421px;
     min-height: 421px;
@@ -1849,4 +1717,11 @@ html[data-motion="reduced"] {
 html[data-motion="reduced"] .tension-pack {
   transform: none;
   transition: none;
+}
+
+/* Keep a readable opening when a landscape window is too short to pin. */
+@media (max-height: 519px) {
+  .hero.tension-hero {
+    min-height: 560px;
+  }
 }

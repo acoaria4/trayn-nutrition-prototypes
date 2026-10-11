@@ -85,9 +85,8 @@ The local environment initially had a Node certificate-chain issue during instal
 - `prototypes/openings/`: the retained Quiet Before, Under Tension and Flavour Study drafts, their original generated imagery, independent package and comparison harness.
 - `src/styles.css`: shared navigation, product, disclosure and dialog foundations.
 - `src/under-tension.css`: selected visual system, responsive compositions, Manrope typography and product/material scenes.
-- `src/under-tension.js`: keyboard/touch light control and bounded pointer response, independent of the optional motion chunk.
 - `src/main.js`: navigation, progressive flavour selection, direct-image/modal gallery, history, image fallbacks and active navigation.
-- `src/motion.js`: optional GSAP entrances, unpinned material transitions and one Lenis instance on wide fine-pointer screens, with reduced-motion and lifecycle cleanup; absent from non-home pages’ execution.
+- `src/motion.js`: optional GSAP pinned story, scroll-driven lighting and one Lenis instance on wide fine-pointer screens, with reduced-motion and lifecycle cleanup; absent from non-home pages’ execution.
 - `public/`: self-hosted images, fonts and licences. No remote media or third-party trackers are required at runtime.
 - `tests/`: product-truth checks and real Chrome browser verification.
 - `docs/`: design/capability audit, provenance, verification, screenshots and performance evidence.

@@ -6,13 +6,11 @@ import {
   productDescription,
 } from "./data/products.js";
 import { withBasePath, withoutBasePath } from "./site-paths.js";
-import { initializeLight } from "./under-tension.js";
 
 const basePath = import.meta.env.BASE_URL;
 const localUrl = (path) => withBasePath(path, basePath);
 
 document.documentElement.classList.add("js");
-initializeLight();
 
 // Disclosure navigation keeps the document scrollable and never traps focus.
 const menuButton = document.querySelector(".menu-toggle");
