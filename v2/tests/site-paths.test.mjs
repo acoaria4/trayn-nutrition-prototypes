@@ -6,7 +6,12 @@ import {
   withoutBasePath,
   rebaseHtml,
 } from "../src/site-paths.js";
-import { document, home, productPage } from "../src/templates.js";
+import {
+  document,
+  home,
+  productPage,
+  informationPage,
+} from "../src/templates.js";
 
 test("root and repository deployments preserve local links and external destinations", () => {
   for (const base of [undefined, "", "/"])
@@ -66,10 +71,10 @@ test("real static templates rebase assets, image candidates and navigation for n
       "/trayn-preview/",
     );
     assert.ok(html.includes('href="/trayn-preview/#blend"'));
-    assert.ok(html.includes('href="/trayn-preview/concepts/cafe-mocha/"'));
+    assert.ok(!html.includes('href="/trayn-preview/concepts/cafe-mocha/"'));
     assert.ok(
       html.includes(
-        "/trayn-preview/images/products/belgian-chocolate-640.webp 640w, /trayn-preview/images/products/belgian-chocolate-1024.webp 1024w",
+        "/trayn-preview/images/products/belgian-chocolate-wpc-640.webp 640w, /trayn-preview/images/products/belgian-chocolate-wpc-1024.webp 1024w",
       ),
     );
     assert.ok(html.includes('href="https://traynnutrition.com/"'));
@@ -78,6 +83,13 @@ test("real static templates rebase assets, image candidates and navigation for n
       rebaseHtml(html, "/trayn-preview/"),
       html,
       "Vite's already-prefixed asset URLs must not be prefixed twice",
+    );
+  }
+  const information = rebaseHtml(informationPage(), "/trayn-preview/");
+  for (const id of ["vanilla-creme", "cafe-mocha", "cookies-cream"]) {
+    assert.ok(
+      information.includes(`href="/trayn-preview/concepts/${id}/"`),
+      "Archived flavour studies remain reachable without JavaScript",
     );
   }
 });

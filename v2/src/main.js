@@ -1,4 +1,10 @@
-import { featuredProduct, getProduct, productUrl } from "./data/products.js";
+import {
+  featuredProduct,
+  getProduct,
+  productUrl,
+  productTitle,
+  productDescription,
+} from "./data/products.js";
 import { withBasePath, withoutBasePath } from "./site-paths.js";
 import { initializeLight } from "./under-tension.js";
 
@@ -98,8 +104,23 @@ document.querySelectorAll("img").forEach((image) => {
 
 // The source catalogue is intentionally non-selling. No price or inventory is inferred.
 const explorers = [...document.querySelectorAll("[data-product-explorer]")];
+// Older shared links used a query to switch flavours. Each concept now has its
+// own complete page so the gallery, formulation and supporting copy stay aligned.
+const legacyFlavor = new URLSearchParams(location.search).get("flavor");
+if (document.body.dataset.page === "product" && legacyFlavor) {
+  const legacyProduct = getProduct(legacyFlavor);
+  if (legacyProduct.id === legacyFlavor) {
+    const destination = new URL(location.href);
+    destination.pathname = localUrl(productUrl(legacyProduct));
+    destination.searchParams.delete("flavor");
+    location.replace(destination.href);
+  }
+}
 function currentProduct() {
-  const queryFlavor = new URLSearchParams(location.search).get("flavor");
+  const queryFlavor =
+    document.body.dataset.page === "product"
+      ? null
+      : new URLSearchParams(location.search).get("flavor");
   const pathname = withoutBasePath(location.pathname, basePath);
   const conceptFlavor = pathname.match(/^\/concepts\/([^/]+)\/?$/)?.[1];
   const routeFlavor = pathname.startsWith("/products/trayn-whey-rich-chocolate")
@@ -115,7 +136,7 @@ function setImage(image, product, view = "front") {
   clearImageError(image);
   image.srcset = `${localUrl(`${base}-640.webp`)} 640w, ${localUrl(`${base}-1024.webp`)} 1024w`;
   image.src = localUrl(`${base}-640.webp`);
-  image.alt = `TRAYN ${product.flavor} 500 g whey blend ${view === "back" ? "back-label" : "pouch"} concept; not for sale`;
+  image.alt = `TRAYN ${product.flavor} ${product.netQuantityGrams} g ${product.name.toLowerCase()} ${view === "back" ? "back-label" : "pouch"} concept${product.archived ? "; archived artwork" : ""}`;
 }
 function setProduct(explorer, product, { announce = true } = {}) {
   explorer.dataset.selectedFlavor = product.id;
@@ -123,13 +144,23 @@ function setProduct(explorer, product, { announce = true } = {}) {
   explorer
     .querySelectorAll("[data-product-name], [data-product-flavor]")
     .forEach((element) => (element.textContent = product.flavor));
+  for (const [selector, value] of [
+    ["[data-product-type]", product.name],
+    ["[data-product-formulation]", product.blend],
+    ["[data-product-description]", product.description],
+  ]) {
+    explorer
+      .querySelectorAll(selector)
+      .forEach((element) => (element.textContent = value));
+  }
   explorer
     .querySelectorAll("[data-product-status]")
     .forEach((element) => (element.textContent = product.status));
   const status = explorer.querySelector("[data-flavor-status]");
-  if (announce)
+  if (announce && status)
     status.textContent = `${product.flavor} · ${product.status} · Not for sale`;
-  setImage(explorer.querySelector("[data-product-image]"), product);
+  const image = explorer.querySelector("[data-product-image]");
+  if (image) setImage(image, product);
   explorer.querySelectorAll("[data-flavor]").forEach((link) => {
     const current = link.dataset.flavor === product.id;
     link.classList.toggle("is-active", current);
@@ -149,9 +180,9 @@ function setProduct(explorer, product, { announce = true } = {}) {
     link.setAttribute("aria-current", String(!isBack));
   });
   if (document.body.dataset.page === "product") {
-    document.title = `${product.flavor} Whey Blend Concept, 500 g | TRAYN`;
+    document.title = productTitle(product);
     const description = document.querySelector('meta[name="description"]');
-    description.content = `Explore TRAYN’s ${product.flavor} whey blend packaging concept. Intended 500 g concentrate and isolate blend; not for sale.`;
+    description.content = productDescription(product);
     const canonical = new URL(productUrl(product), "https://traynnutrition.com")
       .href;
     document.querySelector('link[rel="canonical"]').href = canonical;

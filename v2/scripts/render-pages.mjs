@@ -7,14 +7,19 @@ import {
   informationPage,
   notFoundPage,
 } from "../src/templates.js";
-import { products, featuredProduct, productUrl } from "../src/data/products.js";
+import {
+  products,
+  featuredProduct,
+  productUrl,
+  productTitle,
+  productDescription,
+} from "../src/data/products.js";
 
 const product = {
   type: "product",
   initialFlavor: featuredProduct.id,
-  title: "Belgian Chocolate Whey Blend Concept, 500 g | TRAYN",
-  description:
-    "Inspect TRAYN’s Belgian Chocolate concentrate and isolate blend concept, shown in a 500 g pack. Packaging concepts, not for sale.",
+  title: productTitle(featuredProduct),
+  description: productDescription(featuredProduct),
   canonical: "/products/trayn-whey-rich-chocolate",
   content: productPage(featuredProduct),
 };
@@ -24,7 +29,7 @@ const pages = [
     type: "home",
     title: "TRAYN Nutrition — Under Tension",
     description:
-      "Discover TRAYN Under Tension. Explore the Belgian Chocolate whey blend packaging concept and the next chapter of TRAYN Nutrition.",
+      "TRAYN Under Tension. Belgian Chocolate whey protein concentrate in a 500 g pack. Explore the product and its packaging.",
     canonical: "/",
     content: home(),
   },
@@ -36,8 +41,8 @@ const pages = [
       file: `concepts/${concept.id}/index.html`,
       type: "product",
       initialFlavor: concept.id,
-      title: `${concept.flavor} Whey Blend Concept, 500 g | TRAYN`,
-      description: `Explore TRAYN’s ${concept.flavor} future flavour concept, shown as a 500 g concentrate and isolate blend. Packaging artwork, not for sale.`,
+      title: productTitle(concept),
+      description: productDescription(concept),
       canonical: productUrl(concept),
       content: productPage(concept),
     })),
@@ -46,7 +51,7 @@ const pages = [
     type: "information",
     title: "Product & Packaging Concept Information | TRAYN",
     description:
-      "What TRAYN’s concept packaging shows, what is still unverified, and how to contact TRAYN for product information.",
+      "Product and packaging information for TRAYN Belgian Chocolate whey protein concentrate, with earlier flavour studies kept in the archive.",
     canonical: "/label-information.html",
     content: informationPage(),
   },
@@ -55,7 +60,7 @@ const pages = [
     type: "404",
     title: "Page Not Found | TRAYN Nutrition",
     description:
-      "Return to TRAYN Nutrition and explore the whey blend concept.",
+      "Return to TRAYN Nutrition and explore Belgian Chocolate whey protein concentrate.",
     canonical: "/404.html",
     content: notFoundPage(),
   },

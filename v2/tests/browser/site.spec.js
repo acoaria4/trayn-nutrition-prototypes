@@ -10,7 +10,7 @@ import {
 
 const routes = [
   { path: "/", name: "home" },
-  { path: "/products/trayn-whey-rich-chocolate/", name: "original-product" },
+  { path: "/products/trayn-whey-rich-chocolate/", name: "wpc-product" },
   { path: "/product.html?flavor=cafe-mocha", name: "legacy-mocha-product" },
   ...products
     .filter((product) => product !== featuredProduct)
@@ -21,7 +21,7 @@ const routes = [
   { path: "/label-information.html", name: "label-information" },
   { path: "/404.html", name: "not-found" },
 ];
-const originalProduct = "/products/trayn-whey-rich-chocolate/";
+const currentProduct = "/products/trayn-whey-rich-chocolate/";
 
 async function expectNoOverflow(page) {
   const dimensions = await page.evaluate(() => ({
@@ -151,7 +151,22 @@ test("home navigation reaches the real section destinations", async ({
 }) => {
   await page.goto("/");
   await expect(page.locator("h1")).toContainText(/UNDER\s*TENSION\./i);
-  for (const id of ["blend", "flavors", "story", "contact"]) {
+  await expect(page.locator(".hero-pouch")).toHaveAttribute(
+    "src",
+    /belgian-chocolate-wpc/,
+  );
+  await expect(page.locator("main")).not.toContainText(
+    /whey protein isolate|WPI|concentrate\s*\+\s*isolate/i,
+  );
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    /whey protein concentrate/i,
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    /wpc/,
+  );
+  for (const id of ["blend", "story", "contact"]) {
     await expect(page.locator(`#${id}`)).toHaveCount(1);
     await expect(
       page.locator(`a[href="#${id}"], a[href="/#${id}"]`).first(),
@@ -160,11 +175,12 @@ test("home navigation reaches the real section destinations", async ({
   const menu = page.getByRole("button", { name: /menu/i });
   if (await menu.isVisible()) await menu.click();
   await page
-    .locator('a[href="#flavors"], a[href="/#flavors"]')
+    .locator('a[href="#blend"], a[href="/#blend"]')
     .filter({ visible: true })
     .first()
     .click();
-  await expect(page).toHaveURL(/#flavors$/);
+  await expect(page).toHaveURL(/#blend$/);
+  await expect(page.locator("#flavors, main [data-flavor]")).toHaveCount(0);
 });
 
 test("mobile menu works by keyboard, closes on Escape and restores focus", async ({
@@ -195,44 +211,69 @@ test("mobile menu works by keyboard, closes on Escape and restores focus", async
   await expect(page).toHaveURL(/#blend$/);
 });
 
-test("a flavor can be selected and its shareable URL reopens the same product", async ({
+test("archived flavours remain reachable from information and preserve shareable URLs", async ({
   page,
 }) => {
-  await page.goto(originalProduct);
+  await page.goto("/label-information.html");
+  await page.locator('main a[href="/concepts/cafe-mocha/"]').click();
   const name = page.locator("[data-product-name]");
-  const image = page.locator("[data-product-image]").first();
-  const before = await image.getAttribute("src");
-  await page.locator('[data-flavor="cafe-mocha"]').click();
   await expect(name).toContainText(/Café Mocha/i);
-  await expect(page.locator("[data-flavor-status]")).toContainText(/Mocha/i);
-  await expect(image).not.toHaveAttribute("src", before);
+  await expect(page.locator("[data-product-status]")).toContainText(
+    /Archived/i,
+  );
+  await expect(page.locator("[data-product-image]").first()).toHaveAttribute(
+    "src",
+    /cafe-mocha/,
+  );
   await expect(page).toHaveURL(/\/concepts\/cafe-mocha\/$/);
   await page.reload();
   await expect(name).toContainText(/Café Mocha/i);
   await expect(page).toHaveTitle(/Café Mocha/);
   await page.goBack();
-  await expect(name).toHaveText("Belgian Chocolate");
+  await expect(page).toHaveURL(/\/label-information\.html$/);
   await page.goForward();
   await expect(name).toHaveText("Café Mocha");
   await expectNoOverflow(page);
 });
 
-test("original front and back packaging can be examined in a keyboard accessible dialog", async ({
+test("the current WPC pack has accurate copy, artwork and a keyboard accessible dialog", async ({
   page,
 }) => {
-  await page.goto(originalProduct);
+  await page.goto(currentProduct);
   const image = page.locator("[data-product-image]").first();
-  const front = await image.getAttribute("src");
-  await page.locator('[data-gallery-view="back"]').click();
-  await expect(image).not.toHaveAttribute("src", front);
-  await page.locator('[data-gallery-view="front"]').click();
-  await expect(image).toHaveAttribute("src", front);
+  await expect(image).toHaveAttribute("src", /belgian-chocolate-wpc/);
+  await expect(image).toHaveAttribute("alt", /whey protein concentrate/i);
+  await expect(page.locator("h1")).toContainText(
+    /WHEY\s*PROTEIN\s*CONCENTRATE/i,
+  );
+  await expect(page.locator("main")).not.toContainText(
+    /whey protein isolate|WPI|concentrate\s*\+\s*isolate/i,
+  );
+  await expect(page.locator("[data-flavor]")).toHaveCount(0);
+  await expect(page.locator('[data-gallery-view="back"]')).not.toBeVisible();
+  for (const selector of [
+    'meta[name="description"]',
+    'meta[property="og:description"]',
+  ]) {
+    await expect(page.locator(selector)).toHaveAttribute(
+      "content",
+      /whey protein concentrate/i,
+    );
+    await expect(page.locator(selector)).not.toHaveAttribute(
+      "content",
+      /isolate|blend/i,
+    );
+  }
   const opener = page.locator("[data-open-packaging]");
   await opener.focus();
   await page.keyboard.press("Enter");
   const dialog = page.locator("#packaging-dialog");
   await expect(dialog).toBeVisible();
   await expect(dialog).toHaveAttribute("open", "");
+  await expect(dialog.locator("img")).toHaveAttribute(
+    "src",
+    /belgian-chocolate-wpc/,
+  );
   await expect(dialog.getByRole("button", { name: /close/i })).toBeVisible();
   await expectAccessible(page);
   await page.keyboard.press("Escape");
@@ -287,12 +328,14 @@ test("without JavaScript, content and product navigation remain useful", async (
   try {
     await page.goto("/");
     await expect(page.locator("h1")).toBeVisible();
-    for (const id of ["blend", "flavors", "story", "contact"])
+    for (const id of ["blend", "story", "contact"])
       await expect(page.locator(`#${id}`)).toBeVisible();
     await expectNoOverflow(page);
-    await page.goto(originalProduct);
+    await page.goto(currentProduct);
     await expect(page.locator("[data-product-name]")).toBeVisible();
-    await page.locator('[data-flavor="cafe-mocha"]').click();
+    await expect(page.locator("[data-flavor]")).toHaveCount(0);
+    await page.goto("/label-information.html");
+    await page.locator('main a[href="/concepts/cafe-mocha/"]').click();
     await expect(page).toHaveURL(/\/concepts\/cafe-mocha\/$/);
     await expect(page.locator("[data-product-name]")).toHaveText("Café Mocha");
     await expect(page.locator("[data-product-image]").first()).toHaveAttribute(
@@ -330,7 +373,7 @@ test("image failures preserve readable content and usable contact navigation", a
   await expect(page.locator("#contact")).toBeVisible();
   await expect(page.locator('a[href^="mailto:"]').first()).toBeVisible();
   await expectNoOverflow(page);
-  await page.goto(originalProduct);
+  await page.goto(currentProduct);
   await expect(page.locator("html")).toHaveClass(/\bjs\b/);
   expect(
     (await page.locator(".site-header").boundingBox()).height,
@@ -364,10 +407,10 @@ test("a blocked entry module restores visible native navigation", async ({
   await expect(page.locator("h1")).toBeVisible();
   const navigation = page.locator("#main-navigation");
   await expect(navigation).toBeVisible();
-  for (const id of ["blend", "flavors", "story", "contact"]) {
+  for (const id of ["blend", "story", "contact"]) {
     await expect(navigation.locator(`a[href="/#${id}"]`)).toBeVisible();
   }
-  await navigation.locator('a[href="/#flavors"]').click();
-  await expect(page).toHaveURL(/#flavors$/);
+  await navigation.locator('a[href="/#blend"]').click();
+  await expect(page).toHaveURL(/#blend$/);
   await expectNoOverflow(page);
 });

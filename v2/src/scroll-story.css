@@ -1,0 +1,273 @@
+/* The opening keeps its original composition. Enhancement pins the whole scene;
+   without motion, the two chapters stay in normal, readable document flow. */
+.tension-story {
+  background: #0c0b0b;
+}
+html.lenis {
+  scroll-behavior: auto;
+}
+.tension-scene {
+  position: relative;
+}
+.tension-chapters {
+  padding: 0 var(--gutter);
+}
+.tension-chapter {
+  padding: 90px 0;
+  border-top: 1px solid #ffffff25;
+}
+.tension-chapter h2 {
+  margin: 22px 0 28px;
+  font-size: clamp(45px, 5.3vw, 84px);
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+  font-weight: 800;
+}
+.tension-chapter > p:not(.eyebrow) {
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+.chapter-detail {
+  display: block;
+  max-width: 370px;
+  color: #beb8b4;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.tension-chapter .text-link {
+  margin-top: 28px;
+}
+.story-progress {
+  display: none;
+}
+.is-story-motion .tension-chapters {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.is-story-motion .tension-chapter {
+  position: absolute;
+  top: 27%;
+  left: 53%;
+  width: 43%;
+  padding: 0;
+  border: 0;
+  pointer-events: auto;
+}
+.is-story-motion .story-progress {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 28px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 28px;
+  z-index: 5;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: #d4cdca;
+}
+.story-progress > div {
+  height: 1px;
+  background: #ffffff30;
+}
+.story-progress i {
+  display: block;
+  height: 100%;
+  background: #ee362f;
+  transform-origin: left center;
+}
+.tension-sheen {
+  background: linear-gradient(
+    112deg,
+    transparent 26%,
+    #fff0 35%,
+    #fff8 calc(var(--tension-light-x, 50%) + var(--story-light, 0%)),
+    transparent 66%
+  );
+}
+.wpc-product {
+  border-top: 1px solid #ffffff25;
+}
+.wpc-product .section-top {
+  margin-bottom: 70px;
+}
+.wpc-product-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 10%;
+}
+.wpc-product h2,
+.wpc-pack-copy h2 {
+  font-size: clamp(43px, 5vw, 76px);
+  letter-spacing: -0.065em;
+  line-height: 1.02;
+  margin: 0 0 30px;
+}
+.wpc-product .body-copy {
+  max-width: 440px;
+  margin-bottom: 30px;
+}
+.wpc-product .spec-list {
+  margin-top: 0;
+}
+.wpc-product .spec-list dd {
+  text-align: right;
+}
+.wpc-product .small-note {
+  max-width: 420px;
+}
+.wpc-packaging {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9%;
+  align-items: center;
+  padding-bottom: 130px;
+}
+.wpc-pack-detail {
+  margin: 0;
+  aspect-ratio: 1 / 1.08;
+  background: radial-gradient(
+    ellipse at 45% 45%,
+    #49302a,
+    #181312 65%,
+    #0b0b0b
+  );
+  overflow: hidden;
+}
+.wpc-pack-detail a {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}
+.wpc-pack-detail img {
+  display: block;
+  width: 92%;
+  height: auto;
+  margin: 8% auto 0;
+  transform: rotate(-8deg);
+}
+.wpc-pack-detail a > span {
+  position: absolute;
+  inset: auto 20px 20px;
+  padding: 15px 18px;
+  background: #0b0b0be6;
+  border: 1px solid #ffffff30;
+  font-size: 12px;
+}
+.wpc-pack-copy .eyebrow {
+  margin-bottom: 26px;
+}
+.wpc-pack-copy .body-copy {
+  margin-bottom: 28px;
+}
+.wpc-pack-copy .small-note {
+  margin-top: 25px;
+}
+.archived-concepts {
+  grid-column: 1 / -1;
+}
+.archived-concepts .text-link {
+  margin: 10px 30px 10px 0;
+}
+.product-information h1 {
+  text-transform: uppercase;
+  font-size: clamp(34px, 4vw, 66px);
+}
+@media (max-width: 1100px) and (min-width: 801px) {
+  .tension-chapter h2 {
+    font-size: 55px;
+  }
+  .is-story-motion .tension-chapter {
+    left: 51%;
+    width: 46%;
+  }
+}
+@media (max-width: 800px) {
+  .tension-chapter {
+    padding: 65px 0;
+  }
+  .is-story-motion .tension-chapter {
+    top: 55%;
+    left: var(--gutter);
+    right: var(--gutter);
+    width: auto;
+    text-align: center;
+  }
+  .tension-chapter h2 {
+    font-size: clamp(38px, 7.6vw, 58px);
+    margin: 13px 0 16px;
+  }
+  .tension-chapter > p:not(.eyebrow) {
+    font-size: 19px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+  }
+  .chapter-detail {
+    font-size: 12px;
+    max-width: 340px;
+  }
+  .is-story-motion .chapter-detail {
+    margin: 0 auto;
+  }
+  .tension-chapter .text-link {
+    margin-top: 18px;
+    font-size: 12px;
+  }
+  .is-story-motion .story-progress {
+    bottom: 24px;
+    gap: 15px;
+    font-size: 8px;
+  }
+  .wpc-product .section-top {
+    margin-bottom: 45px;
+  }
+  .wpc-product-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .wpc-packaging {
+    gap: 45px;
+    grid-template-columns: 1fr;
+    padding-bottom: 70px;
+  }
+  .wpc-pack-detail {
+    max-height: 600px;
+  }
+  .wpc-pack-copy {
+    max-width: 520px;
+  }
+}
+@media (max-width: 360px) {
+  .is-story-motion .tension-chapter {
+    top: 53%;
+  }
+  .tension-chapter h2 {
+    font-size: 34px;
+  }
+  .tension-chapter .eyebrow {
+    font-size: 9px;
+  }
+  .tension-chapter > p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  .chapter-detail {
+    font-size: 11px;
+  }
+  .is-story-motion .story-progress {
+    grid-template-columns: 1fr auto;
+  }
+  .story-progress > span:first-child {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wpc-pack-detail img {
+    transform: none;
+  }
+}

@@ -364,25 +364,34 @@ try {
   await page.goto(siteUrl("/product.html?flavor=cafe-mocha"));
   await assertFlavor(page, "cafe-mocha", "Café Mocha");
   await page.goto(siteUrl("/products/trayn-whey-rich-chocolate/"));
-  await page.locator('[data-flavor="cafe-mocha"]').click();
+  await assertFlavor(page, "belgian-chocolate-wpc", "Belgian Chocolate");
+  await expect(page.locator("[data-flavor]")).toHaveCount(0);
+  await expect(page.locator('[data-gallery-view="back"]')).not.toBeVisible();
+  await expect(page.locator("h1")).toContainText(
+    /WHEY\s*PROTEIN\s*CONCENTRATE/i,
+  );
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    /whey protein concentrate/i,
+  );
+  await page.goto(siteUrl("/label-information.html"));
+  await page.locator('main a[href$="/concepts/cafe-mocha/"]').click();
   await assertFlavor(page, "cafe-mocha", "Café Mocha");
   assert.equal(page.url(), siteUrl("/concepts/cafe-mocha/"));
   await page.reload();
   await assertFlavor(page, "cafe-mocha", "Café Mocha");
   await page.goBack();
-  await assertFlavor(page, "belgian-chocolate", "Belgian Chocolate");
-  assert.equal(page.url(), siteUrl("/products/trayn-whey-rich-chocolate/"));
+  assert.equal(page.url(), siteUrl("/label-information.html"));
   await page.goForward();
   await assertFlavor(page, "cafe-mocha", "Café Mocha");
   assert.equal(page.url(), siteUrl("/concepts/cafe-mocha/"));
   console.log(
-    "PASS: legacy query, flavor selection, reload, and Back/Forward preserve the hosting prefix",
+    "PASS: active WPC product, legacy query, archive links, reload and Back/Forward preserve the hosting prefix",
   );
 
   await page.goto(siteUrl("/products/trayn-whey-rich-chocolate/"));
-  await page.locator('[data-gallery-view="back"]').click();
   const image = page.locator("[data-product-image]").first();
-  assert.match(await image.getAttribute("src"), /belgian-chocolate-back/);
+  assert.match(await image.getAttribute("src"), /belgian-chocolate-wpc/);
   await waitForImage(image);
   await page.locator("[data-open-packaging]").click();
   const dialog = page.locator("#packaging-dialog");
@@ -395,11 +404,10 @@ try {
   await waitForImage(dialog.locator("img"));
   await page.keyboard.press("Escape");
   await dialog.waitFor({ state: "hidden" });
-  await page.locator('[data-gallery-view="front"]').click();
   assert.doesNotMatch(await image.getAttribute("src"), /-back/);
   await waitForImage(image);
   console.log(
-    "PASS: front/back packaging and full-size dialog assets load under the prefix",
+    "PASS: current WPC front packaging and full-size dialog assets load under the prefix",
   );
 
   const missing = await page.goto(`${origin}${missingPath}`);
@@ -435,20 +443,27 @@ try {
   console.log(
     "PASS: all three draft openings and packaging links retain static mobile content without JavaScript",
   );
+  await nativePage.goto(siteUrl("/"));
+  await inspectPage(nativePage);
+  for (const id of ["blend", "story", "contact"])
+    await expect(nativePage.locator(`#${id}`)).toBeVisible();
   await nativePage.goto(siteUrl("/products/trayn-whey-rich-chocolate/"));
+  await assertFlavor(nativePage, "belgian-chocolate-wpc", "Belgian Chocolate");
+  await inspectPage(nativePage);
   for (const [id, flavor] of [
     ["vanilla-creme", "Vanilla Creme"],
     ["cafe-mocha", "Café Mocha"],
     ["cookies-cream", "Cookies & Cream"],
   ]) {
-    await nativePage.locator(`[data-flavor="${id}"]`).click();
+    await nativePage.goto(siteUrl("/label-information.html"));
+    await nativePage.locator(`main a[href$="/concepts/${id}/"]`).click();
     assert.equal(nativePage.url(), siteUrl(`/concepts/${id}/`));
     await assertFlavor(nativePage, id, flavor);
     await inspectPage(nativePage);
   }
   await noScript.close();
   console.log(
-    "PASS: all future flavor links and content work without JavaScript",
+    "PASS: WPC homepage, product and archived flavour links work without JavaScript",
   );
 
   for (const url of new Set([...localLinks, ...supersededResources])) {

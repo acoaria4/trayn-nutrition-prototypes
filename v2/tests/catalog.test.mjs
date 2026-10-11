@@ -6,6 +6,8 @@ import {
   getProduct,
   productPath,
   productUrl,
+  productTitle,
+  productDescription,
   brand,
 } from "../src/data/products.js";
 
@@ -93,18 +95,37 @@ test("every flavor has a unique public destination and safely falls back from un
   }
 });
 
-test("only the supplied original pack exposes a back-label image", () => {
-  assert.ok(
-    featuredProduct.backImage,
-    "The original source pack has a back view",
+test("the current WPC pack never exposes the previous blend back label", () => {
+  assert.equal(featuredProduct.name, "Whey Protein Concentrate");
+  assert.equal(featuredProduct.blend, "Whey protein concentrate (WPC)");
+  assert.equal(featuredProduct.archived, false);
+  assert.equal(
+    featuredProduct.image,
+    "/images/products/belgian-chocolate-wpc",
   );
-  for (const product of products.filter(
-    (product) => product !== featuredProduct,
-  )) {
+  assert.doesNotMatch(productTitle(featuredProduct), /blend|isolate/i);
+  assert.doesNotMatch(productDescription(featuredProduct), /blend|isolate/i);
+  for (const product of products) {
     assert.equal(
       product.backImage,
       null,
-      `${product.id}: do not invent a future flavor nutrition label`,
+      `${product.id}: no matching back label has been supplied`,
     );
+  }
+});
+
+test("archived flavour routes retain their earlier formulation and artwork", () => {
+  for (const product of products.filter(
+    (product) => product !== featuredProduct,
+  )) {
+    assert.equal(product.archived, true);
+    assert.equal(product.status, "Archived flavour concept");
+    assert.equal(product.name, "Whey Protein Blend");
+    assert.match(product.blend, /concentrate.*isolate/i);
+    assert.equal(product.image, `/images/products/${product.id}`);
+    assert.equal(productUrl(product), `/concepts/${product.id}/`);
+    assert.match(productTitle(product), /Archived Concept/);
+    assert.match(productDescription(product), /archived concept/i);
+    assert.match(productDescription(product), /concentrate and isolate blend/i);
   }
 });
