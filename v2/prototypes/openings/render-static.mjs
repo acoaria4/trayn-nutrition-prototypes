@@ -34,7 +34,7 @@ for (const [index, name] of names.entries()) {
       '<div id="experience-content"></div>',
       `<div id="experience-content">${content}</div>`,
     )
-    .replace(/<noscript>[\s\S]*?<\/noscript>/, "");
+    .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript\s*>/gi, "");
   await writeFile(new URL(`./${name}.html`, root), html);
 }
 console.log("Rendered three isolated, static opening studies.");

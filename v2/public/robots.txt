@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Concept preview pages carry noindex in their HTML.
+# Permit crawling so that search engines can read the noindex directive.

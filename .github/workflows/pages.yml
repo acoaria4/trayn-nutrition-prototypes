@@ -1,8 +1,8 @@
-name: Deploy website to GitHub Pages
+name: Deploy TRAYN prototype versions
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -13,59 +13,65 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    # Deploy the repository's actual default branch, whatever it is named.
-    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+  pages:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: read
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v7
-      - name: Set up Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24"
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            prototypes/openings/package-lock.json
-      - name: Read Pages URL configuration
-        id: pages
-        uses: actions/configure-pages@v6
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm ci --prefix prototypes/openings
-      - name: Check source and product data
-        run: |
-          npm run check
-          npm test
-      - name: Build main site and retained drafts for Pages
-        run: npm run build
-        env:
-          SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-      - name: Verify static routes and nested draft assets
-        run: npm run test:hosting:static
-        env:
-          SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-      - name: Upload built website
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: dist
-          include-hidden-files: true
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            v1/package-lock.json
+            v2/package-lock.json
+            v2/prototypes/openings/package-lock.json
+      - name: Read Pages configuration
+        id: pages
+        uses: actions/configure-pages@v6
+      - name: Install dependencies
+        run: |
+          npm ci --prefix v1
+          npm ci --prefix v2
+          npm ci --prefix v2/prototypes/openings
+      - name: Check both versions
+        run: |
+          npm --prefix v1 run check
+          npm --prefix v1 test
+          npm --prefix v2 run check
+          npm --prefix v2 test
+      - name: Build both versions
+        env:
+          PAGES_BASE: ${{ steps.pages.outputs.base_path }}
+        run: |
+          SITE_BASE_PATH="${PAGES_BASE%/}/v1/" npm --prefix v1 run build
+          SITE_BASE_PATH="${PAGES_BASE%/}/v2/" npm --prefix v2 run build
+          SITE_BASE_PATH="${PAGES_BASE%/}/v2/" npm --prefix v2 run test:hosting:static
+      - name: Assemble the Pages artifact
+        run: |
+          mkdir -p dist
+          cp index.html dist/index.html
+          cp index.html dist/404.html
+          cp -R v1/dist dist/v1
+          cp -R v2/dist dist/v2
+          touch dist/.nojekyll
+          test -f dist/v1/index.html
+          test -f dist/v2/index.html
+          test -f dist/v2/drafts/index.html
+          test -f dist/v2/drafts/quiet.html
+          test -f dist/v2/drafts/tension.html
+          test -f dist/v2/drafts/flavour.html
+      - name: Upload the combined website
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+          include-hidden-files: true
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v5
