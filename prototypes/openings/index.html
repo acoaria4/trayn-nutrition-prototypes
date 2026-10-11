@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#191919" />
+    <title>TRAYN — Three opening studies</title>
+    <link rel="icon" href="./assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="./studio.css" />
+    <link rel="stylesheet" href="./picker.css" />
+  </head>
+  <body>
+    <header class="studio-bar">
+      <a class="studio-name" href="./">TRAYN <span>/ OPENING STUDIES</span></a>
+      <p class="studio-direction" aria-live="polite">01 — The Quiet Before</p>
+      <div class="studio-views" role="group" aria-label="Preview size">
+        <button type="button" data-viewport="desktop" aria-pressed="true">
+          Desktop
+        </button>
+        <button type="button" data-viewport="mobile" aria-pressed="false">
+          Mobile
+        </button>
+        <button type="button" id="reduce-motion" aria-pressed="false">
+          Reduce motion
+        </button>
+        <a
+          id="open-experience"
+          href="./quiet.html"
+          target="_blank"
+          rel="noopener"
+          aria-label="Open selected experience full screen"
+          >↗</a
+        >
+      </div>
+    </header>
+    <main class="studio-stage" id="stage">
+      <iframe
+        id="experience"
+        title="The Quiet Before — interactive opening prototype"
+        src="./quiet.html"
+      ></iframe>
+    </main>
+    <nav class="proto-picker" aria-label="Prototype variants">
+      <span class="proto-picker-highlight" aria-hidden="true"></span>
+      <button class="proto-picker-item" data-active aria-current="true">
+        Quiet
+      </button>
+      <button class="proto-picker-item">Tension</button>
+      <button class="proto-picker-item">Flavour</button>
+      <span class="proto-picker-divider" aria-hidden="true"></span>
+      <button
+        class="proto-picker-item proto-picker-replay"
+        aria-label="Replay animation (R)"
+      >
+        ↻
+      </button>
+    </nav>
+    <noscript
+      ><p class="studio-noscript">
+        Choose an opening: <a href="./quiet.html">Quiet Before</a> ·
+        <a href="./tension.html">Under Tension</a> ·
+        <a href="./flavour.html">Flavour Study</a>. Enable JavaScript for
+        interactive comparison.
+      </p></noscript
+    >
+    <script type="module" src="./studio.js"></script>
+  </body>
+</html>

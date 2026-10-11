@@ -28,17 +28,26 @@ jobs:
         with:
           node-version: "24"
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            prototypes/openings/package-lock.json
       - name: Read Pages URL configuration
         id: pages
         uses: actions/configure-pages@v6
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm ci --prefix prototypes/openings
       - name: Check source and product data
         run: |
           npm run check
           npm test
-      - name: Build for the configured Pages path
+      - name: Build main site and retained drafts for Pages
         run: npm run build
+        env:
+          SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+      - name: Verify static routes and nested draft assets
+        run: npm run test:hosting:static
         env:
           SITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - name: Upload built website

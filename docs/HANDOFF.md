@@ -1,5 +1,7 @@
 # TRAYN After Dark — completed redesign
 
+Historical handoff. The current main site uses Under Tension; see [the 11 October implementation and verification record](UNDER_TENSION.md). The measurements below describe the earlier build, not the current revision.
+
 Delivered 9 October 2026. Local production preview: http://127.0.0.1:4174/
 
 The complete eight-page showcase lives in `G:/Programs/traynnutrition3`. The original `G:/Programs/traynnutrition-website-v2` repository is unchanged. Nothing has been published to the live store.

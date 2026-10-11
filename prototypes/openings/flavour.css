@@ -1,0 +1,938 @@
+.flavour {
+  --flavour-paper: #f5eee2;
+  --flavour-ink: #33271e;
+  --flavour-muted: #6e5948;
+  --flavour-wine: #692832;
+  --flavour-line: #cfc1ae;
+  background: var(--flavour-paper);
+  color: var(--flavour-ink);
+  font-family: "Manrope", Arial, sans-serif;
+  overflow: clip;
+  padding: 0 4.4vw;
+}
+.flavour :is(h1, h2, h3, p, figure) {
+  margin: 0;
+}
+.flavour :is(a, button) {
+  -webkit-tap-highlight-color: transparent;
+}
+.flavour a {
+  text-decoration: none;
+}
+.flavour button {
+  color: inherit;
+}
+.flavour :is(a, button):focus-visible {
+  outline: 2px solid var(--flavour-wine);
+  outline-offset: 5px;
+}
+.flavour [hidden] {
+  display: none !important;
+}
+.flavour-nav {
+  height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--flavour-line);
+}
+.flavour-logo {
+  width: 96px;
+  flex: 0 0 auto;
+}
+.flavour-logo img {
+  width: 100%;
+  height: auto;
+}
+.flavour-nav-title {
+  font:
+    28px/1 "Instrument Serif",
+    Georgia,
+    serif;
+}
+.flavour-nav nav {
+  display: flex;
+  gap: 32px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.flavour-nav nav a {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 44px;
+}
+.flavour-nav nav a:hover {
+  color: var(--flavour-wine);
+}
+.flavour-opening {
+  padding-top: 28px;
+}
+.flavour-opening-caption {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.flavour-opening-caption span:last-child {
+  color: var(--flavour-muted);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.flavour-opening h1 {
+  position: relative;
+  z-index: 2;
+  font:
+    400 clamp(82px, 10.65vw, 166px)/0.86 "Instrument Serif",
+    Georgia,
+    serif;
+  text-align: center;
+  letter-spacing: -0.055em;
+  padding: 20px 0 0;
+}
+.flavour-opening h1 > * {
+  display: block;
+}
+.flavour-opening h1 em {
+  font-weight: 400;
+  color: var(--flavour-wine);
+  padding: 0 12px 12px;
+}
+.flavour-hero-canvas {
+  position: relative;
+  margin-top: -4px;
+  padding: 0 8.3%;
+}
+.flavour-hero-frame {
+  position: relative;
+  height: clamp(340px, 31.2vw, 465px);
+  border-radius: 48% 48% 3px 3px / 60% 60% 3px 3px;
+  overflow: hidden;
+  background: #e3cfb0;
+}
+.flavour-hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+}
+.flavour-image-note {
+  position: absolute;
+  left: 2.4%;
+  top: 36%;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+.flavour-hero-cta {
+  position: absolute;
+  left: 0;
+  bottom: 14px;
+  width: 174px;
+  height: 174px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border-radius: 50%;
+  background: var(--flavour-wine);
+  color: #fff7e8;
+  text-align: center;
+}
+.flavour-hero-cta > span:first-child {
+  font-size: 12px;
+  line-height: 1.25;
+}
+.flavour-hero-cta em {
+  font:
+    italic 36px/0.95 "Instrument Serif",
+    Georgia,
+    serif;
+}
+.flavour-cta-arrow {
+  font-size: 26px;
+  line-height: 1;
+  transition: transform 0.2s ease-out;
+}
+.flavour-hero-cta:hover .flavour-cta-arrow {
+  transform: translateY(4px);
+}
+.flavour-catalogue {
+  position: absolute;
+  right: 0;
+  top: 16%;
+  width: 176px;
+  min-height: 281px;
+  padding: 13px 13px 0;
+  background: #fff9ee;
+  border: 1px solid #d4c5af;
+  transform: rotate(6deg);
+  text-align: center;
+  box-shadow: 0 7px 16px #4833220c;
+}
+.flavour-catalogue-top {
+  display: block;
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+}
+.flavour-catalogue > img {
+  height: 155px;
+  width: 104px;
+  object-fit: contain;
+  margin: 10px auto 7px;
+}
+.flavour-catalogue > div p {
+  font:
+    20px/1.1 "Instrument Serif",
+    Georgia,
+    serif;
+}
+.flavour-catalogue > div > span {
+  display: block;
+  font-size: 8px;
+  margin-top: 5px;
+  color: var(--flavour-muted);
+}
+.flavour-catalogue > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  border-top: 1px solid var(--flavour-line);
+  margin-top: 10px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.flavour-catalogue > a:hover {
+  color: var(--flavour-wine);
+}
+.flavour-opening-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 26px 0 42px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.flavour-opening-bottom > p {
+  max-width: 250px;
+}
+.flavour-opening-bottom > span {
+  color: var(--flavour-muted);
+  font-size: 11px;
+  text-align: center;
+}
+.flavour-opening-bottom > a {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  min-height: 44px;
+  font-weight: 600;
+}
+.flavour-study {
+  border-top: 1px solid var(--flavour-line);
+  padding-top: 68px;
+  scroll-margin-top: 24px;
+}
+.flavour-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.09em;
+}
+.flavour-study-heading {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.flavour-study-heading > .flavour-eyebrow {
+  padding-top: 10px;
+}
+.flavour-study-heading h2 {
+  font:
+    400 clamp(42px, 5.35vw, 80px)/0.96 "Instrument Serif",
+    Georgia,
+    serif;
+  letter-spacing: -0.035em;
+}
+.flavour-study-heading h2 em {
+  color: var(--flavour-wine);
+  font-weight: 400;
+}
+.flavour-study-heading > p:last-child {
+  justify-self: end;
+  color: var(--flavour-muted);
+  font-size: 12px;
+  line-height: 1.7;
+  padding-top: 10px;
+}
+.flavour-study-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 8.5%;
+  align-items: center;
+  margin-top: 50px;
+}
+.flavour-study-visual {
+  min-width: 0;
+  align-self: start;
+}
+.flavour-study-frame {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50% 50% 47% 47%;
+  overflow: hidden;
+  background: #e3cfb0;
+}
+.flavour-study-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.flavour-study-visual figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 17px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.flavour-study-visual figcaption > span:last-child {
+  color: var(--flavour-muted);
+  font-size: 8px;
+  letter-spacing: 0.09em;
+}
+.flavour-notebook {
+  padding-right: 6%;
+}
+.flavour-selector {
+  display: flex;
+  border-bottom: 1px solid var(--flavour-line);
+  gap: 29px;
+  margin-bottom: 32px;
+}
+.flavour-selector button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0 0 16px;
+  min-height: 44px;
+  font-size: 12px;
+}
+.flavour-selector button[aria-pressed="true"] {
+  border-bottom-color: var(--flavour-wine);
+  font-weight: 700;
+}
+.flavour-selector button:hover {
+  color: var(--flavour-wine);
+}
+.flavour-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: block;
+}
+.chocolate-dot {
+  background: #523021;
+}
+.vanilla-dot {
+  background: #dbc79f;
+  border: 1px solid #9f8767;
+}
+.flavour-story h3 {
+  margin-top: 12px;
+  font:
+    400 clamp(54px, 5.4vw, 82px)/0.96 "Instrument Serif",
+    Georgia,
+    serif;
+  letter-spacing: -0.04em;
+}
+.flavour-story h3 em {
+  font-weight: 400;
+  color: var(--flavour-wine);
+}
+.flavour-story-copy {
+  max-width: 365px;
+  margin-top: 21px !important;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.flavour-concept-note {
+  color: var(--flavour-muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 12px !important;
+}
+.flavour-specs {
+  margin: 28px 0 0;
+  border-top: 1px solid var(--flavour-line);
+}
+.flavour-specs > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--flavour-line);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.flavour-specs dt {
+  color: var(--flavour-muted);
+}
+.flavour-specs dd {
+  margin: 0;
+  text-align: right;
+}
+.flavour-study-product {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-top: 22px;
+}
+.flavour-mini-pack {
+  width: 63px;
+  height: 93px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flavour-mini-pack img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.flavour-mini-pack > span {
+  font:
+    15px/1.2 "Instrument Serif",
+    Georgia,
+    serif;
+  text-align: center;
+}
+.flavour-study-product > div:last-child {
+  flex: 1;
+}
+.flavour-study-product .flavour-eyebrow {
+  font-size: 8px;
+}
+.flavour-study-product a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  max-width: 280px;
+  font:
+    29px/1.2 "Instrument Serif",
+    Georgia,
+    serif;
+}
+.flavour-study-product a:hover {
+  color: var(--flavour-wine);
+}
+.flavour-study-product p {
+  font-size: 9px;
+  color: var(--flavour-muted);
+  line-height: 1.5;
+}
+.flavour-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  border-top: 1px solid var(--flavour-line);
+  margin-top: 70px;
+  padding: 28px 0 46px;
+}
+.flavour-footer-brand {
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+.flavour-footer-brand em {
+  font:
+    italic 24px/1 "Instrument Serif",
+    Georgia,
+    serif;
+  letter-spacing: -0.025em;
+}
+.flavour-footer p {
+  font-size: 10px;
+  color: var(--flavour-muted);
+  line-height: 1.6;
+}
+.flavour-footer > a {
+  font-size: 10px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.flavour-dialog {
+  width: min(640px, calc(100vw - 32px));
+  max-height: min(90dvh, 1000px);
+  padding: 24px;
+  border: none;
+  background: var(--flavour-paper);
+  color: var(--flavour-ink);
+  overflow: auto;
+}
+.flavour-dialog::backdrop {
+  background: #291c18bd;
+  backdrop-filter: blur(7px);
+}
+.flavour-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.flavour-dialog h2 {
+  font:
+    32px/1.05 "Instrument Serif",
+    Georgia,
+    serif;
+  margin-top: 7px;
+}
+.flavour-dialog-head button {
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  font-size: 12px;
+}
+.flavour-dialog-head button span {
+  font-size: 24px;
+}
+.flavour-dialog-views {
+  display: flex;
+  gap: 24px;
+  margin-top: 14px;
+  border-bottom: 1px solid var(--flavour-line);
+}
+.flavour-dialog-views button {
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  min-height: 44px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.flavour-dialog-views button[aria-pressed="true"] {
+  border-bottom-color: var(--flavour-wine);
+}
+.flavour-dialog-art {
+  overflow: auto;
+  max-height: 60dvh;
+  margin-top: 14px;
+}
+.flavour-dialog-art img {
+  width: min(100%, 430px);
+  height: auto;
+  margin: auto;
+}
+.flavour-dialog-note {
+  margin-top: 16px !important;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--flavour-muted);
+}
+
+@media (max-width: 1000px) {
+  .flavour {
+    padding: 0 4vw;
+  }
+  .flavour-nav {
+    height: 88px;
+  }
+  .flavour-nav-title {
+    font-size: 23px;
+  }
+  .flavour-nav nav {
+    gap: 18px;
+  }
+  .flavour-nav nav a {
+    gap: 12px;
+  }
+  .flavour-opening h1 {
+    font-size: 12.6vw;
+    padding-top: 30px;
+  }
+  .flavour-hero-canvas {
+    padding: 0 5%;
+    margin-top: 10px;
+  }
+  .flavour-hero-frame {
+    height: 370px;
+  }
+  .flavour-catalogue {
+    width: 145px;
+    top: 20%;
+    padding: 10px 10px 0;
+    min-height: 250px;
+  }
+  .flavour-catalogue > img {
+    height: 127px;
+    width: 90px;
+  }
+  .flavour-catalogue > div p {
+    font-size: 18px;
+  }
+  .flavour-hero-cta {
+    width: 143px;
+    height: 143px;
+    bottom: 0;
+  }
+  .flavour-image-note {
+    left: 0;
+  }
+  .flavour-study {
+    padding-top: 50px;
+  }
+  .flavour-study-heading {
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+  }
+  .flavour-study-heading > p:last-child {
+    display: none;
+  }
+  .flavour-study-heading h2 {
+    font-size: 55px;
+  }
+  .flavour-study-layout {
+    gap: 5%;
+    margin-top: 37px;
+    align-items: start;
+    grid-template-columns: 1fr 1fr;
+  }
+  .flavour-notebook {
+    padding-right: 0;
+  }
+  .flavour-story h3 {
+    font-size: 54px;
+  }
+  .flavour-story-copy {
+    font-size: 13px;
+  }
+  .flavour-specs > div {
+    font-size: 10px;
+  }
+  .flavour-study-product {
+    gap: 16px;
+  }
+  .flavour-study-product a {
+    font-size: 25px;
+  }
+  .flavour-footer {
+    margin-top: 44px;
+    gap: 18px;
+  }
+  .flavour-footer p {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 600px) {
+  .flavour {
+    padding: 0 20px;
+  }
+  .flavour-nav {
+    height: 76px;
+  }
+  .flavour-logo {
+    width: 69px;
+  }
+  .flavour-nav-title {
+    display: none;
+  }
+  .flavour-nav nav {
+    gap: 18px;
+    font-size: 10px;
+  }
+  .flavour-nav nav a {
+    gap: 8px;
+  }
+  .flavour-opening {
+    padding-top: 23px;
+  }
+  .flavour-opening-caption {
+    font-size: 8px;
+    letter-spacing: 0.06em;
+  }
+  .flavour-opening-caption span:last-child {
+    font-size: 9px;
+    max-width: 128px;
+    text-align: right;
+    line-height: 1.35;
+  }
+  .flavour-opening h1 {
+    font-size: clamp(56px, 16.8vw, 92px);
+    line-height: 0.87;
+    letter-spacing: -0.05em;
+    padding-top: 25px;
+  }
+  .flavour-opening h1 em {
+    padding: 2px 0 13px;
+  }
+  .flavour-hero-canvas {
+    margin-top: 9px;
+    padding: 0;
+  }
+  .flavour-hero-frame {
+    height: 327px;
+    margin-right: 26px;
+    border-radius: 50% 50% 3px 3px / 36% 36% 3px 3px;
+  }
+  .flavour-hero-image {
+    object-position: 45% 58%;
+  }
+  .flavour-image-note {
+    display: none;
+  }
+  .flavour-catalogue {
+    top: 96px;
+    right: -4px;
+    width: 112px;
+    min-height: 202px;
+    padding: 9px 9px 0;
+    transform: rotate(6deg);
+  }
+  .flavour-catalogue-top {
+    font-size: 5px;
+    letter-spacing: 0.055em;
+  }
+  .flavour-catalogue > img {
+    height: 99px;
+    width: 66px;
+    margin: 8px auto 6px;
+  }
+  .flavour-catalogue > div p {
+    font-size: 15px;
+    line-height: 0.95;
+  }
+  .flavour-catalogue > div > span {
+    font-size: 6px;
+    line-height: 1.4;
+  }
+  .flavour-catalogue > a {
+    min-height: 44px;
+    font-size: 8px;
+    margin-top: 7px;
+  }
+  .flavour-hero-cta {
+    left: 7px;
+    bottom: -22px;
+    width: 116px;
+    height: 116px;
+    gap: 8px;
+  }
+  .flavour-hero-cta > span:first-child {
+    font-size: 10px;
+  }
+  .flavour-hero-cta em {
+    font-size: 29px;
+  }
+  .flavour-cta-arrow {
+    font-size: 23px;
+  }
+  .flavour-opening-bottom {
+    padding: 44px 0 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 18px;
+    font-size: 10px;
+    line-height: 1.55;
+  }
+  .flavour-opening-bottom > p {
+    max-width: 185px;
+  }
+  .flavour-opening-bottom > span {
+    display: none;
+  }
+  .flavour-opening-bottom > a {
+    min-height: 44px;
+    font-size: 9px;
+    gap: 11px;
+  }
+  .flavour-study {
+    padding-top: 35px;
+    scroll-margin-top: 10px;
+  }
+  .flavour-study-heading {
+    display: block;
+  }
+  .flavour-study-heading > .flavour-eyebrow {
+    padding: 0;
+    font-size: 9px;
+  }
+  .flavour-study-heading h2 {
+    font-size: clamp(39px, 11.7vw, 65px);
+    line-height: 0.98;
+    margin-top: 17px;
+  }
+  .flavour-study-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 29px;
+    margin-top: 29px;
+  }
+  .flavour-study-visual {
+    width: 100%;
+    padding-right: 38px;
+  }
+  .flavour-study-frame {
+    border-radius: 49% 49% 46% 46%;
+  }
+  .flavour-study-visual figcaption {
+    font-size: 9px;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .flavour-study-visual figcaption > span:last-child {
+    font-size: 7px;
+  }
+  .flavour-notebook {
+    width: 100%;
+  }
+  .flavour-selector {
+    gap: 32px;
+    margin-bottom: 25px;
+  }
+  .flavour-selector button {
+    font-size: 13px;
+    padding-bottom: 13px;
+    min-height: 44px;
+  }
+  .flavour-story > .flavour-eyebrow {
+    font-size: 9px;
+  }
+  .flavour-story h3 {
+    font-size: 59px;
+  }
+  .flavour-story-copy {
+    font-size: 13px;
+    line-height: 1.75;
+    max-width: 320px;
+    margin-top: 16px !important;
+  }
+  .flavour-concept-note {
+    font-size: 11px;
+  }
+  .flavour-specs {
+    margin-top: 21px;
+  }
+  .flavour-specs > div {
+    font-size: 11px;
+    padding: 14px 0;
+  }
+  .flavour-study-product {
+    gap: 22px;
+    margin-top: 21px;
+  }
+  .flavour-mini-pack {
+    width: 58px;
+    height: 88px;
+  }
+  .flavour-study-product a {
+    font-size: 28px;
+  }
+  .flavour-study-product p {
+    font-size: 9px;
+  }
+  .flavour-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 19px;
+    margin-top: 34px;
+    padding: 28px 0 60px;
+  }
+  .flavour-footer-brand {
+    font-size: 12px;
+  }
+  .flavour-footer p {
+    font-size: 10px;
+    line-height: 1.65;
+    max-width: 290px;
+  }
+  .flavour-footer > a {
+    min-height: 44px;
+    font-size: 11px;
+    justify-self: start;
+  }
+  .flavour-dialog {
+    padding: 18px;
+  }
+  .flavour-dialog h2 {
+    font-size: 28px;
+  }
+  .flavour-dialog-head .flavour-eyebrow {
+    font-size: 8px;
+  }
+  .flavour-dialog-head button {
+    font-size: 11px;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 359px) {
+  .flavour {
+    padding: 0 16px;
+  }
+  .flavour-nav nav {
+    gap: 12px;
+    font-size: 9px;
+  }
+  .flavour-logo {
+    width: 58px;
+  }
+  .flavour-opening h1 {
+    font-size: 56px;
+  }
+  .flavour-hero-frame {
+    height: 299px;
+    margin-right: 16px;
+  }
+  .flavour-catalogue {
+    width: 102px;
+    top: 85px;
+  }
+  .flavour-catalogue > div p {
+    font-size: 14px;
+  }
+  .flavour-opening-bottom {
+    gap: 9px;
+    font-size: 9px;
+  }
+  .flavour-opening-bottom > a {
+    font-size: 8px;
+    gap: 8px;
+  }
+  .flavour-story h3 {
+    font-size: 52px;
+  }
+  .flavour-specs > div {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flavour *,
+  .flavour *::before,
+  .flavour *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}

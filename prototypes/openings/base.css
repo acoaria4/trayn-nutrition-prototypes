@@ -1,0 +1,91 @@
+@font-face {
+  font-family: "Manrope";
+  src: url("./assets/manrope.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("./assets/instrument-serif.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("./assets/instrument-serif-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  margin: 0;
+  scroll-behavior: auto;
+}
+body {
+  margin: 0;
+  font-family: "Manrope", Arial, sans-serif;
+  background: #151515;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 5px;
+}
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -100px;
+  z-index: 1000;
+  padding: 12px 20px;
+  background: white;
+  color: #151515;
+}
+.skip-link:focus {
+  top: 12px;
+}
+.no-script {
+  padding: 60px 24px;
+  background: #eee9df;
+  min-height: 100vh;
+}
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

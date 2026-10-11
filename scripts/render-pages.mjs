@@ -22,9 +22,9 @@ const pages = [
   {
     file: "index.html",
     type: "home",
-    title: "TRAYN Nutrition — Built for What’s Next",
+    title: "TRAYN Nutrition — Under Tension",
     description:
-      "Discover TRAYN After Dark. Explore the Belgian Chocolate whey blend packaging concept and the next chapter of TRAYN Nutrition.",
+      "Discover TRAYN Under Tension. Explore the Belgian Chocolate whey blend packaging concept and the next chapter of TRAYN Nutrition.",
     canonical: "/",
     content: home(),
   },

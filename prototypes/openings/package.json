@@ -1,0 +1,17 @@
+{
+  "name": "trayn-opening-studies",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node render-static.mjs && vite --host 127.0.0.1 --port 4186 --strictPort",
+    "build": "node render-static.mjs && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4187 --strictPort"
+  },
+  "dependencies": {
+    "gsap": "3.15.0",
+    "lenis": "1.3.26"
+  },
+  "devDependencies": {
+    "vite": "7.3.7"
+  }
+}

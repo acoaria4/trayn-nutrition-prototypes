@@ -150,9 +150,7 @@ test("home navigation reaches the real section destinations", async ({
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText(
-    /BUILT FOR\s*WHAT[’']S\s*NEXT\./i,
-  );
+  await expect(page.locator("h1")).toContainText(/UNDER\s*TENSION\./i);
   for (const id of ["blend", "flavors", "story", "contact"]) {
     await expect(page.locator(`#${id}`)).toHaveCount(1);
     await expect(

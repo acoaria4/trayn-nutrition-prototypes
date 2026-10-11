@@ -4,20 +4,23 @@ import { readFile, stat } from "node:fs/promises";
 import { dirname, extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, expect } from "@playwright/test";
+import { verifyStaticHosting } from "./verify-static-hosting.mjs";
+import { normalizeBasePath } from "../src/site-paths.js";
 
 // Verify the existing build under a real directory prefix, without an SPA fallback.
 // Usage: node scripts/verify-hosting.mjs --base=/trayn-preview/
-const rawBase =
+const requestedBase =
   process.argv.find((argument) => argument.startsWith("--base="))?.slice(7) ??
+  process.env.SITE_BASE_PATH ??
   "/";
-assert.match(
-  rawBase,
-  /^\/(?:[A-Za-z0-9_-]+\/)*$/,
-  "--base must start and end with / and contain simple directory names",
-);
-const base = rawBase;
+const base = normalizeBasePath(requestedBase);
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const distRoot = resolve(projectRoot, "dist");
+const staticResult = await verifyStaticHosting(distRoot, base);
+console.log(
+  `PASS: ${staticResult.drafts} draft pages and ${staticResult.references} HTML/CSS references in ${staticResult.files} built files (${base})`,
+);
+if (process.argv.includes("--static")) process.exit(0);
 const custom404 = await readFile(resolve(distRoot, "404.html"));
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -162,7 +165,9 @@ async function inspectPage(page, expectedStatus = 200) {
   );
   // Request every real image without relying on in-page timers or RAF, which
   // are unavailable in the JavaScript-disabled verification context.
-  const images = page.locator("img:not([data-deferred-image])");
+  const images = page.locator(
+    "img[src]:not([data-deferred-image]), img[srcset]:not([src]):not([data-deferred-image])",
+  );
   await images.evaluateAll((elements) => {
     elements.forEach((image) => {
       image.loading = "eager";
@@ -272,6 +277,66 @@ try {
     `PASS: 8 direct page routes, images, fonts, and local URL prefixes (${base})`,
   );
 
+  for (const direction of ["quiet", "tension", "flavour"]) {
+    const response = await page.goto(siteUrl(`/drafts/${direction}.html`));
+    assert.equal(
+      response.status(),
+      200,
+      `The ${direction} draft must be directly shareable`,
+    );
+    await inspectPage(page);
+    await expect
+      .poll(() => page.evaluate(() => typeof window.__prototypeReview))
+      .toBe("function");
+  }
+  await page.locator('[data-flavour-choice="chocolate"]').click();
+  await expect(page.locator("[data-flavour-name]")).toHaveText(
+    "Belgian Chocolate.",
+  );
+  await waitForImage(page.locator("[data-flavour-scene]"));
+  await page.locator('[data-flavour-choice="chocolate"]').press("ArrowRight");
+  await expect(page.locator("[data-flavour-name]")).toHaveText(
+    "Vanilla Creme.",
+  );
+  await waitForImage(page.locator("[data-flavour-scene]"));
+
+  await page.goto(siteUrl("/drafts/tension.html"));
+  await page.locator('[data-tension-view="back"]').click();
+  await expect(page.locator('[data-tension-view="back"]')).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await waitForImage(page.locator("[data-tension-detail-image]"));
+  await page.locator("#tension-light").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#tension-light")).toHaveValue("51");
+
+  await page.goto(siteUrl("/drafts/"));
+  await expect(
+    page.frameLocator("#experience").locator("main.quiet"),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Flavour", exact: true }).click();
+  await expect(
+    page.frameLocator("#experience").locator("main.flavour"),
+  ).toBeVisible();
+  const selectedDraft = new URL(
+    await page.locator("#experience").getAttribute("src"),
+    page.url(),
+  );
+  assert.equal(selectedDraft.href, siteUrl("/drafts/flavour.html"));
+  await page.locator('[data-viewport="mobile"]').click();
+  await expect(page.locator("body")).toHaveAttribute("data-viewport", "mobile");
+  assert.equal(
+    new URL(
+      await page.locator("#open-experience").getAttribute("href"),
+      page.url(),
+    ).href,
+    siteUrl("/drafts/flavour.html"),
+  );
+  console.log(
+    "PASS: retained draft pages, flavour keyboard control, packaging, lighting and comparison links stay under /drafts/",
+  );
+
   const redirect = await fetch(siteUrl("/products/trayn-whey-rich-chocolate"), {
     redirect: "manual",
     signal: AbortSignal.timeout(8000),
@@ -352,6 +417,13 @@ try {
   });
   noScript.on("page", observePage);
   const nativePage = await noScript.newPage();
+  for (const direction of ["quiet", "tension", "flavour"]) {
+    await nativePage.goto(siteUrl(`/drafts/${direction}.html`));
+    await inspectPage(nativePage);
+  }
+  console.log(
+    "PASS: all three draft openings and packaging links retain static mobile content without JavaScript",
+  );
   await nativePage.goto(siteUrl("/products/trayn-whey-rich-chocolate/"));
   for (const [id, flavor] of [
     ["vanilla-creme", "Vanilla Creme"],

@@ -1,0 +1,120 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #222;
+  color: #e8e8e8;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.studio-bar {
+  height: 46px;
+  padding: 0 22px;
+  background: #191919;
+  border-bottom: 1px solid #343434;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.studio-name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: #eee;
+  white-space: nowrap;
+}
+.studio-name span {
+  font-size: 9px;
+  font-weight: 400;
+  color: #aaa;
+  margin-left: 8px;
+}
+.studio-direction {
+  margin: 0;
+  font-size: 11px;
+  color: #ccc;
+}
+.studio-views {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.studio-views button,
+.studio-views a {
+  background: transparent;
+  border: 0;
+  padding: 7px 12px;
+  border-radius: 4px;
+  color: #aaa;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.studio-views [aria-pressed="true"] {
+  color: #fff;
+  background: #373737;
+}
+.studio-views a {
+  font-size: 18px;
+}
+.studio-stage {
+  height: calc(100dvh - 46px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+}
+#experience {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #111;
+  display: block;
+}
+body[data-viewport="mobile"] #experience {
+  width: min(390px, 100%);
+  height: 100%;
+  box-shadow: 0 0 0 1px #4d4d4d;
+}
+:focus-visible {
+  outline: 2px solid #eee;
+  outline-offset: 3px;
+}
+.studio-noscript {
+  position: fixed;
+  top: 46px;
+  padding: 24px;
+  background: #222;
+}
+.studio-noscript a {
+  color: white;
+}
+@media (max-width: 700px) {
+  .studio-bar {
+    padding-inline: 12px;
+    gap: 10px;
+  }
+  .studio-name span {
+    display: none;
+  }
+  .studio-direction {
+    font-size: 10px;
+  }
+  .studio-views [data-viewport] {
+    display: none;
+  }
+  .studio-views #reduce-motion {
+    padding: 7px 6px;
+    font-size: 9px;
+  }
+  .studio-views a {
+    padding: 4px;
+  }
+}

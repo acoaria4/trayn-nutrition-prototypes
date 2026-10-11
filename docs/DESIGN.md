@@ -1,5 +1,7 @@
 # TRAYN After Dark — implementation direction
 
+Historical direction. The user selected Under Tension on 11 October 2026; see [the current direction](UNDER_TENSION.md). All three exploration drafts are retained for feedback.
+
 Prepared before implementation, 9 October 2026.
 
 ## Source and rollback

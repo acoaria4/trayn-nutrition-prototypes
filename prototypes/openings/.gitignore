@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vite/
+captures/
+*.log
+quiet.html
+tension.html
+flavour.html
