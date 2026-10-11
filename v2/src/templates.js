@@ -62,8 +62,8 @@ export function home() {
     <div class="tension-scene">
       <section class="hero tension-hero" aria-labelledby="hero-heading" data-story-progress="0">
         <div class="tension-material" aria-hidden="true"><img src="/images/campaign/tension-hero-1672.webp" srcset="/images/campaign/tension-hero-960.webp 960w, /images/campaign/tension-hero-1672.webp 1672w" sizes="100vw" width="1672" height="941" alt="" fetchpriority="high"></div>
-        <div class="tension-heading"><h1 id="hero-heading"><span>UNDER</span> <span>TENSION.</span></h1></div>
-        <p class="tension-statement">FUEL YOUR POTENTIAL.</p>
+        <div class="tension-heading"><h1 id="hero-heading"><span>FUEL YOUR</span> <span class="campaign-accent">POTENTIAL.</span></h1></div>
+        <p class="tension-statement">Belgian Chocolate whey protein concentrate.</p>
         <div class="tension-stage"><div class="tension-pack">${productImage(featuredProduct, { className: "hero-pouch", priority: true })}<span class="tension-light" aria-hidden="true"><span class="tension-sheen"></span></span></div></div>
         <div class="tension-hero-bottom">
           <p class="tension-product-note">Belgian Chocolate.<br>Whey protein concentrate.<span>500 g packaging concept. Not for sale.</span></p>
@@ -71,28 +71,28 @@ export function home() {
         </div>
       </section>
       <div class="tension-chapters">
-        <article class="tension-chapter" data-chapter="1"><p class="eyebrow">01 / The protein</p><h2>WHEY.<br>IN FOCUS.</h2><p>Whey protein concentrate.</p><span class="chapter-detail">The protein source in our Belgian Chocolate pack. Contains milk.</span></article>
-        <article class="tension-chapter" data-chapter="2"><p class="eyebrow">02 / The flavour</p><h2>BELGIAN<br>CHOCOLATE.</h2><p>Whey protein concentrate · 500 g</p><a class="text-link" href="#blend">Explore the product ${arrow}</a></article>
+        <article class="tension-chapter" data-chapter="1"><p class="eyebrow"><span class="section-index">01</span> / The protein</p><h2>WHEY.<br>IN FOCUS.</h2><p>Whey protein concentrate.</p><span class="chapter-detail">The protein source in our Belgian Chocolate pack. Contains milk.</span></article>
+        <article class="tension-chapter" data-chapter="2"><p class="eyebrow"><span class="section-index">02</span> / The flavour</p><h2>BELGIAN<br>CHOCOLATE.</h2><p>Whey protein concentrate · 500 g</p><a class="text-link" href="#blend">Explore the product ${arrow}</a></article>
       </div>
       <div class="story-progress" aria-hidden="true"><span>TRAYN / BELGIAN CHOCOLATE</span><div><i></i></div><span>WPC · 500 g</span></div>
     </div>
   </section>
   <section class="wpc-product section-space wrap" id="blend" aria-labelledby="blend-heading">
-    <div class="section-top"><p class="eyebrow">03 / The details</p><span class="section-caption">Belgian Chocolate / 500 g</span></div>
+    <div class="section-top"><p class="eyebrow"><span class="section-index">03</span> / The details</p><span class="section-caption">Belgian Chocolate / 500 g</span></div>
     <div class="wpc-product-layout"><div><h2 id="blend-heading">KNOW YOUR<br>PROTEIN.</h2><p class="body-copy">WPC stands for whey protein concentrate. It’s the protein source in our Belgian Chocolate pack.</p><p class="body-copy">The essentials are here: protein source, flavour, pack size and the known milk allergen.</p><a class="text-link" href="${productPath}">View product details ${arrow}</a></div><div>${specificationRows(featuredProduct)}<p class="small-note">Looking for nutrition values or serving directions? <a href="/label-information.html">Check the current product information.</a></p></div></div>
   </section>
   <section class="wpc-packaging wrap" id="story" aria-labelledby="packaging-heading">
     <figure class="wpc-pack-detail"><a href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging aria-label="Inspect Belgian Chocolate packaging">${productImage(featuredProduct)}<span aria-hidden="true">Inspect packaging +</span></a></figure>
-    <div class="wpc-pack-copy"><p class="eyebrow">04 / The packaging</p><h2 id="packaging-heading">A CLOSER<br>LOOK.</h2><p class="body-copy">Explore the front of the Belgian Chocolate pouch: the product name, flavour and 500 g pack size, together.</p><a class="text-link" href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging>See the pack up close ${arrow}</a><p class="small-note">Front packaging concept. Final label information is still to be confirmed.</p></div>
+    <div class="wpc-pack-copy"><p class="eyebrow"><span class="section-index">04</span> / The packaging</p><h2 id="packaging-heading">A CLOSER<br>LOOK.</h2><p class="body-copy">Explore the front of the Belgian Chocolate pouch: the product name, flavour and 500 g pack size, together.</p><a class="text-link" href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging>See the pack up close ${arrow}</a><p class="small-note">Front packaging concept. Final label information is still to be confirmed.</p></div>
   </section>
   <section class="trayn-mindset section-space" id="about" aria-labelledby="mindset-heading">
     <div class="trayn-mindset-inner wrap">
-      <div><p class="eyebrow">05 / The TRAYN mindset</p><h2 id="mindset-heading">GET<br>BUILT.</h2></div>
+      <div><p class="eyebrow"><span class="section-index">05</span> / The TRAYN mindset</p><h2 id="mindset-heading">GET<br>BUILT.</h2></div>
       <div class="trayn-mindset-copy"><p class="eyebrow">TRAYN by gLitCh</p><h3>Built for those<br>who show up.</h3><p>Discipline. Grit. The drive to show up every day. That’s the spirit behind TRAYN.</p><p>For regular gym goers, competitive athletes and people starting their first training routine. Wherever you begin, keep showing up.</p><a class="text-link" href="#contact">Get to know TRAYN ${arrow}</a></div>
     </div>
   </section>
   <section class="wpc-questions section-space wrap" id="questions" aria-labelledby="questions-heading">
-    <div><p class="eyebrow">06 / Before your next scoop</p><h2 id="questions-heading">KNOW<br>YOUR PACK.</h2><p class="body-copy">Clear product information belongs alongside the training mindset.</p><a class="text-link" href="/label-information.html">Read the product information ${arrow}</a></div>
+    <div><p class="eyebrow"><span class="section-index">06</span> / Before your next scoop</p><h2 id="questions-heading">KNOW<br>YOUR PACK.</h2><p class="body-copy">Clear product information belongs alongside the training mindset.</p><a class="text-link" href="/label-information.html">Read the product information ${arrow}</a></div>
     <div class="faq-list">
       <details open><summary>What does WPC mean?<span aria-hidden="true">+</span></summary><p>WPC means whey protein concentrate. The current TRAYN product direction is Belgian Chocolate WPC in a 500 g pack.</p></details>
       <details><summary>Does this product contain milk?<span aria-hidden="true">+</span></summary><p>Yes. Milk is the known allergen for this whey product. The full ingredient and allergen information will appear with the final label.</p></details>

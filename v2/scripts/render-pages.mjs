@@ -27,7 +27,7 @@ const pages = [
   {
     file: "index.html",
     type: "home",
-    title: "TRAYN Nutrition — Under Tension",
+    title: "TRAYN Nutrition — Fuel Your Potential",
     description:
       "Fuel your potential. Get built. Explore TRAYN Belgian Chocolate whey protein concentrate, the 500 g pack and the mindset behind the brand.",
     canonical: "/",

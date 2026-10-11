@@ -14,6 +14,8 @@
   --silver: #d2d1cd;
   --white: #f6f5f1;
   --red: #e51b2b;
+  /* Pouch highlight for text and accents; deeper red fills keep white text readable. */
+  --red-accent: #f82030;
   --muted: #b5b3af;
   --line: #353535;
   --body: Manrope, Arial, sans-serif;
@@ -43,6 +45,28 @@ input {
 .eyebrow {
   font-size: 11px;
   letter-spacing: 0.11em;
+}
+.eyebrow:has(.section-index) {
+  gap: 0.55em;
+}
+.campaign-accent,
+.section-index {
+  color: var(--red-accent);
+  font-weight: 800;
+}
+.text-link > span[aria-hidden],
+.header-cta > span[aria-hidden],
+.contact-email > span[aria-hidden],
+.footer-links a > span[aria-hidden] {
+  color: var(--red-accent);
+}
+.contact-email {
+  transition: color 0.2s ease-out, border-color 0.2s ease-out;
+}
+.contact-email:hover,
+.contact-email:focus-visible {
+  color: var(--red-accent);
+  border-color: var(--red-accent);
 }
 .small-note {
   font-size: 12px;
@@ -127,13 +151,14 @@ input {
   display: flex;
   justify-content: space-between;
   gap: 28px;
-  font-size: clamp(78px, 9.4vw, 170px);
+  font-size: clamp(56px, 7.9vw, 144px);
   font-weight: 800;
   line-height: 0.98;
   letter-spacing: -0.075em;
 }
 .hero.tension-hero .tension-heading h1 > span {
   display: block;
+  white-space: nowrap;
 }
 .tension-statement {
   position: relative;
@@ -871,7 +896,7 @@ input {
     padding-top: 27px;
   }
   .hero.tension-hero .tension-heading h1 {
-    font-size: 9.7vw;
+    font-size: 7.9vw;
     gap: 12px;
   }
   .tension-statement {
@@ -1171,7 +1196,7 @@ input {
     margin-inline: var(--gutter);
   }
   .tension-stage {
-    inset: clamp(170px, 24svh, 200px) 8% clamp(96px, 15svh, 130px);
+    inset: clamp(192px, 26svh, 218px) 8% clamp(96px, 15svh, 130px);
   }
   .tension-pack {
     max-width: 310px;
@@ -1619,7 +1644,7 @@ input {
     margin-top: 15px;
   }
   .tension-stage {
-    inset: clamp(150px, 24svh, 177px) 6% clamp(96px, 15svh, 120px);
+    inset: clamp(172px, 26svh, 195px) 6% clamp(96px, 15svh, 120px);
   }
   .tension-hero-bottom {
     bottom: 18px;

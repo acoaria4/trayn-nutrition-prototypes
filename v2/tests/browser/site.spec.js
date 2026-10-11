@@ -150,7 +150,7 @@ test("home navigation reaches the real section destinations", async ({
   page,
 }, testInfo) => {
   await page.goto("/");
-  await expect(page.locator("h1")).toContainText(/UNDER\s*TENSION\./i);
+  await expect(page.locator("h1")).toContainText(/FUEL YOUR\s*POTENTIAL\./i);
   await expect(page.locator(".hero-pouch")).toHaveAttribute(
     "src",
     /belgian-chocolate-wpc/,
