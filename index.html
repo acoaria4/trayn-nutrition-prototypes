@@ -11,6 +11,10 @@
       h1 { line-height: 1.1; font-size: clamp(36px, 8vw, 72px); }
       a { color: inherit; display: block; padding: 20px 0; border-bottom: 1px solid #555; }
       a:focus-visible { outline: 3px solid #e54848; outline-offset: 4px; }
+      .draft-links { margin: 0; padding: 4px 0 4px 24px; list-style: none; border-bottom: 1px solid #555; }
+      .draft-links a { padding: 12px 0; border-color: #333; font-size: 16px; color: #bbb; }
+      .draft-links a:hover { color: #f2f0eb; }
+      .draft-links li:last-child a { border-bottom: 0; }
       p { color: #bbb; }
     </style>
   </head>
@@ -18,11 +22,16 @@
     <main>
       <p>TRAYN NUTRITION / DESIGN REVIEW</p>
       <h1>Choose a version.</h1>
-      <p>Explore the original website, the selected direction, and the three opening studies.</p>
+      <p>Explore After Dark, Under Tension, and the three opening studies.</p>
       <nav aria-label="Website versions">
-        <a href="/trayn-nutrition-prototypes/v1/">V1 — Original website</a>
+        <a href="/trayn-nutrition-prototypes/v1/">V1 — After Dark</a>
         <a href="/trayn-nutrition-prototypes/v2/">V2 — Under Tension</a>
         <a href="/trayn-nutrition-prototypes/v2/drafts/">Compare all three opening studies</a>
+        <ul class="draft-links" aria-label="Opening study drafts">
+          <li><a href="/trayn-nutrition-prototypes/v2/drafts/quiet.html">The Quiet Before</a></li>
+          <li><a href="/trayn-nutrition-prototypes/v2/drafts/tension.html">Under Tension</a></li>
+          <li><a href="/trayn-nutrition-prototypes/v2/drafts/flavour.html">The Flavour Study</a></li>
+        </ul>
       </nav>
       <p>Design and packaging concepts. Not for sale.</p>
     </main>

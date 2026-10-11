@@ -3,7 +3,7 @@
 Two independent website versions and three opening studies share one GitHub Pages deployment.
 
 - [Choose a version](https://acoaria4.github.io/trayn-nutrition-prototypes/)
-- [V1 — Original website](https://acoaria4.github.io/trayn-nutrition-prototypes/v1/), restored from commit `80ce629`.
+- [V1 — After Dark](https://acoaria4.github.io/trayn-nutrition-prototypes/v1/), restored from commit `80ce629`.
 - [V2 — Under Tension](https://acoaria4.github.io/trayn-nutrition-prototypes/v2/), preserved from commit `9d74a99`.
 - [Compare the three opening studies](https://acoaria4.github.io/trayn-nutrition-prototypes/v2/drafts/).
 
