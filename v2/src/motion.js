@@ -7,6 +7,88 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Preserve the original 1000px desktop pacing (906px hero × 2.25), on every screen.
 const STORY_SCROLL_DISTANCE = 2040;
+const SECTION_SNAP_DISTANCE = 56;
+
+function initializeSectionSnap(scroll) {
+  const sections = [...document.querySelectorAll("#about, #story, #blend")];
+  let idleTimer;
+  let gestureStart;
+  let isSnapping = false;
+  const cancel = () => {
+    clearTimeout(idleTimer);
+    gestureStart = undefined;
+    if (isSnapping) {
+      isSnapping = false;
+      if (!scroll.isStopped) {
+        scroll.stop();
+        scroll.start();
+      }
+    }
+  };
+  const settle = () => {
+    if (
+      document.hidden ||
+      scroll.isStopped ||
+      document.querySelector("dialog[open]")
+    )
+      return cancel();
+    // Let the existing wheel inertia finish before making a small correction.
+    if (scroll.isScrolling) {
+      idleTimer = setTimeout(settle, 100);
+      return;
+    }
+    const nearest = sections
+      .map((section) => {
+        const top = section.getBoundingClientRect().top + window.scrollY;
+        return { top, distance: Math.abs(top - window.scrollY) };
+      })
+      .sort((first, second) => first.distance - second.distance)[0];
+    const origin = gestureStart ?? window.scrollY;
+    gestureStart = undefined;
+    if (
+      !nearest ||
+      nearest.distance < 2 ||
+      nearest.distance > SECTION_SNAP_DISTANCE ||
+      // A small scroll away from a boundary should never pull the reader back.
+      nearest.distance >= Math.abs(nearest.top - origin)
+    )
+      return;
+    scroll.scrollTo(nearest.top, {
+      duration: 0.25,
+      onStart: () => {
+        isSnapping = true;
+      },
+      onComplete: () => {
+        isSnapping = false;
+      },
+    });
+  };
+  const onWheel = ({ event, deltaY }) => {
+    clearTimeout(idleTimer);
+    if (
+      event.type !== "wheel" ||
+      !deltaY ||
+      event.ctrlKey ||
+      event.target?.closest?.(
+        "dialog, [data-lenis-prevent], [data-lenis-prevent-wheel]",
+      )
+    )
+      return cancel();
+    // Lenis retargets an active correction as soon as fresh wheel input arrives.
+    isSnapping = false;
+    gestureStart ??= window.scrollY;
+    idleTimer = setTimeout(settle, 180);
+  };
+  scroll.on("virtual-scroll", onWheel);
+  window.addEventListener("keydown", cancel);
+  window.addEventListener("pointerdown", cancel);
+  return () => {
+    cancel();
+    scroll.off("virtual-scroll", onWheel);
+    window.removeEventListener("keydown", cancel);
+    window.removeEventListener("pointerdown", cancel);
+  };
+}
 
 export function initializeMotion() {
   const hero = document.querySelector(".tension-hero");
@@ -20,8 +102,11 @@ export function initializeMotion() {
     new URLSearchParams(location.search).get("motion") === "off";
   let media;
   let lenis;
+  let destroySectionSnap;
   const tick = (time) => lenis?.raf(time * 1000);
   const destroyScroll = () => {
+    destroySectionSnap?.();
+    destroySectionSnap = undefined;
     gsap.ticker.remove(tick);
     lenis?.destroy();
     lenis = undefined;
@@ -165,6 +250,7 @@ export function initializeMotion() {
           )
           .to(chapters[1], { autoAlpha: 1, y: 0, duration: 0.12 }, 0.7);
         updateAccess(timeline.scrollTrigger.progress);
+        if (wide && fine) destroySectionSnap = initializeSectionSnap(lenis);
         // Keep pin bounds and spacing in sync with the dynamic-height material,
         // including small touch resizes that ScrollTrigger ignores by default.
         let viewportFrame;

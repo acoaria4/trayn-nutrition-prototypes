@@ -86,7 +86,7 @@ The local environment initially had a Node certificate-chain issue during instal
 - `src/styles.css`: shared navigation, product, disclosure and dialog foundations.
 - `src/under-tension.css`: selected visual system, responsive compositions, Manrope typography and product/material scenes.
 - `src/main.js`: navigation, progressive flavour selection, direct-image/modal gallery, history, image fallbacks and active navigation.
-- `src/motion.js`: optional GSAP pinned story with the same 2,040 px scroll distance on every viewport, delayed scroll-driven lighting and one Lenis instance on wide fine-pointer screens, with reduced-motion and lifecycle cleanup; absent from non-home pages’ execution.
+- `src/motion.js`: optional GSAP pinned story with the same 2,040 px scroll distance on every viewport, delayed scroll-driven lighting and one Lenis instance on fine-pointer screens. Wide fine-pointer screens softly settle within 56 px of the mindset, packaging and product-details starts after wheel inertia finishes; touch, reduced motion, hero chapters, FAQ and footer retain free scrolling. Motion includes lifecycle cleanup and is absent from non-home pages’ execution.
 - `public/`: self-hosted images, fonts and licences. No remote media or third-party trackers are required at runtime.
 - `tests/`: product-truth checks and real Chrome browser verification.
 - `docs/`: design/capability audit, provenance, verification, screenshots and performance evidence.

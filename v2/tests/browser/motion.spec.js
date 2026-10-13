@@ -1,5 +1,20 @@
 import { test, expect } from "@playwright/test";
 
+async function sectionTop(page, selector) {
+  return page
+    .locator(selector)
+    .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+}
+
+async function moveTo(page, top) {
+  await page.evaluate((top) => scrollTo({ top, behavior: "instant" }), top);
+  await page.waitForTimeout(150);
+}
+
+async function expectScrollAt(page, top) {
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeCloseTo(top, 0);
+}
+
 const transform = (locator) =>
   locator.evaluate((element) => {
     const matrix = new DOMMatrixReadOnly(getComputedStyle(element).transform);
@@ -375,4 +390,83 @@ test("mobile browser height changes leave no gap and preserve scroll pacing", as
   await expect(page.locator('[data-chapter="1"]')).toBeVisible();
   await scrollStory(page, 0.8);
   await expect(page.locator('[data-chapter="2"]')).toBeVisible();
+});
+
+test("desktop softly settles at selected starts and leaves reading positions free", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.use.isMobile || testInfo.project.use.viewport.width <= 800,
+    "Desktop wheel snapping",
+  );
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
+  await page.evaluate(() => document.fonts.ready);
+  await page.mouse.move(20, 200);
+  for (const id of ["about", "story", "blend"]) {
+    const top = await sectionTop(page, `#${id}`);
+    await moveTo(page, top - 80);
+    await page.mouse.wheel(0, 40);
+    await expectScrollAt(page, top);
+    await page.mouse.wheel(0, 20);
+    await expectScrollAt(page, top + 20);
+    await page.waitForTimeout(400);
+    await expectScrollAt(page, top + 20);
+  }
+  const interruptTarget = await sectionTop(page, "#story");
+  await moveTo(page, interruptTarget - 80);
+  await page.mouse.wheel(0, 40);
+  await page.waitForFunction(
+    (top) => scrollY > top - 28 && scrollY < top - 1,
+    interruptTarget,
+    { polling: "raf" },
+  );
+  await page.keyboard.press("Shift");
+  const interruptedPosition = await page.evaluate(() => scrollY);
+  expect(interruptedPosition).toBeLessThan(interruptTarget - 1);
+  await page.waitForTimeout(400);
+  await expectScrollAt(page, interruptedPosition);
+  const middle = (await sectionTop(page, "#story")) + 200;
+  await moveTo(page, middle);
+  await page.mouse.wheel(0, 30);
+  await expectScrollAt(page, middle + 30);
+  await page.waitForTimeout(400);
+  await expectScrollAt(page, middle + 30);
+  await scrollStory(page, 0.4);
+  const heroPosition = await page.evaluate(() => scrollY);
+  await page.mouse.wheel(0, 40);
+  await expectScrollAt(page, heroPosition + 40);
+  await page.waitForTimeout(400);
+  await expectScrollAt(page, heroPosition + 40);
+  const questions = Math.min(
+    (await sectionTop(page, "#questions")) + 100,
+    await page.evaluate(
+      () => document.documentElement.scrollHeight - innerHeight - 60,
+    ),
+  );
+  await moveTo(page, questions);
+  await page.mouse.wheel(0, 30);
+  await expectScrollAt(page, questions + 30);
+  await page.waitForTimeout(400);
+  await expectScrollAt(page, questions + 30);
+});
+
+test("touch, narrow and reduced-motion layouts scroll freely near section starts", async ({
+  page,
+}, testInfo) => {
+  if (testInfo.project.use.viewport.width > 800)
+    await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-motion",
+    /enabled|reduced/,
+  );
+  await page.evaluate(() => document.fonts.ready);
+  const top = await sectionTop(page, "#about");
+  await moveTo(page, top - 80);
+  await page.mouse.move(20, 200);
+  await page.mouse.wheel(0, 40);
+  await expectScrollAt(page, top - 40);
+  await page.waitForTimeout(500);
+  await expectScrollAt(page, top - 40);
 });
