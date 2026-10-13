@@ -105,7 +105,7 @@ export function initializeMotion() {
         });
         timeline
           .to(
-            ".tension-heading, .tension-statement",
+            ".tension-heading",
             { y: -28, autoAlpha: 0, duration: 0.18 },
             0.02,
           )

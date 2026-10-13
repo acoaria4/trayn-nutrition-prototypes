@@ -126,7 +126,7 @@ html.lenis {
   grid-template-columns: 1fr 1fr;
   gap: 9%;
   align-items: center;
-  padding-bottom: 130px;
+  padding-block: 105px;
 }
 .wpc-pack-detail {
   margin: 0;
@@ -234,7 +234,7 @@ html.lenis {
   .wpc-packaging {
     gap: 45px;
     grid-template-columns: 1fr;
-    padding-bottom: 70px;
+    padding-block: 70px;
   }
   .wpc-pack-detail {
     max-height: 600px;
@@ -280,9 +280,6 @@ html.lenis {
   .tension-heading {
     padding-top: 20px;
   }
-  .tension-statement {
-    margin-top: 16px;
-  }
   .is-story-motion .tension-chapter {
     top: 22%;
   }
@@ -323,10 +320,29 @@ html.lenis {
 
 /* The product story gives way to the people and purpose behind TRAYN. */
 .trayn-mindset {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
   border-block: 1px solid #ffffff25;
   background: #151313;
 }
+.trayn-mindset::after {
+  content: "";
+  position: absolute;
+  bottom: -26px;
+  right: -36px;
+  width: clamp(360px, 42vw, 650px);
+  height: 160px;
+  background: url("/images/brand/trayn-slipstream.svg") center / 100% 100%
+    no-repeat;
+  mask-image: linear-gradient(to right, transparent, #000 35%);
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: 0;
+}
 .trayn-mindset-inner {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1.1fr 1fr;
   gap: 10%;
@@ -386,6 +402,13 @@ html.lenis {
   font-size: 13px;
 }
 @media (max-width: 800px) {
+  .trayn-mindset::after {
+    bottom: -12px;
+    right: -24px;
+    width: 220px;
+    height: 72px;
+    opacity: 0.24;
+  }
   .trayn-mindset-inner,
   .wpc-questions {
     grid-template-columns: 1fr;
