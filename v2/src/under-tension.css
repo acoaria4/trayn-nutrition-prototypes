@@ -112,10 +112,11 @@ input {
 
 /* One continuous material scene, with lighting driven by the scroll timeline. */
 .hero.tension-hero {
+  --hero-opening-height: min(calc(100svh - 94px), 1200px);
   display: block;
   width: 100%;
   max-width: none;
-  height: calc(100svh - 94px);
+  height: var(--hero-opening-height);
   min-height: 0;
   max-height: 1200px;
   padding: 0;
@@ -123,6 +124,10 @@ input {
   isolation: isolate;
   overflow: hidden;
   background: #0c0b0b;
+}
+.tension-opening {
+  position: relative;
+  height: 100%;
 }
 .tension-hero .tension-material {
   position: absolute;
@@ -888,7 +893,8 @@ input {
     font-size: 11px;
   }
   .hero.tension-hero {
-    height: calc(100svh - 82px);
+    --hero-opening-height: calc(100svh - 82px);
+    height: var(--hero-opening-height);
     min-height: 0;
     max-height: none;
   }
@@ -1160,7 +1166,8 @@ input {
   }
   .hero.tension-hero {
     display: block;
-    height: calc(100svh - 76px);
+    --hero-opening-height: calc(100svh - 76px);
+    height: var(--hero-opening-height);
     min-height: 0;
     max-height: none;
     padding: 0;

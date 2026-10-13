@@ -165,6 +165,20 @@ export function initializeMotion() {
           )
           .to(chapters[1], { autoAlpha: 1, y: 0, duration: 0.12 }, 0.7);
         updateAccess(timeline.scrollTrigger.progress);
+        // Keep pin bounds and spacing in sync with the dynamic-height material,
+        // including small touch resizes that ScrollTrigger ignores by default.
+        let viewportFrame;
+        let previousHeight = hero.offsetHeight;
+        const viewportObserver = new ResizeObserver(() => {
+          const height = hero.offsetHeight;
+          if (height === previousHeight) return;
+          previousHeight = height;
+          cancelAnimationFrame(viewportFrame);
+          viewportFrame = requestAnimationFrame(() => {
+            ScrollTrigger.refresh();
+          });
+        });
+        viewportObserver.observe(hero);
         // Resolve after the pin has established its spacing, including very early
         // keyboard activation. Native anchor scrolling can retain pre-pin bounds.
         const navigateSection = (event) => {
@@ -217,6 +231,8 @@ export function initializeMotion() {
         };
         document.addEventListener("click", navigateSection);
         return () => {
+          viewportObserver?.disconnect();
+          cancelAnimationFrame(viewportFrame);
           document.removeEventListener("click", navigateSection);
           resetStory();
         };

@@ -62,12 +62,14 @@ export function home() {
     <div class="tension-scene">
       <section class="hero tension-hero" aria-labelledby="hero-heading" data-story-progress="0">
         <div class="tension-material" aria-hidden="true"><img src="/images/campaign/tension-hero-1672.webp" srcset="/images/campaign/tension-hero-960.webp 960w, /images/campaign/tension-hero-1672.webp 1672w" sizes="100vw" width="1672" height="941" alt="" fetchpriority="high"></div>
+        <div class="tension-opening">
         <div class="tension-heading"><h1 id="hero-heading"><span>FUEL YOUR</span> <span class="campaign-accent">POTENTIAL.</span></h1></div>
         <p class="tension-statement">Belgian Chocolate whey protein concentrate.</p>
         <div class="tension-stage"><div class="tension-pack">${productImage(featuredProduct, { className: "hero-pouch", priority: true })}<span class="tension-light" aria-hidden="true"><span class="tension-sheen"></span></span></div></div>
         <div class="tension-hero-bottom">
           <p class="tension-product-note">Belgian Chocolate.<br>Whey protein concentrate.<span>500 g packaging concept. Not for sale.</span></p>
           <a class="tension-explore" href="#blend" aria-label="Discover the product"><span>Scroll to explore</span><span aria-hidden="true">↓</span></a>
+        </div>
         </div>
       </section>
       <div class="tension-chapters">

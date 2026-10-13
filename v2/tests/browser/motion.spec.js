@@ -229,6 +229,18 @@ test("the opening and both scroll chapters fit the viewport", async ({
   await page.evaluate(() => document.fonts.ready);
   for (const progress of [0, 0.4, 0.8]) {
     await scrollStory(page, progress);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const hero = document.querySelector(".tension-hero");
+          const scene = document.querySelector(".tension-scene");
+          return Math.max(
+            Math.abs(hero.getBoundingClientRect().bottom - innerHeight),
+            Math.abs(scene.getBoundingClientRect().bottom - innerHeight),
+          );
+        }),
+      )
+      .toBeLessThan(2);
     const bounds = await page.evaluate((progress) => {
       const selectors =
         progress === 0
@@ -287,11 +299,80 @@ test("resizing a laptop keeps one working scroll scene", async ({
   );
   await page.goto("/");
   await scrollStory(page, 0.4);
-  await page.setViewportSize({ width: 1280, height: 600 });
-  await expect(page.locator(".pin-spacer")).toHaveCount(1);
-  await scrollStory(page, 0.8);
-  await expect(page.locator('[data-chapter="2"]')).toBeVisible();
-  await page.setViewportSize({ width: 1280, height: 900 });
+  for (const height of [600, 900, 1400]) {
+    await page.setViewportSize({ width: 1280, height });
+    await expect(page.locator(".pin-spacer")).toHaveCount(1);
+    const progress = height === 600 ? 0.8 : 0.4;
+    await scrollStory(page, progress);
+    await expect(
+      page.locator(`[data-chapter="${progress === 0.8 ? 2 : 1}"]`),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .locator(".tension-hero")
+          .evaluate((el) =>
+            Math.abs(el.getBoundingClientRect().bottom - innerHeight),
+          ),
+      )
+      .toBeLessThan(2);
+  }
+});
+
+test("mobile browser height changes leave no gap and preserve scroll pacing", async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !testInfo.project.use.isMobile,
+    "Touch browser viewport regression",
+  );
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  await scrollStory(page, 0.1);
+  const openingHeight = await page
+    .locator(".tension-opening")
+    .evaluate((el) => el.offsetHeight);
+  // Model iPhone browser controls retracting: the small viewport composition
+  // remains stable while the dynamic viewport grows by less than 25%.
+  await page.addStyleTag({
+    content: `.tension-hero { --hero-opening-height: ${openingHeight}px !important; }`,
+  });
+  const viewport = page.viewportSize();
+  const originalScroll = await page.evaluate(() => scrollY);
+  for (const height of [viewport.height + 120, viewport.height]) {
+    await page.setViewportSize({ width: viewport.width, height });
+    await expect(page.locator(".pin-spacer")).toHaveCount(1);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const hero = document.querySelector(".tension-hero");
+          const scene = document.querySelector(".tension-scene");
+          const story = document.querySelector(".tension-story");
+          return Math.max(
+            Math.abs(hero.getBoundingClientRect().bottom - innerHeight),
+            Math.abs(scene.getBoundingClientRect().bottom - innerHeight),
+            Math.abs(story.offsetHeight - hero.offsetHeight - 2040),
+          );
+        }),
+      )
+      .toBeLessThan(2);
+    expect(await page.evaluate(() => scrollY)).toBeCloseTo(originalScroll, 0);
+    await expect(page.locator(".tension-opening")).toHaveCSS(
+      "height",
+      `${openingHeight}px`,
+    );
+    await expect
+      .poll(async () =>
+        Number(
+          await page
+            .locator(".tension-hero")
+            .getAttribute("data-story-progress"),
+        ),
+      )
+      .toBeCloseTo(0.1, 3);
+  }
   await scrollStory(page, 0.4);
   await expect(page.locator('[data-chapter="1"]')).toBeVisible();
+  await scrollStory(page, 0.8);
+  await expect(page.locator('[data-chapter="2"]')).toBeVisible();
 });
