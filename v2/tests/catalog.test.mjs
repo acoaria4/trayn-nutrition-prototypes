@@ -99,18 +99,24 @@ test("the current WPC pack never exposes the previous blend back label", () => {
   assert.equal(featuredProduct.name, "Whey Protein Concentrate");
   assert.equal(featuredProduct.blend, "Whey protein concentrate (WPC)");
   assert.equal(featuredProduct.archived, false);
-  assert.equal(
-    featuredProduct.image,
-    "/images/products/belgian-chocolate-wpc",
-  );
+  assert.equal(featuredProduct.image, "/images/products/belgian-chocolate-wpc");
   assert.doesNotMatch(productTitle(featuredProduct), /blend|isolate/i);
   assert.doesNotMatch(productDescription(featuredProduct), /blend|isolate/i);
-  for (const product of products) {
+  assert.equal(
+    featuredProduct.backImage,
+    "/images/products/belgian-chocolate-wpc-back",
+  );
+  assert.equal(
+    featuredProduct.backLabelPdf,
+    "/images/products/belgian-chocolate-wpc-back-label.pdf",
+  );
+  for (const product of products.filter((product) => product.archived)) {
     assert.equal(
       product.backImage,
       null,
       `${product.id}: no matching back label has been supplied`,
     );
+    assert.equal(product.backLabelPdf, undefined);
   }
 });
 

@@ -12,7 +12,9 @@ export const products = [
     status: "Featured concept",
     color: "#8c4b35",
     image: "/images/products/belgian-chocolate-wpc",
-    backImage: null,
+    backImage: "/images/products/belgian-chocolate-wpc-back",
+    backLabelImage: "/images/products/belgian-chocolate-wpc-back-label.webp",
+    backLabelPdf: "/images/products/belgian-chocolate-wpc-back-label.pdf",
   },
   {
     id: "vanilla-creme",

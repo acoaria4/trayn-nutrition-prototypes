@@ -258,6 +258,50 @@ window.addEventListener("popstate", () =>
 // The anchor remains a direct image link when JavaScript or dialog support is absent.
 const dialog = document.querySelector("#packaging-dialog");
 let dialogOpener;
+let dialogProduct;
+function setDialogView(view) {
+  const product = dialogProduct;
+  const image = dialog.querySelector("[data-dialog-image]");
+  const views = {
+    front: {
+      path: `${product.image}-1024.webp`,
+      label: "front pouch",
+      caption: "Front packaging concept.",
+    },
+    back: {
+      path: `${product.backImage}-1024.webp`,
+      label: "back pouch visualisation",
+      caption:
+        "Back pouch visualisation. For small print, use the supplied back label.",
+    },
+    label: {
+      path: product.backLabelImage,
+      label: "original back label artwork from the supplied printer PDF",
+      caption: "Original back artwork from the supplied printer PDF.",
+    },
+  };
+  const selected = views[view];
+  clearImageError(image);
+  image.src = localUrl(selected.path);
+  image.alt = `TRAYN ${product.flavor} ${selected.label}`;
+  dialog.dataset.selectedView = view;
+  dialog.querySelector(".dialog-caption").textContent = selected.caption;
+  dialog.querySelectorAll("[data-dialog-view]").forEach((link) => {
+    const key = link.dataset.dialogView;
+    link.hidden =
+      key === "back"
+        ? !product.backImage
+        : key === "label"
+          ? !product.backLabelImage
+          : false;
+    if (views[key].path) link.href = localUrl(views[key].path);
+    link.setAttribute("aria-current", String(key === view));
+  });
+  const labelPdf = dialog.querySelector("[data-dialog-label-pdf]");
+  labelPdf.hidden = !product.backLabelPdf;
+  if (product.backLabelPdf) labelPdf.href = localUrl(product.backLabelPdf);
+  dialog.scrollTop = 0;
+}
 let priorBodyOverflow = "";
 if (typeof dialog.showModal === "function") {
   document.querySelectorAll("[data-open-packaging]").forEach((link) =>
@@ -266,18 +310,25 @@ if (typeof dialog.showModal === "function") {
         return;
       event.preventDefault();
       dialogOpener = link;
-      const image = dialog.querySelector("[data-dialog-image]");
       const explorer = link.closest("[data-product-explorer]");
-      const product = getProduct(explorer?.dataset.selectedFlavor);
-      clearImageError(image);
-      image.src = link.href;
-      image.alt = `Enlarged TRAYN ${product.flavor} ${explorer?.dataset.selectedView === "back" ? "back-label" : "front pouch"} packaging concept; not for sale`;
+      dialogProduct = getProduct(explorer?.dataset.selectedFlavor);
+      setDialogView(
+        explorer?.dataset.selectedView === "back" ? "back" : "front",
+      );
       priorBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       dialog.showModal();
       dialog.querySelector(".dialog-close").focus();
     }),
   );
+  dialog.querySelectorAll("[data-dialog-view]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)
+        return;
+      event.preventDefault();
+      setDialogView(link.dataset.dialogView);
+    });
+  });
   dialog
     .querySelector(".dialog-close")
     .addEventListener("click", () => dialog.close());

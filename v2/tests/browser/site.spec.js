@@ -338,7 +338,11 @@ test("the current WPC pack has accurate copy, artwork and a keyboard accessible 
     /whey protein isolate|WPI|concentrate\s*\+\s*isolate/i,
   );
   await expect(page.locator("[data-flavor]")).toHaveCount(0);
-  await expect(page.locator('[data-gallery-view="back"]')).not.toBeVisible();
+  await expect(page.locator('[data-gallery-view="back"]')).toBeVisible();
+  await page.locator('[data-gallery-view="back"]').click();
+  await expect(image).toHaveAttribute("src", /belgian-chocolate-wpc-back/);
+  await page.locator('[data-gallery-view="front"]').click();
+  await expect(image).toHaveAttribute("src", /belgian-chocolate-wpc-640/);
   for (const selector of [
     'meta[name="description"]',
     'meta[property="og:description"]',
@@ -370,6 +374,82 @@ test("the current WPC pack has accurate copy, artwork and a keyboard accessible 
   await opener.click();
   await dialog.getByRole("button", { name: /close/i }).click();
   await expect(dialog).not.toBeVisible();
+});
+
+test("packaging inspection shows the matching back and original label on home and product pages", async ({
+  page,
+}, testInfo) => {
+  for (const path of ["/", currentProduct]) {
+    await page.goto(path);
+    const opener = page.locator("[data-open-packaging]").first();
+    if (path === currentProduct) {
+      await page.locator('[data-gallery-view="back"]').click();
+    }
+    await opener.click();
+    const dialog = page.locator("#packaging-dialog");
+    const image = dialog.locator("[data-dialog-image]");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toHaveAttribute(
+      "data-selected-view",
+      path === "/" ? "front" : "back",
+    );
+    const back = dialog.locator('[data-dialog-view="back"]');
+    await back.focus();
+    await page.keyboard.press("Enter");
+    await expect(image).toHaveAttribute(
+      "src",
+      /belgian-chocolate-wpc-back-1024.webp$/,
+    );
+    await expect(back).toHaveAttribute("aria-current", "true");
+    await expect
+      .poll(() => image.evaluate((el) => el.complete && el.naturalWidth > 0))
+      .toBe(true);
+    await expectAccessible(page);
+    if (path === "/")
+      await page.screenshot({
+        path: testInfo.outputPath("back-inspector.png"),
+      });
+    await dialog.locator('[data-dialog-view="label"]').click();
+    await expect(image).toHaveAttribute(
+      "src",
+      /belgian-chocolate-wpc-back-label.webp$/,
+    );
+    await expect(image).toHaveAttribute("alt", /original back label/);
+    await expect
+      .poll(() =>
+        image.evaluate((el) => el.complete && el.naturalWidth === 2711),
+      )
+      .toBe(true);
+    const pdf = dialog.locator("[data-dialog-label-pdf]");
+    await expect(pdf).toBeVisible();
+    await expect(pdf).toHaveAttribute(
+      "href",
+      /belgian-chocolate-wpc-back-label.pdf$/,
+    );
+    expect((await page.request.get(await pdf.getAttribute("href"))).ok()).toBe(
+      true,
+    );
+    await expectAccessible(page);
+    await expectNoOverflow(page);
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+    await expect(opener).toBeFocused();
+    await opener.click();
+    await expect(dialog).toHaveAttribute(
+      "data-selected-view",
+      path === "/" ? "front" : "back",
+    );
+    await page.keyboard.press("Escape");
+  }
+  await page.goto("/concepts/cafe-mocha/");
+  await page.locator("[data-open-packaging]").click();
+  for (const selector of [
+    '[data-dialog-view="back"]',
+    '[data-dialog-view="label"]',
+    "[data-dialog-label-pdf]",
+  ]) {
+    await expect(page.locator(selector)).not.toBeVisible();
+  }
 });
 
 test("reduced motion keeps content visible and disables continuous decorative animation", async ({
