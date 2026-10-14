@@ -9,10 +9,10 @@ html.lenis {
 .tension-scene {
   position: relative;
 }
-/* The header scrolls away during the pin. The material fills the visible screen
-   on every device while the opening keeps its original content dimensions. */
+/* Fill the viewport below the persistent header throughout the pin. The
+   opening keeps its stable composition as mobile browser controls retract. */
 .is-story-motion .hero.tension-hero {
-  height: 100dvh;
+  height: calc(100dvh - var(--header-height));
   max-height: none;
 }
 .is-story-motion .tension-opening {

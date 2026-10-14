@@ -90,8 +90,39 @@ input {
 .button-primary:hover {
   transform: none;
 }
+/* Reserve the persistent navigation's actual height for scenes and anchors. */
+:root {
+  --header-height: 94px;
+}
+html {
+  scroll-padding-top: calc(var(--header-height) + 16px);
+}
 .site-header {
+  position: sticky;
+  top: 0;
   background: #0a0a0a;
+}
+@media (max-width: 800px) {
+  :root {
+    --header-height: 82px;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --header-height: 76px;
+  }
+  .js .main-nav.is-open {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: calc(100dvh - var(--header-height));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-inline: var(--gutter);
+    background: #0a0a0a;
+    border-bottom: 1px solid var(--line);
+  }
 }
 .header-inner {
   border-bottom-color: #2b2b2b;
@@ -114,7 +145,7 @@ input {
 
 /* One continuous material scene, with lighting driven by the scroll timeline. */
 .hero.tension-hero {
-  --hero-opening-height: min(calc(100svh - 94px), 1200px);
+  --hero-opening-height: min(calc(100svh - var(--header-height)), 1200px);
   display: block;
   width: 100%;
   max-width: none;
@@ -882,7 +913,7 @@ input {
     font-size: 11px;
   }
   .hero.tension-hero {
-    --hero-opening-height: calc(100svh - 82px);
+    --hero-opening-height: calc(100svh - var(--header-height));
     height: var(--hero-opening-height);
     min-height: 0;
     max-height: none;
@@ -1150,7 +1181,7 @@ input {
   }
   .hero.tension-hero {
     display: block;
-    --hero-opening-height: calc(100svh - 76px);
+    --hero-opening-height: calc(100svh - var(--header-height));
     height: var(--hero-opening-height);
     min-height: 0;
     max-height: none;

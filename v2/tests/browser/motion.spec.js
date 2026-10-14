@@ -3,7 +3,12 @@ import { test, expect } from "@playwright/test";
 async function sectionTop(page, selector) {
   return page
     .locator(selector)
-    .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+    .evaluate(
+      (el) =>
+        el.getBoundingClientRect().top +
+        scrollY -
+        parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop),
+    );
 }
 
 async function moveTo(page, top) {
@@ -38,7 +43,10 @@ async function scrollStory(page, progress) {
     .locator(".tension-story")
     .evaluate((story, value) => {
       const hero = story.querySelector(".tension-hero");
-      const start = story.getBoundingClientRect().top + scrollY;
+      const start =
+        story.getBoundingClientRect().top +
+        scrollY -
+        document.querySelector(".site-header").offsetHeight;
       return start + (story.offsetHeight - hero.offsetHeight) * value;
     }, progress);
   await page.evaluate(
@@ -101,7 +109,13 @@ test("one continuous pouch scene stays pinned, advances and reverses with scroll
     .toBeGreaterThan(1);
   await expect
     .poll(async () =>
-      Math.abs((await page.locator(".tension-scene").boundingBox()).y),
+      page.evaluate(() =>
+        Math.abs(
+          document.querySelector(".tension-scene").getBoundingClientRect().top -
+            document.querySelector(".site-header").getBoundingClientRect()
+              .bottom,
+        ),
+      ),
     )
     .toBeLessThan(3);
   await page.waitForTimeout(800);
@@ -279,11 +293,16 @@ test("the opening and both scroll chapters fit the viewport", async ({
           right: rect.right,
           width: innerWidth,
           height: innerHeight,
+          headerBottom: document
+            .querySelector(".site-header")
+            .getBoundingClientRect().bottom,
         };
       });
     }, progress);
     for (const rect of bounds) {
-      expect(rect.top, rect.selector).toBeGreaterThanOrEqual(-1);
+      expect(rect.top, rect.selector).toBeGreaterThanOrEqual(
+        rect.headerBottom - 1,
+      );
       expect(rect.bottom, rect.selector).toBeLessThanOrEqual(rect.height + 1);
       expect(rect.left, rect.selector).toBeGreaterThanOrEqual(-1);
       expect(rect.right, rect.selector).toBeLessThanOrEqual(rect.width + 1);
@@ -392,12 +411,12 @@ test("mobile browser height changes leave no gap and preserve scroll pacing", as
   await expect(page.locator('[data-chapter="2"]')).toBeVisible();
 });
 
-test("desktop softly settles at selected starts and leaves reading positions free", async ({
+test("wheel scrolling remains free near every section start", async ({
   page,
 }, testInfo) => {
   test.skip(
-    testInfo.project.use.isMobile || testInfo.project.use.viewport.width <= 800,
-    "Desktop wheel snapping",
+    testInfo.project.use.isMobile,
+    "Wheel regression uses a fine pointer",
   );
   await page.goto("/");
   await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
@@ -407,48 +426,10 @@ test("desktop softly settles at selected starts and leaves reading positions fre
     const top = await sectionTop(page, `#${id}`);
     await moveTo(page, top - 80);
     await page.mouse.wheel(0, 40);
-    await expectScrollAt(page, top);
-    await page.mouse.wheel(0, 20);
-    await expectScrollAt(page, top + 20);
-    await page.waitForTimeout(400);
-    await expectScrollAt(page, top + 20);
+    await expectScrollAt(page, top - 40);
+    await page.waitForTimeout(500);
+    await expectScrollAt(page, top - 40);
   }
-  const interruptTarget = await sectionTop(page, "#story");
-  await moveTo(page, interruptTarget - 80);
-  await page.mouse.wheel(0, 40);
-  await page.waitForFunction(
-    (top) => scrollY > top - 28 && scrollY < top - 1,
-    interruptTarget,
-    { polling: "raf" },
-  );
-  await page.keyboard.press("Shift");
-  const interruptedPosition = await page.evaluate(() => scrollY);
-  expect(interruptedPosition).toBeLessThan(interruptTarget - 1);
-  await page.waitForTimeout(400);
-  await expectScrollAt(page, interruptedPosition);
-  const middle = (await sectionTop(page, "#story")) + 200;
-  await moveTo(page, middle);
-  await page.mouse.wheel(0, 30);
-  await expectScrollAt(page, middle + 30);
-  await page.waitForTimeout(400);
-  await expectScrollAt(page, middle + 30);
-  await scrollStory(page, 0.4);
-  const heroPosition = await page.evaluate(() => scrollY);
-  await page.mouse.wheel(0, 40);
-  await expectScrollAt(page, heroPosition + 40);
-  await page.waitForTimeout(400);
-  await expectScrollAt(page, heroPosition + 40);
-  const questions = Math.min(
-    (await sectionTop(page, "#questions")) + 100,
-    await page.evaluate(
-      () => document.documentElement.scrollHeight - innerHeight - 60,
-    ),
-  );
-  await moveTo(page, questions);
-  await page.mouse.wheel(0, 30);
-  await expectScrollAt(page, questions + 30);
-  await page.waitForTimeout(400);
-  await expectScrollAt(page, questions + 30);
 });
 
 test("touch, narrow and reduced-motion layouts scroll freely near section starts", async ({

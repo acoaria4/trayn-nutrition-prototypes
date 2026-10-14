@@ -12,6 +12,18 @@ const localUrl = (path) => withBasePath(path, basePath);
 
 document.documentElement.classList.add("js");
 
+// Keep anchor and hero offsets accurate across responsive header sizes.
+const siteHeader = document.querySelector(".site-header");
+const measureHeader = () => {
+  document.documentElement.style.setProperty(
+    "--header-height",
+    `${siteHeader.offsetHeight}px`,
+  );
+};
+measureHeader();
+const headerObserver = new ResizeObserver(measureHeader);
+headerObserver.observe(siteHeader);
+
 // Disclosure navigation keeps the document scrollable and never traps focus.
 const menuButton = document.querySelector(".menu-toggle");
 const navigation = document.querySelector("#main-navigation");

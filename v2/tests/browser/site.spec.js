@@ -126,6 +126,20 @@ for (const route of routes) {
     );
     await expectNoOverflow(page);
     await inspectLinks(page);
+    await page.evaluate(() =>
+      scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: "instant",
+      }),
+    );
+    await expect(page.locator(".site-header")).toHaveCSS("position", "sticky");
+    await expect
+      .poll(() =>
+        page
+          .locator(".site-header")
+          .evaluate((el) => Math.abs(el.getBoundingClientRect().top)),
+      )
+      .toBeLessThan(1);
     await capturePage(page, route.name, testInfo.project.name);
     const brokenImages = await page
       .locator("img:not([data-deferred-image])")
@@ -185,16 +199,76 @@ test("home navigation reaches the real section destinations", async ({
   await page.locator('#main-navigation a[href="/#about"]').click();
   await expect(page).toHaveURL(/#about$/);
   await expect(page.locator("#about")).toBeInViewport();
-  await page
-    .locator("#about")
-    .screenshot({
-      path: resolve(`docs/screenshots/${testInfo.project.name}-mindset.png`),
-    });
+  await page.locator("#about").screenshot({
+    path: resolve(`docs/screenshots/${testInfo.project.name}-mindset.png`),
+  });
   const availability = page.locator("#questions details").last();
   await availability.locator("summary").focus();
   await page.keyboard.press("Enter");
   await expect(availability).toHaveAttribute("open", "");
   await expect(availability.locator('a[href^="mailto:"]')).toBeVisible();
+});
+
+test("persistent navigation reaches sections below the bar without resizing the scene", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
+  await page.evaluate(() => document.fonts.ready);
+  const menu = page.getByRole("button", { name: /menu/i });
+  const heroHeight = await page
+    .locator(".tension-hero")
+    .evaluate((el) => el.offsetHeight);
+  for (const id of ["about", "story", "blend"]) {
+    if (await menu.isVisible()) {
+      await menu.click();
+      await expect(page.locator(".tension-hero")).toHaveCSS(
+        "height",
+        `${heroHeight}px`,
+      );
+      await expect
+        .poll(() =>
+          page.locator("#main-navigation").evaluate((el) => {
+            const rect = el.getBoundingClientRect();
+            const header = document
+              .querySelector(".site-header")
+              .getBoundingClientRect();
+            return Math.max(
+              Math.abs(rect.top - header.bottom),
+              rect.bottom - innerHeight,
+            );
+          }),
+        )
+        .toBeLessThan(1);
+    }
+    await page.locator(`#main-navigation a[href="/#${id}"]`).click();
+    await expect(page).toHaveURL(new RegExp(`#${id}$`));
+    await expect
+      .poll(() =>
+        page
+          .locator(`#${id}`)
+          .evaluate((el) =>
+            Math.abs(
+              el.getBoundingClientRect().top -
+                document.querySelector(".site-header").getBoundingClientRect()
+                  .bottom -
+                16,
+            ),
+          ),
+      )
+      .toBeLessThan(2);
+    await expect
+      .poll(() =>
+        page
+          .locator(".site-header")
+          .evaluate((el) => Math.abs(el.getBoundingClientRect().top)),
+      )
+      .toBeLessThan(1);
+    if (["laptop", "mobile", "short-mobile"].includes(testInfo.project.name))
+      await page.screenshot({
+        path: testInfo.outputPath(`persistent-${id}.png`),
+      });
+  }
 });
 
 test("mobile menu works by keyboard, closes on Escape and restores focus", async ({
