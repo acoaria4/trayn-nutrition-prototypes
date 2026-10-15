@@ -2,9 +2,11 @@
 
 A complete TRAYN product showcase: FUEL YOUR POTENTIAL → Belgian Chocolate → GET BUILT → packaging → product information → questions → contact. V2 keeps its current design. V3 owns its source, assets, dependencies, tests and build output.
 
-The last published V3 snapshot is at https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/. The current red product section, larger charcoal reader, expandable label details and completed question dividers are **local and unpublished**. The previous publication updated only V3; the chooser, V1, V2 and drafts were preserved byte for byte in that deployment snapshot. No build or test command publishes anything; later changes still require an explicit publication request. See [deployment record](docs/SITES_DEPLOYMENT.md).
+V3 is public at https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/, including the red product section, larger charcoal reader, expandable label details and completed question dividers. This publication updated only V3; the chooser, V1, V2 and drafts were preserved byte for byte. No build or test command publishes anything; later changes still require an explicit publication request. See [deployment record](docs/SITES_DEPLOYMENT.md).
 
 ## Preview
+
+Local revision awaiting review: the charcoal product reader now retains 8–12 px red side and bottom gutters on phones and tablets. Inner padding compensates to preserve the existing reading width; desktop retains its existing red surround. This revision is not published.
 
 ```sh
 npm ci

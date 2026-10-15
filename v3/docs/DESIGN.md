@@ -1,6 +1,6 @@
 # V3 — Slipstream: complete showcase
 
-Purpose: introduce the Belgian Chocolate WPC packaging concept, express the TRAYN mindset, and let visitors inspect the pack and read the supplied label. Shopify, sales and checkout remain deferred. V2 is unchanged. The red product section, larger charcoal reader, expandable label details and completed question dividers are local only. The Sites deployment record describes the earlier published snapshot; a new publication request is required to update it.
+Purpose: introduce the Belgian Chocolate WPC packaging concept, express the TRAYN mindset, and let visitors inspect the pack and read the supplied label. Shopify, sales and checkout remain deferred. V2 is unchanged. The red product section, larger charcoal reader, expandable label details and completed question dividers are published on Sites; see the deployment record. Future publication requires a new request.
 
 ## Art direction
 
@@ -28,11 +28,13 @@ Motion is explanatory marketing motion plus state feedback. Existing GSAP/Scroll
 
 ## Verification
 
+Local revision after the Sites version 5 publication: below 900 px, retain 8–12 px of the red section around the charcoal reader's sides and bottom. Reduce its inner horizontal padding by the same inset so the reading column retains its position and width. Desktop keeps its existing section gutters. Square corners, no border or shadow; no typography or motion changes. This gutter revision is unpublished. Checked 18 Chrome and 9 phone WebKit cases covering the reader, unchanged hero pacing and no-JavaScript content, plus gutter/overflow measurements from 320 to 1440 px.
+
 Exercise desktop, laptop, tablet, phone and compact phone; include WebKit. Check hero fit and its unchanged 2,040 px distance, the absence of another pin, opposing typography travel, reversible macro reveal, the absence of hard image edges/frame, anchor offsets, mobile navigation, front/back state, inspector focus/rapid reopening, label-tab keyboard behaviour, FAQ interruption, reduced-motion changes, no-JavaScript reading and static builds under a version prefix. Use only the supplied back-label transcription, clearly distinguished from approved retail data.
 
 ## Implemented and checked — 15 October 2026
 
-The current red product and question-rule revision is available locally at `http://127.0.0.1:4175/` and is unpublished. The preceding snapshot remains public at `https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/`; see the deployment record. The current work leaves that collection unchanged. V2's main, template, hero CSS and interaction source fingerprints are unchanged.
+The current red product and question-rule revision is available locally at `http://127.0.0.1:4175/` and publicly at `https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/`; see the deployment record. The chooser, V1, V2 and drafts were preserved byte for byte. V2's main, template, hero CSS and interaction source fingerprints are unchanged.
 
 Syntax and unit checks passed. The repository-prefixed `/trayn-nutrition-prototypes/v3/` static build passed all 44 HTML/CSS references across 17 output files. All 72 browser checks across six Chrome profiles and all 36 checks across three WebKit phone profiles passed, covering keyboard controls, reduced motion, no-JavaScript content, source-backed label tabs, inspector zoom/focus/rapid reopening, the reversible red entry cover, contrast across all information panels, independent label disclosures, mobile value selection and complete no-JavaScript tables, all five question dividers before/after expansion, native anchor offsets and viewport-height changes.
 

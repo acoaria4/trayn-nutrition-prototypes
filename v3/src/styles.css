@@ -1823,10 +1823,14 @@ html {
 .disclosure-icon::after { transform: rotate(90deg); }
 .label-disclosure[open] > summary .disclosure-icon::after { transform: rotate(90deg) scaleX(0); }
 @media (max-width: 899px) {
-  .product-section { padding-bottom: 32px; }
+  .product-section {
+    --reader-inset: clamp(8px, 1.5vw, 12px);
+    padding-bottom: var(--reader-inset);
+  }
   .label-reader {
-    margin-inline: calc(var(--gutter) * -1);
-    padding: 28px var(--gutter) 36px;
+    /* Keep the red section visible while preserving the reading column width. */
+    margin-inline: calc(var(--reader-inset) - var(--gutter));
+    padding: 28px calc(var(--gutter) - var(--reader-inset)) 36px;
   }
   .label-reader .label-tabs { gap: 20px; }
   .label-reader .label-tabs a { font-size: 14px; }
