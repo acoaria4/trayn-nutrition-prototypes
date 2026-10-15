@@ -1,6 +1,16 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+const browserErrors = new WeakMap();
+test.beforeEach(({ page }) => {
+  const errors = [];
+  browserErrors.set(page, errors);
+  page.on("pageerror", (error) => errors.push(error.message));
+});
+test.afterEach(({ page }) => {
+  expect(browserErrors.get(page), "uncaught browser errors").toEqual([]);
+});
+
 async function ready(page) {
   await page.goto("/");
   await page.evaluate(() => document.fonts.ready);
@@ -267,41 +277,98 @@ test("label tabs preserve printed values and questions interrupt cleanly", async
   await overflow(page);
 });
 
-test("lower sections move their artwork while all content remains accessible", async ({
-  page,
-}, testInfo) => {
+async function entryProgress(page, selector, fraction, startViewport, endViewport, headerOffset = 0) {
+  const top = await page.locator(selector).first().evaluate((el, values) => {
+    const docTop = el.getBoundingClientRect().top + scrollY;
+    const start = docTop - innerHeight * values.startViewport;
+    const end = docTop - (values.headerOffset ? document.querySelector("header").offsetHeight + values.headerOffset : innerHeight * values.endViewport);
+    // WebKit rounds scroll positions to whole pixels. Cross the end by two
+    // pixels so a fractional trigger boundary can reach its settled state.
+    return start + (end - start) * values.fraction + (values.fraction === 1 ? 2 : 0);
+  }, { fraction, startViewport, endViewport, headerOffset });
+  await page.evaluate(y => scrollTo({ top: y, behavior: "instant" }), top);
+}
+
+test("back-label assembly unfolds, stays clear of reading data and follows tab selection", async ({ page }, testInfo) => {
   await ready(page);
-  for (const [section, art] of [
-    ["#product", ".detail-pouch"],
-    ["#questions", ".question-art"],
-    ["#contact", ".contact-ribbon"],
-  ]) {
-    const el = page.locator(section);
-    await el.evaluate((el) =>
-      scrollTo({
-        top: el.getBoundingClientRect().top + scrollY - innerHeight + 20,
-        behavior: "instant",
-      }),
-    );
-    const initial = await page
-      .locator(art)
-      .evaluate((el) => getComputedStyle(el).transform);
-    await el.evaluate((el) =>
-      scrollTo({
-        top: el.getBoundingClientRect().top + scrollY - innerHeight * 0.2,
-        behavior: "instant",
-      }),
-    );
-    await expect
-      .poll(() =>
-        page.locator(art).evaluate((el) => getComputedStyle(el).transform),
-      )
-      .not.toBe(initial);
-  }
-  await page.screenshot({ path: testInfo.outputPath("full-v3-contact.png") });
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
+  const sheet = page.locator(".label-assembly");
+  await entryProgress(page, ".label-assembly", 0.05, 0.95, 0, 100);
+  await expect.poll(async () => Number(await sheet.getAttribute("data-assembly-progress"))).toBeCloseTo(0.05, 2);
+  const transform = () => page.locator(".label-fold-left").evaluate(el => getComputedStyle(el).transform);
+  const folded = await transform();
+  await entryProgress(page, ".label-assembly", 1, 0.95, 0, 100);
+  await expect.poll(async () => Number(await sheet.getAttribute("data-assembly-progress"))).toBe(1);
+  expect(await transform()).not.toBe(folded);
+  const flat = await page.locator(".label-fold-left").evaluate(el => {
+    const m = new DOMMatrix(getComputedStyle(el).transform);
+    return [m.m11, m.m22, m.m33, m.m41, m.m42];
+  });
+  expect(flat).toEqual([1, 1, 1, 0, 0]);
+  await expect(page.locator(".label-fold-center")).toHaveCSS("background-image", /wpc-back-label.webp/);
+  await entryProgress(page, ".label-assembly", 0.1, 0.95, 0, 100);
+  await page.getByRole("tab", { name: "Ingredients", exact: true }).click();
+  await expect(sheet).toHaveAttribute("data-assembly-progress", "1");
+  await expect(page.locator(".label-study")).toHaveAttribute("data-label-view", "ingredients");
+  const corner = page.locator(".label-region i").first();
+  const ingredientsCorner = await corner.evaluate(el => el.style.transform);
+  await page.getByRole("tab", { name: "Ingredients", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator(".label-study")).toHaveAttribute("data-label-view", "usage");
+  expect(await corner.evaluate(el => el.style.transform)).not.toBe(ingredientsCorner);
+  await expect(corner).toHaveCSS("transition-duration", "0s");
+  await expect(page.getByRole("tabpanel")).toHaveCSS("transform", "none");
+  await expect(page.getByRole("tabpanel")).toContainText("200 ml cold water or milk");
+  await page.screenshot({ path: testInfo.outputPath("label-assembly.png") });
+  await expect(page.locator(".pin-spacer")).toHaveCount(1);
+  await overflow(page);
+});
+
+test("questions extend their rules and track the open row without floating artwork", async ({ page }, testInfo) => {
+  await ready(page);
+  const row = page.locator(".faq-list details").first();
+  const rule = row.locator(".faq-rule");
+  await expect(rule).toBeVisible();
+  await entryProgress(page, ".faq-list details", 0.05, 0.95, 0.72);
+  const scale = () => rule.evaluate(el => new DOMMatrix(getComputedStyle(el).transform).m11);
+  await expect.poll(scale).toBeLessThan(0.3);
+  await entryProgress(page, ".faq-list details", 1, 0.95, 0.72);
+  await expect.poll(scale).toBeCloseTo(1, 2);
+  const second = page.locator(".faq-list details").nth(1);
+  await second.locator("summary").click();
+  await expect(second).toHaveAttribute("data-expanded", "true");
+  await expect(page.locator("[data-question-index]")).toHaveText("02");
+  await expect(second.locator(".faq-icon i").last()).toHaveCSS("opacity", "0");
+  await expect(page.locator(".question-art")).toHaveCount(0);
+  await second.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(second).not.toHaveAttribute("open", "");
+  await expect(page.locator("[data-question-index]")).toHaveText("—");
+  if (testInfo.project.use.viewport.width < 900) await expect(page.locator(".question-index")).toBeHidden();
+  else await expect(page.locator(".question-index")).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("question-index.png") });
+  await overflow(page);
+});
+
+test("contact strokes join the email underline and settle before interaction", async ({ page }, testInfo) => {
+  await ready(page);
+  const email = page.locator(".contact-email");
+  await entryProgress(page, ".contact-email", 0.05, 0.95, 0.65);
+  const matrix = () => page.locator(".contact-stroke-red").evaluate(el => {
+    const m = new DOMMatrix(getComputedStyle(el).transform);
+    return { x: m.m41, y: m.m42, rotation: m.m12, scale: m.m11 };
+  });
+  await expect.poll(async () => (await matrix()).y).toBeGreaterThan(10);
+  await page.evaluate(() => scrollTo({top: document.documentElement.scrollHeight, behavior: "instant"}));
+  await expect.poll(async () => Number(await email.getAttribute("data-closing-progress"))).toBe(1);
+  const end = await matrix();
+  expect(end.x).toBe(0); expect(end.y).toBe(0); expect(end.rotation).toBe(0); expect(end.scale).toBe(1);
+  await email.focus();
+  await expect(email).toHaveAttribute("data-closing-progress", "1");
+  await expect(page.locator("#contact-heading")).toHaveCSS("transform", "none");
+  await expect(email).toHaveAttribute("href", "mailto:traynnutrition@gmail.com");
+  await expect(page.locator(".contact-ribbon")).toHaveCount(0);
+  await page.screenshot({ path: testInfo.outputPath("contact-resolution.png") });
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
   await overflow(page);
 });
@@ -321,9 +388,9 @@ test("reduced motion and short landscape keep all chapters readable without pinn
     await expect(page.locator(selector)).toBeVisible();
     await expect(page.locator(selector)).not.toHaveAttribute("inert");
   }
-  expect(
-    await page.locator(".detail-pouch").evaluate((el) => el.style.transform),
-  ).toBe("");
+  for (const selector of [".label-fold-left", ".label-fold-right", ".faq-rule", ".contact-stroke-red"]) {
+    expect(await page.locator(selector).first().evaluate(el => el.style.transform)).toBe("");
+  }
   await page.setViewportSize({ width: 844, height: 390 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(page.locator(".pin-spacer")).toHaveCount(0);

@@ -3,6 +3,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { initializeInteractions } from "./interactions.js";
 import { initializeFullPageMotion } from "./motion.js";
 import { initializeChapterMotion } from "./chapter-motion.js";
+import { initializeLowerMotion } from "./lower-motion.js";
 
 gsap.registerPlugin(ScrollTrigger);
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -50,6 +51,7 @@ document.querySelectorAll("[data-study-view]").forEach((link) =>
 initializeFullPageMotion({ header });
 initializeChapterMotion({ header });
 initializeInteractions();
+initializeLowerMotion({ header });
 
 const restoreAnchor = () => {
   if (!location.hash) return;

@@ -118,66 +118,6 @@ export function initializeFullPageMotion({ header }) {
           });
           resizeObserver.observe(scene);
         }
-        // Printed values and reading copy stay still; only these decorative objects move.
-        gsap.fromTo(
-          ".detail-pouch",
-          { rotation: 13, y: 35 },
-          {
-            rotation: -5,
-            y: -25,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".product-section",
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-        gsap.fromTo(
-          ".product-mark > span",
-          { xPercent: 10 },
-          {
-            xPercent: -8,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".product-section",
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-        gsap.fromTo(
-          ".question-art",
-          { rotation: -12, y: 28 },
-          {
-            rotation: 9,
-            y: -24,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".questions-section",
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-        gsap.fromTo(
-          ".contact-ribbon",
-          { xPercent: 20, rotation: -8 },
-          {
-            xPercent: -10,
-            rotation: 4,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".contact-section",
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
         return restore;
       },
     );

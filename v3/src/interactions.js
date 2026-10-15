@@ -46,7 +46,28 @@ function tabs() {
   const links = [...root.querySelectorAll("[data-label-tab]")];
   const panels = [...root.querySelectorAll("[data-label-panel]")];
   const indicator = root.querySelector(".tab-indicator");
+  const artwork = document.querySelector(".label-study");
+  const sheet = artwork.querySelector(".label-assembly");
+  // Normalised bounds measured from the supplied back-label artwork.
+  const regions = [
+    { name: "Nutrition", view: "nutrition", box: [0.08, 0.335, 0.72, 0.195] },
+    { name: "Ingredients", view: "ingredients", box: [0.08, 0.532, 0.43, 0.061] },
+    { name: "How to Use", view: "usage", box: [0.08, 0.639, 0.36, 0.121] },
+  ];
   let selected = 0;
+  const positionArtwork = (instant = true) => {
+    artwork.classList.toggle("is-instant", instant || reduce.matches || motionOff);
+    const { name, view, box: [x, y, w, h] } = regions[selected];
+    artwork.dataset.labelView = view;
+    artwork.dataset.enhanced = "true";
+    artwork.querySelector("[data-label-caption]").textContent = name;
+    const width = sheet.clientWidth;
+    const height = sheet.clientHeight;
+    [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(([left, top], i) => {
+      sheet.querySelectorAll(".label-region i")[i].style.transform =
+        `translate(${left * width}px, ${top * height}px)`;
+    });
+  };
   const position = () => {
     const tab = links[selected];
     indicator.style.transform = `translateX(${tab.offsetLeft}px) scaleX(${tab.offsetWidth})`;
@@ -70,6 +91,8 @@ function tabs() {
       panels[i].hidden = i !== index;
     });
     position();
+    positionArtwork(instant);
+    root.dispatchEvent(new CustomEvent("labelselect"));
     requestAnimationFrame(() => ScrollTrigger.refresh());
   };
   links.forEach((link, index) => {
@@ -99,15 +122,32 @@ function tabs() {
   hash();
   window.addEventListener("hashchange", hash);
   new ResizeObserver(position).observe(list);
+  new ResizeObserver(() => positionArtwork()).observe(sheet);
   document.fonts.ready.then(position);
 }
 
 function questions() {
-  document.querySelectorAll(".faq-list details").forEach((details) => {
+  const rows = [...document.querySelectorAll(".faq-list details")];
+  const index = document.querySelector("[data-question-index]");
+  const caption = document.querySelector("[data-question-caption]");
+  let lastActive;
+  const select = (details, open, instant) => {
+    details.dataset.expanded = String(open);
+    if (open) lastActive = details;
+    if (lastActive?.dataset.expanded !== "true")
+      lastActive = rows.findLast((row) => row.dataset.expanded === "true");
+    const display = document.querySelector(".question-index");
+    display.classList.toggle("is-instant", instant || reduce.matches || motionOff);
+    display.dataset.active = String(Boolean(lastActive));
+    index.textContent = lastActive ? String(rows.indexOf(lastActive) + 1).padStart(2, "0") : "—";
+    caption.textContent = lastActive ? "Selected question / 04" : "04 questions";
+  };
+  rows.forEach((details) => {
     const summary = details.querySelector("summary");
     const answer = details.querySelector(".faq-answer");
     let animation;
     let desired = details.open;
+    select(details, desired, true);
     const finish = () => {
       animation?.cancel();
       animation = undefined;
@@ -128,6 +168,7 @@ function questions() {
       if (!animation) desired = details.open;
       animation?.cancel();
       desired = !desired;
+      select(details, desired, instant);
       details.open = true;
       answer.inert = !desired;
       const to = desired
@@ -143,6 +184,7 @@ function questions() {
     details.addEventListener("toggle", () => {
       if (!animation) {
         desired = details.open;
+        select(details, desired, details.classList.contains("is-instant"));
         requestAnimationFrame(() => ScrollTrigger.refresh());
       }
     });

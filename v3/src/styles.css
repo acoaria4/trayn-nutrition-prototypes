@@ -549,7 +549,7 @@ html {
   transform-origin: left;
 }
 
-/* 05: the label remains still. Motion belongs to the adjacent product mark. */
+/* 05: readable label data, with supplied artwork alongside. */
 .section-shell {
   padding: 120px var(--gutter);
 }
@@ -578,38 +578,6 @@ html {
   font-size: 14px;
   line-height: 1.8;
   color: #4b4745;
-}
-.product-mark {
-  position: relative;
-  height: 260px;
-  max-width: 450px;
-  margin: 30px 0 5px;
-  overflow: clip;
-}
-.product-mark > span {
-  position: absolute;
-  left: 0;
-  top: 12%;
-  font:
-    800 clamp(100px, 14vw, 205px)/1 Barlow,
-    sans-serif;
-  color: #8c8580;
-  letter-spacing: -0.065em;
-}
-.product-mark > span > span {
-  font-size: 0.45em;
-  letter-spacing: -0.02em;
-}
-.detail-pouch {
-  position: absolute;
-  height: 100%;
-  aspect-ratio: 2 / 3;
-  left: 33%;
-  transform: rotate(10deg);
-}
-.detail-pouch img {
-  height: 100%;
-  width: 100%;
 }
 .source-note {
   font-size: 11px;
@@ -833,19 +801,6 @@ tbody th {
   position: relative;
   z-index: 1;
 }
-.question-art {
-  position: absolute;
-  bottom: -100px;
-  left: 35%;
-  font:
-    800 400px/1 Barlow,
-    sans-serif;
-  color: transparent;
-  -webkit-text-stroke: 1px #625b57;
-  opacity: 0.5;
-  z-index: -1;
-  pointer-events: none;
-}
 .faq-list {
   min-width: 0;
 }
@@ -855,18 +810,6 @@ tbody th {
 }
 .faq-list details:last-child {
   border-bottom: 1px solid #ffffff35;
-}
-.faq-list details::before {
-  content: "";
-  position: absolute;
-  top: -1px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--red-accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 200ms var(--ease-out);
 }
 .faq-list details[open]::before {
   transform: scaleX(1);
@@ -897,13 +840,25 @@ summary::-webkit-details-marker {
   align-self: center;
 }
 .faq-icon {
-  font-size: 25px;
-  line-height: 1;
-  transition: transform 200ms var(--ease-out);
+  position: relative;
+  width: 18px;
+  height: 18px;
 }
-.faq-list details[open] .faq-icon {
-  transform: rotate(45deg);
-  color: var(--red-accent);
+.faq-icon i {
+  position: absolute;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  left: 1px;
+  top: 8px;
+}
+.faq-icon i:last-child {
+  transform: rotate(90deg);
+  transition: transform 200ms var(--ease-out), opacity 200ms var(--ease-out);
+}
+.faq-list details[open] .faq-icon i:last-child {
+  transform: rotate(0);
+  opacity: 0;
 }
 .faq-answer {
   padding: 0 35px 22px 38px;
@@ -966,20 +921,6 @@ summary::-webkit-details-marker {
   margin: 60px 0 0;
   font-size: 11px;
   color: var(--silver);
-}
-.contact-ribbon {
-  position: absolute;
-  right: -10%;
-  bottom: -42%;
-  width: 62%;
-  height: 85%;
-  pointer-events: none;
-  z-index: -1;
-  opacity: 0.75;
-}
-.closing-stream {
-  width: 100%;
-  height: 100%;
 }
 .study-footer {
   align-items: center;
@@ -1126,9 +1067,6 @@ summary::-webkit-details-marker {
   }
   .label-tabs {
     gap: 18px;
-  }
-  .product-mark {
-    height: 225px;
   }
 }
 @media (max-width: 899px) {
@@ -1309,21 +1247,6 @@ summary::-webkit-details-marker {
   .product-intro > .reading-copy {
     margin-top: 10px;
   }
-  .product-mark {
-    grid-column: 2;
-    grid-row: 2 / 4;
-    height: 215px;
-    margin: -10px 0 0;
-  }
-  .product-mark > span {
-    font-size: 110px;
-    left: -10%;
-    top: 34%;
-  }
-  .detail-pouch {
-    left: 12%;
-    height: 96%;
-  }
   .source-note {
     max-width: 48ch;
   }
@@ -1344,12 +1267,6 @@ summary::-webkit-details-marker {
   }
   .questions-heading h2 {
     font-size: clamp(64px, 15vw, 110px);
-  }
-  .question-art {
-    left: auto;
-    right: 8%;
-    bottom: -60px;
-    font-size: 290px;
   }
   .faq-list summary {
     min-height: 82px;
@@ -1379,12 +1296,6 @@ summary::-webkit-details-marker {
   }
   .contact-arrow {
     font-size: 38px;
-  }
-  .contact-ribbon {
-    width: 110%;
-    height: 70%;
-    bottom: -33%;
-    right: -30%;
   }
   .study-footer {
     flex-direction: row;
@@ -1471,12 +1382,6 @@ summary::-webkit-details-marker {
   .product-intro h2 {
     font-size: 64px;
   }
-  .product-mark {
-    height: 190px;
-  }
-  .product-mark > span {
-    font-size: 90px;
-  }
   .contact-top > p:last-child {
     max-width: 16ch;
   }
@@ -1508,7 +1413,6 @@ summary::-webkit-details-marker {
   }
   .tab-indicator,
   .faq-icon,
-  .faq-list details::before,
   .site-menu summary span,
   .study-link span,
   .contact-arrow {
@@ -1566,34 +1470,6 @@ summary::-webkit-details-marker {
 }
 .product-section .eyebrow > span {
   color: #d60b20;
-}
-.contact-ribbon {
-  bottom: -10%;
-  right: -3%;
-  height: 70%;
-  clip-path: inset(55% 0 0 0);
-}
-@media (max-width: 899px) {
-  .contact-ribbon {
-    width: 130%;
-    right: -5%;
-    bottom: -10%;
-    height: 70%;
-    clip-path: inset(65% 0 0 0);
-  }
-}
-/* Keep the question mark in the spare upper-right space, clear of the words. */
-.question-art {
-  top: -10px;
-  bottom: auto;
-  left: auto;
-  right: -2%;
-  font-size: 180px;
-}
-@media (max-width: 1100px) {
-  .question-art {
-    font-size: 130px;
-  }
 }
 /* Apply the measured header offset once for native section links. */
 html {
@@ -1758,4 +1634,161 @@ html {
   .packaging-reveal {
     transform: none;
   }
+}
+
+/* 05: three contiguous slices of the original back-label image unfold into
+   one flat reference. The separate information reader never transforms. */
+.label-study {
+  width: min(100%, 320px);
+  margin: 34px 0 20px;
+}
+.label-assembly {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2711 / 3600;
+  perspective: 850px;
+}
+.label-fold {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: calc(100% / 3);
+  background-image: url('/images/products/belgian-chocolate-wpc-back-label.webp');
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  backface-visibility: hidden;
+}
+.label-fold-left {
+  left: 0;
+  background-position: left top;
+  transform-origin: right center;
+}
+.label-fold-center {
+  left: calc(100% / 3);
+  background-position: center top;
+}
+.label-fold-right {
+  left: calc(100% * 2 / 3);
+  background-position: right top;
+  transform-origin: left center;
+}
+.label-region {
+  display: none;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.label-study[data-enhanced] .label-region { display: block; }
+.label-region i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--red-accent);
+  border-right: 0;
+  border-bottom: 0;
+  transition: transform 200ms var(--ease-out);
+}
+.label-region i:nth-child(2) { margin-left: -12px; border-left: 0; border-right: 2px solid var(--red-accent); }
+.label-region i:nth-child(3) { margin-top: -12px; border-top: 0; border-bottom: 2px solid var(--red-accent); }
+.label-region i:nth-child(4) { margin-left: -12px; margin-top: -12px; border-left: 0; border-top: 0; border-right: 2px solid var(--red-accent); border-bottom: 2px solid var(--red-accent); }
+.label-study figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #625b57;
+}
+.label-study figcaption span:first-child { color: #b20c20; }
+
+/* 06: rules establish the index, then the visitor controls the sequence. */
+.question-index {
+  margin-top: 42px;
+  display: flex;
+  align-items: end;
+  gap: 24px;
+  color: var(--silver);
+}
+.question-index > span {
+  font: 800 clamp(120px, 15vw, 220px)/0.8 Barlow, Impact, sans-serif;
+  letter-spacing: -0.03em;
+}
+.question-index small {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+}
+.question-index[data-active="true"] > span { color: var(--red-accent); }
+.faq-rule {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--silver);
+  transform-origin: left;
+  pointer-events: none;
+  z-index: 1;
+}
+.faq-list details::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 3px;
+  background: var(--red-accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 200ms var(--ease-out);
+  pointer-events: none;
+}
+.faq-list details[open]::after { transform: scaleY(1); }
+.faq-list details[open] .faq-rule { background: var(--red-accent); }
+.faq-list details[open] .faq-icon { color: var(--red-accent); }
+.faq-list summary { padding-left: 12px; }
+.faq-answer { padding-left: 50px; }
+.product-section a:focus-visible { outline-color: var(--black); }
+.product-section[tabindex="-1"]:focus { outline: none; }
+
+/* Closing: two strokes become the email underline; the headline stays still. */
+.contact-email { border-bottom: 0; }
+.contact-arrow-flight { display: block; }
+.contact-seam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  pointer-events: none;
+}
+.contact-seam i {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+}
+.contact-stroke-red { left: 0; background: var(--red-accent); transform-origin: right center; }
+.contact-stroke-silver { right: 0; background: var(--silver); transform-origin: left center; }
+.contact-note { margin-top: 100px; }
+.label-study.is-instant .label-region i,
+.faq-list details.is-instant::after,
+.faq-list details.is-instant .faq-icon i {
+  transition: none;
+}
+@media (max-width: 899px) {
+  .product-intro { display: block; }
+  .label-study { width: min(68%, 280px); margin: 30px auto; }
+  .questions-heading { min-height: 0; }
+  .question-index { display: none; }
+  .contact-note { margin-top: 75px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .label-region i,
+  .faq-list details::after,
+  .faq-icon i { transition: none; }
 }
