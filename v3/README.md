@@ -4,6 +4,8 @@ Independent version of the GET BUILT → packaging motion direction. V2 keeps it
 current design. V3 owns its source, assets, dependencies, tests and build output.
 Nothing is published by running the commands below.
 
+Public preview: [V3 — Slipstream](https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/), included in the [version collection](https://trayn-nutrition-v2.blondridge1.chatgpt.site/).
+
 ```sh
 npm ci
 npm run dev
@@ -22,8 +24,8 @@ node scripts/render-pages.mjs --dev
 ```
 
 Production comparison links use `../v2/` alongside the V3 deployment. The version
-picker and build workflow include V3; deploying still requires an explicit
-request and a push or manual workflow run.
+picker and build workflow include V3. Further deployment requires an explicit
+request, using Sites publication or the independent GitHub Pages workflow.
 
 Desktop uses a bounded, reversible 1,800 px graphic scene. Phones retain normal,
 content-sized chapters with scroll-driven artwork. Reduced motion and readable

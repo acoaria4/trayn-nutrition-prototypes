@@ -1,6 +1,8 @@
 # TRAYN Nutrition prototypes
 
-Three independent website versions and three opening studies are prepared for one GitHub Pages deployment. V3 has not been published yet.
+Three independent website versions and three opening studies are hosted together on Sites, with a version chooser. GitHub Pages retains its separate build workflow.
+
+Public Sites collection: **[Choose a version](https://trayn-nutrition-v2.blondridge1.chatgpt.site/)** — [V1](https://trayn-nutrition-v2.blondridge1.chatgpt.site/v1/), [V2](https://trayn-nutrition-v2.blondridge1.chatgpt.site/v2/), [V3](https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/), [opening studies](https://trayn-nutrition-v2.blondridge1.chatgpt.site/v2/drafts/). All are public; no visitor sign-in is required. The original hostname is retained for previously shared links.
 
 - [Choose a version](https://acoaria4.github.io/trayn-nutrition-prototypes/)
 - [V1 — After Dark](https://acoaria4.github.io/trayn-nutrition-prototypes/v1/), restored from commit `80ce629`.
@@ -9,6 +11,8 @@ Three independent website versions and three opening studies are prepared for on
 - [Compare the three opening studies](https://acoaria4.github.io/trayn-nutrition-prototypes/v2/drafts/).
 
 The studies remain in `v2/prototypes/openings/`. Each version retains its original README, documentation, dependencies, source, and assets. The recovery branch `codex/before-versioned-layout` preserves the repository before the migration.
+
+To prepare an update for the existing Sites checkout after installing each package's locked dependencies, run `node scripts/build-sites-collection.mjs` and `node scripts/verify-sites-collection.mjs` from the repository root. These commands assemble and check the static snapshot; they do not publish it. Follow [the Sites deployment notes](v2/docs/SITES_DEPLOYMENT.md) for the source and publication workflow. Publish only when requested.
 
 ## Build and verify
 
