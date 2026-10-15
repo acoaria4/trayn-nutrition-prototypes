@@ -249,9 +249,10 @@ test("label tabs preserve printed values and questions interrupt cleanly", async
 }) => {
   await ready(page);
   const tabs = page.locator("[data-label-tabs]");
-  await expect(
-    tabs.getByRole("row", { name: /Protein \(dry basis\)/ }),
-  ).toContainText("23.00");
+  await expect(tabs.locator(".nutrition-summary")).toContainText("23.00");
+  await tabs.locator("#full-nutrition > summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(tabs.getByRole("row", { name: /Protein \(dry basis\)/ })).toContainText("23.00");
   const nutrition = tabs.getByRole("tab", { name: "Nutrition", exact: true });
   await nutrition.focus();
   await page.keyboard.press("ArrowRight");
@@ -312,7 +313,8 @@ test("red takeover clears early, settles for input and keeps every information p
   for (const name of ["Nutrition", "Ingredients", "How to Use"]) {
     await page.getByRole("tab", { name, exact: true }).click();
     await expect(page.getByRole("tabpanel")).toHaveCSS("transform", "none");
-    await expect(page.getByRole("tabpanel").locator("p").first()).toHaveCSS("color", "rgb(9, 9, 9)");
+    const readingSize = await page.getByRole("tabpanel").locator("p").first().evaluate(el => parseFloat(getComputedStyle(el).fontSize));
+    expect(readingSize).toBeGreaterThanOrEqual(15);
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
     expect(results.violations).toEqual([]);
   }
@@ -323,6 +325,73 @@ test("red takeover clears early, settles for input and keeps every information p
   await expect(product.locator('a[href$=".pdf"]')).toHaveCount(1);
   await page.screenshot({ path: testInfo.outputPath("red-product.png") });
   await expect(page.locator(".pin-spacer")).toHaveCount(1);
+  await overflow(page);
+});
+
+test("readable disclosures preserve label data and mobile value selection", async ({ page }, testInfo) => {
+  await ready(page);
+  await page.goto("/#product");
+  const reader = page.locator(".label-reader");
+  const full = page.locator("#full-nutrition");
+  const amino = page.locator("#amino-profile");
+  const mobile = testInfo.project.use.viewport.width < 900;
+  await expect(reader).toHaveCSS("background-color", "rgb(21, 19, 19)");
+  await expect(full).not.toHaveAttribute("open", "");
+  await expect(amino).not.toHaveAttribute("open", "");
+  await expect(reader.locator(".nutrition-summary > div")).toHaveCount(3);
+  await expect(reader.locator(".nutrition-summary")).toContainText("134.00");
+  await full.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(full).toHaveAttribute("open", "");
+  const protein = full.getByRole("row", { name: /Protein \(dry basis\)/ });
+  await expect(protein.locator('[data-basis="serving"]')).toHaveText("23.00");
+  await amino.locator("summary").click();
+  await expect(amino).toHaveAttribute("open", "");
+  if (mobile) {
+    const per100 = reader.getByRole("radio", { name: "Per 100 g", exact: true });
+    const serving = reader.getByRole("radio", { name: "Per serving · 33 g", exact: true });
+    await expect(serving).toBeChecked();
+    await expect(protein.locator('[data-basis="100g"]')).toBeHidden();
+    await per100.check();
+    await expect(reader.locator("[data-summary-basis]")).toHaveText("Per 100 g");
+    await expect(reader.locator('.nutrition-summary [data-basis="100g"]').first()).toContainText("402");
+    await expect(protein.locator('[data-basis="100g"]')).toHaveText("69");
+    await expect(protein.locator('[data-basis="100g"]')).toBeVisible();
+    await expect(protein.locator('[data-basis="serving"]')).toBeHidden();
+    await expect(amino.getByRole("row", { name: /^Leucine/ }).locator('[data-basis="100g"]')).toHaveText("8.38");
+    await per100.focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect(serving).toBeChecked();
+    await expect(protein.locator('[data-basis="serving"]')).toBeVisible();
+    await expect(amino.getByRole("row", { name: /^Leucine/ }).locator('[data-basis="serving"]')).toHaveText("2.79");
+  } else {
+    await expect(reader.locator("[data-basis-controls]")).toBeHidden();
+    await expect(protein.locator('[data-basis="100g"]')).toBeVisible();
+    await expect(protein.locator('[data-basis="100g"]')).toHaveText("69");
+    await expect(protein.locator('[data-basis="serving"]')).toBeVisible();
+  }
+  expect(await protein.locator('[data-basis="serving"]').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(14);
+  for (const table of await reader.locator(".table-scroll").all()) {
+    await expect(table).toHaveCSS("overflow-y", "visible");
+  }
+  const contrast = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(contrast.violations).toEqual([]);
+  await full.locator("summary").click();
+  await expect(full).not.toHaveAttribute("open", "");
+  await expect(amino).toHaveAttribute("open", "");
+  await reader.getByRole("tab", { name: "Ingredients", exact: true }).click();
+  await expect(reader.getByRole("tabpanel").locator(".allergen")).toBeVisible();
+  await expect(reader.getByRole("tabpanel")).toContainText("Sweetener (INS 955)");
+  await reader.getByRole("tab", { name: "How to Use", exact: true }).click();
+  await expect(reader.locator(".usage-steps")).toContainText("200 ml cold water or milk");
+  const notes = page.locator("#usage-notes");
+  await expect(notes).not.toHaveAttribute("open", "");
+  await notes.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(notes).toHaveAttribute("open", "");
+  await expect(notes).toContainText("Store in a cool & dry place");
+  await expect(notes).toContainText("Not recommended for children");
+  await page.screenshot({ path: testInfo.outputPath("readable-product-details.png") });
   await overflow(page);
 });
 
@@ -437,6 +506,12 @@ test("no JavaScript retains the full story, original-label link and all informat
     await expect(page.locator("[data-label-panel]")).toHaveCount(3);
     await expect(page.locator("#label-ingredients")).toBeVisible();
     await expect(page.locator("#label-usage")).toBeVisible();
+    await expect(page.locator("[data-basis-controls]")).toBeHidden();
+    await page.locator("#full-nutrition > summary").click();
+    await expect(page.locator("#full-nutrition")).toHaveAttribute("open", "");
+    const fallback = page.locator("#full-nutrition").getByRole("row", { name: /Protein \(dry basis\)/ });
+    await expect(fallback.locator('[data-basis="100g"]')).toBeVisible();
+    await expect(fallback.locator('[data-basis="serving"]')).toBeVisible();
     await expect(page.locator('[data-study-view="back"]')).toHaveAttribute(
       "href",
       /wpc-back-1024/,

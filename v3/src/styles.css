@@ -701,29 +701,6 @@ thead th:first-child {
 tbody th {
   font-weight: 500;
 }
-.amino-details {
-  border-bottom: 1px solid #aaa39b;
-  margin-top: 24px;
-}
-.amino-details summary {
-  min-height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  font-size: 12px;
-  gap: 20px;
-}
-.amino-details summary span {
-  color: #d60b20;
-  font-size: 22px;
-}
-.amino-details[open] summary span {
-  transform: rotate(45deg);
-}
-.amino-details .table-scroll {
-  margin: 15px 0 30px;
-}
 .ingredients-list {
   padding: 0;
   margin: 25px 0;
@@ -1707,43 +1684,16 @@ html {
   .faq-icon i { transition: none; }
 }
 
-/* Black reading type keeps the red field legible; white is reserved for the
-   large PACK headline. No light panels or moving label values. */
+/* Red introduction with black copy and the large white PACK headline. */
 .product-section .product-intro h2 > span {
   color: var(--white);
 }
 .product-section .eyebrow > span,
 .product-section .reading-copy,
 .product-section .source-note,
-.product-section .label-panel p,
-.product-section .label-notes,
-.product-section caption,
-.product-section .label-tabs a,
-.product-section .product-intro .study-link span,
-.product-section .ingredients-list li > span,
-.product-section .usage-steps > li > span,
-.product-section .amino-details summary span {
+.product-section .product-intro .study-link span {
   color: var(--black);
 }
-.product-section .label-tabs a[aria-selected='true'] {
-  font-weight: 800;
-}
-.product-section .tab-indicator,
-.product-section .allergen span {
-  background: var(--black);
-}
-.product-section .allergen span {
-  color: var(--red-accent);
-}
-.product-section thead {
-  background: transparent;
-}
-.product-section th,
-.product-section td,
-.product-section .label-tabs,
-.product-section .ingredients-list li,
-.product-section .usage-steps > li,
-.product-section .amino-details,
 .product-section .study-link {
   border-color: #09090970;
 }
@@ -1757,4 +1707,142 @@ html {
 }
 .faq-end .faq-rule {
   top: 0;
+}
+
+/* One flat reading surface. Disclosures follow page height, with no nested
+   scrolling region or motion applied to printed values. */
+.product-intro .reading-copy { font-size: 17px; }
+.product-intro .source-note { font-size: 14px; line-height: 1.7; }
+.product-intro .study-link { font-size: 16px; }
+.label-reader {
+  background: #151313;
+  color: var(--white);
+  padding: 32px;
+}
+.label-reader .label-tabs {
+  gap: 24px;
+  border-color: #ffffff40;
+  margin-bottom: 28px;
+}
+.label-reader .label-tabs a {
+  color: var(--silver);
+  font-size: 14px;
+}
+.label-reader .label-tabs a[aria-selected='true'] {
+  color: var(--white);
+  font-weight: 800;
+}
+.label-reader .tab-indicator { background: var(--red-accent); }
+.label-reader .label-panel { margin: 0; }
+.label-reader .label-panel h3 { font-size: 28px; }
+.label-reader .label-panel h4 { font-size: 18px; line-height: 1.4; }
+.label-reader .label-panel p,
+.label-reader .label-notes {
+  color: var(--silver);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.label-reader .label-serving { font-size: 15px; margin-bottom: 24px; }
+.label-reader .label-notes { padding-left: 18px; }
+.label-reader .ingredients-list li { font-size: 16px; padding-block: 18px; }
+.label-reader .ingredients-list li > span { color: var(--silver); font-size: 13px; }
+.label-reader .label-panel .allergen { color: var(--white); font-size: 16px; }
+.label-reader .allergen span { background: var(--white); color: var(--black); }
+.label-reader .usage-steps > li { gap: 16px; padding-block: 22px; }
+.label-reader .usage-steps > li > span { color: var(--silver); }
+.label-reader .usage-steps h4 { margin: 0 0 10px; }
+.label-reader .ingredients-list li,
+.label-reader .usage-steps > li { border-color: #ffffff35; }
+.label-reader .table-scroll { overflow: visible; }
+.label-reader table { font-size: 15px; table-layout: fixed; }
+.label-reader caption { color: var(--silver); font-size: 14px; line-height: 1.6; }
+.label-reader thead { background: transparent; }
+.label-reader th,
+.label-reader td {
+  padding: 16px 8px;
+  border-color: #ffffff35;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.label-reader thead th { font-size: 13px; color: var(--silver); }
+.label-reader th:first-child { width: 44%; padding-left: 0; }
+.label-reader .unit-column { width: 12%; }
+.label-reader [data-basis] { width: 22%; }
+.product-section .label-reader :focus-visible { outline-color: var(--white); }
+.nutrient-unit { display: none; }
+.nutrition-basis { display: none; }
+.nutrition-summary-caption {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+.label-reader .nutrition-summary-caption { font-size: 13px; }
+.nutrition-summary { margin: 0 0 28px; }
+.nutrition-summary > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 16px;
+  padding-block: 16px;
+  border-bottom: 1px solid #ffffff35;
+}
+.nutrition-summary dt { font-size: 16px; }
+.nutrition-summary dd { margin: 0; font-size: 23px; font-weight: 700; }
+.nutrition-summary small { font-size: 14px; font-weight: 400; color: var(--silver); }
+.nutrition-summary [data-basis='100g'] { display: none; }
+.label-reader[data-nutrition-basis='100g'] .nutrition-summary [data-basis='100g'] { display: inline; }
+.label-reader[data-nutrition-basis='100g'] .nutrition-summary [data-basis='serving'] { display: none; }
+.label-disclosure { margin-top: 28px; border-top: 1px solid #ffffff40; border-bottom: 1px solid #ffffff40; }
+.label-disclosure + .label-disclosure { margin-top: 0; border-top: 0; }
+.label-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 68px;
+  padding-block: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+}
+.disclosure-content { padding-bottom: 24px; }
+.disclosure-content .table-scroll + .table-scroll { margin-top: 32px; }
+.disclosure-icon { position: relative; flex: 0 0 16px; height: 16px; }
+.disclosure-icon::before,
+.disclosure-icon::after {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+}
+.disclosure-icon::after { transform: rotate(90deg); }
+.label-disclosure[open] > summary .disclosure-icon::after { transform: rotate(90deg) scaleX(0); }
+@media (max-width: 899px) {
+  .product-section { padding-bottom: 32px; }
+  .label-reader {
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 28px var(--gutter) 36px;
+  }
+  .label-reader .label-tabs { gap: 20px; }
+  .label-reader .label-tabs a { font-size: 14px; }
+  .label-reader th,
+  .label-reader td { font-size: 14px; padding: 16px 4px; }
+  .label-reader thead th { font-size: 13px; }
+  .label-reader th:first-child { width: 50%; }
+  .label-reader [data-basis] { width: 25%; }
+  .label-reader .unit-column { display: none; }
+  .nutrient-unit { display: block; color: var(--silver); font-size: 12px; margin-top: 4px; }
+  .label-reader[data-nutrition-basis] th:first-child { width: 62%; }
+  .label-reader[data-nutrition-basis] th[data-basis] { width: 38%; }
+  .label-reader[data-nutrition-basis='serving'] [data-basis='100g'],
+  .label-reader[data-nutrition-basis='100g'] [data-basis='serving'] { display: none; }
+  .nutrition-basis { display: flex; flex-wrap: wrap; gap: 0 18px; border: 0; padding: 0; margin: 0 0 24px; }
+  .nutrition-basis legend { color: var(--silver); font-size: 13px; margin-bottom: 4px; }
+  .nutrition-basis label { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; cursor: pointer; }
+  .nutrition-basis input { accent-color: var(--red-accent); width: 16px; height: 16px; margin: 0; }
 }

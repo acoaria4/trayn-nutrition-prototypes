@@ -46,6 +46,17 @@ function tabs() {
   const links = [...root.querySelectorAll("[data-label-tab]")];
   const panels = [...root.querySelectorAll("[data-label-panel]")];
   const indicator = root.querySelector(".tab-indicator");
+  const basisControls = root.querySelector("[data-basis-controls]");
+  root.dataset.nutritionBasis = "serving";
+  basisControls.hidden = false;
+  basisControls.addEventListener("change", (event) => {
+    if (!event.target.matches('input[name="nutrition-basis"]')) return;
+    const basis = event.target.value;
+    root.dataset.nutritionBasis = basis;
+    root.querySelector("[data-summary-basis]").textContent =
+      basis === "100g" ? "Per 100 g" : "Per serving · 33 g";
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  });
   let selected = 0;
   const position = () => {
     const tab = links[selected];
@@ -274,7 +285,7 @@ export function initializeInteractions() {
   tabs();
   questions();
   inspector();
-  document.querySelectorAll(".amino-details").forEach((details) => {
+  document.querySelectorAll(".label-disclosure").forEach((details) => {
     details.addEventListener("toggle", () =>
       requestAnimationFrame(() => ScrollTrigger.refresh()),
     );
