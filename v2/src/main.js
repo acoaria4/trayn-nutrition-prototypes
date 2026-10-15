@@ -1,3 +1,4 @@
+import { initializeInteractions } from "./interactions.js";
 import {
   featuredProduct,
   getProduct,
@@ -313,7 +314,10 @@ if (typeof dialog.showModal === "function") {
       const explorer = link.closest("[data-product-explorer]");
       dialogProduct = getProduct(explorer?.dataset.selectedFlavor);
       setDialogView(
-        explorer?.dataset.selectedView === "back" ? "back" : "front",
+        explorer?.dataset.selectedView === "back" ||
+          link.dataset.packagingView === "back"
+          ? "back"
+          : "front",
       );
       priorBodyOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
@@ -373,6 +377,8 @@ if (document.body.dataset.page === "home" && "IntersectionObserver" in window) {
     if (event.persisted) observeSections();
   });
 }
+
+initializeInteractions();
 
 // Motion is optional: interaction and readable HTML survive a blocked animation chunk.
 if (document.querySelector(".hero")) {

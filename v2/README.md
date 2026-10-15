@@ -85,6 +85,8 @@ The local environment initially had a Node certificate-chain issue during instal
 - `prototypes/openings/`: the retained Quiet Before, Under Tension and Flavour Study drafts, their original generated imagery, independent package and comparison harness.
 - `src/styles.css`: shared navigation, product, disclosure and dialog foundations.
 - `src/under-tension.css`: selected visual system, responsive compositions, Manrope typography and product/material scenes.
+- `src/data/label-artwork.js`: transcribed supplied WPC back-label artwork (page 2); separate from verified retail records. Values remain as printed.
+- `src/interactions.js` and `src/section-interactions.css`: keyboard-accessible label tabs, front/back preview, interruptible pointer FAQ transitions and a one-time mindset reveal. Native links/details and all label panels remain available without JavaScript.
 - `src/main.js`: navigation, progressive flavour selection, direct-image/modal gallery, history, image fallbacks and active navigation.
 - `src/motion.js`: optional GSAP pinned story with the same 2,040 px scroll distance on every viewport, delayed scroll-driven lighting and one Lenis instance on fine-pointer screens. The header stays visible site-wide; its measured height offsets the pinned scene and section anchors. All sections scroll freely without snapping. Motion includes lifecycle cleanup and is absent from non-home pages’ execution.
 - `public/`: self-hosted images, fonts and licences. No remote media or third-party trackers are required at runtime.

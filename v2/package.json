@@ -13,7 +13,7 @@
     "test:browser": "playwright test",
     "test:hosting": "node scripts/verify-hosting.mjs",
     "test:hosting:static": "node scripts/verify-hosting.mjs --static",
-    "check": "node --check src/main.js && node --check src/motion.js && node --check scripts/render-pages.mjs && node --check scripts/build-site.mjs && node --check scripts/verify-hosting.mjs"
+    "check": "node --check src/main.js && node --check src/motion.js && node --check src/interactions.js && node --check src/data/label-artwork.js && node --check scripts/render-pages.mjs && node --check scripts/build-site.mjs && node --check scripts/verify-hosting.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",
