@@ -1,0 +1,10 @@
+{% if cart.item_count == 0 %}<div class="cart-empty"><p>Your cart is empty.</p><a href="{{ routes.root_url }}#purchase" class="buy-button" data-cart-continue>Explore TRAYN ↗</a></div>{% else %}
+<ul class="cart-items">{% for item in cart.items %}<li class="cart-item">
+{% if item.image %}<a href="{{ item.url }}">{{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120, 240', sizes: '96px', alt: item.image.alt }}</a>{% endif %}
+<div class="cart-item-copy"><a href="{{ item.url }}">{{ item.product.title | escape }}</a>{% unless item.product.has_only_default_variant %}<p>{{ item.variant.title | escape }}</p>{% endunless %}{% if item.selling_plan_allocation %}<p>{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>{% endif %}
+{% for property in item.properties %}{% assign first_character = property.first | slice: 0 %}{% if property.last != blank and first_character != '_' %}<p>{{ property.first | escape }}: {{ property.last | escape }}</p>{% endif %}{% endfor %}
+<p>{{ item.final_line_price | money_with_currency }}</p>{% for allocation in item.line_level_discount_allocations %}<p>{{ allocation.discount_application.title | escape }}: −{{ allocation.amount | money }}</p>{% endfor %}
+<label for="cart-quantity-{{ id_prefix | default: 'drawer' }}-{{ forloop.index }}">Quantity</label><input id="cart-quantity-{{ id_prefix | default: 'drawer' }}-{{ forloop.index }}" type="number" name="updates[]" value="{{ item.quantity }}" min="0" step="{{ item.variant.quantity_rule.increment | default: 1 }}" data-cart-quantity data-key="{{ item.key | escape }}" aria-label="Quantity for {{ item.product.title | escape }}"><a href="{{ item.url_to_remove }}" data-cart-remove data-key="{{ item.key | escape }}">Remove</a>
+</div></li>{% endfor %}</ul>
+<div class="cart-totals">{% for discount in cart.cart_level_discount_applications %}<p>{{ discount.title | escape }} <span>−{{ discount.total_allocated_amount | money }}</span></p>{% endfor %}<p>Subtotal <strong>{{ cart.total_price | money_with_currency }}</strong></p><small>{% if cart.taxes_included %}Taxes included. {% endif %}Shipping calculated at checkout.</small></div>
+{% endif %}

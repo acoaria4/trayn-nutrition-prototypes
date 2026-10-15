@@ -1,0 +1,19 @@
+{
+  "general": {
+    "accessibility": {
+      "skip_to_content": "Skip to content"
+    },
+    "cart": "Cart"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to Cart",
+      "sold_out": "Sold Out",
+      "quantity": "Quantity"
+    },
+    "flavour_image": {
+      "alt": "Dark chocolate pieces with a glossy chocolate ribbon and cocoa on a dark surface",
+      "caption": "Belgian Chocolate / Flavour"
+    }
+  }
+}

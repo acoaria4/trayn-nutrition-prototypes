@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<title>{{ page_title | escape }}{% unless page_title contains shop.name %} — {{ shop.name | escape }}{% endunless %}</title>
+{% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
+<link rel="canonical" href="{{ canonical_url }}">
+<link rel="icon" href="{{ 'favicon.png' | asset_url }}" type="image/png">
+{{ 'barlow-800.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+{{ 'trayn.css' | asset_url | stylesheet_tag }}
+{{ content_for_header }}
+<script src="{{ 'trayn.js' | asset_url }}" defer></script>
+</head>
+<body data-pack-view="front" data-template="{{ request.page_type }}">
+{% render 'pouch-masks' %}
+<a class="study-skip" href="#MainContent">Skip to content</a>
+{% section 'header' %}
+<main id="MainContent" tabindex="-1">{{ content_for_layout }}</main>
+{% section 'footer' %}
+{% render 'cart-drawer' %}
+<script id="trayn-routes" type="application/json">{"root":{{ routes.root_url | json }},"cart":{{ routes.cart_url | json }},"add":{{ routes.cart_add_url | append: '.js' | json }},"change":{{ routes.cart_change_url | append: '.js' | json }},"currency":{{ cart.currency.iso_code | default: shop.currency | json }},"locale":{{ request.locale.iso_code | json }}}</script>
+</body></html>

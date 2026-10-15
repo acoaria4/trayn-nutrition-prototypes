@@ -1,0 +1,3 @@
+{% render 'purchase-panel', purchase_product: product, section_id: section.id, is_main: true, shipping_note: section.settings.shipping_note, purchase_image: section.settings.purchase_image %}
+<script type="application/ld+json">{{ product | structured_data }}</script>
+{% schema %}{"name":"Product purchase","settings":[{"type":"image_picker","id":"purchase_image","label":"Shop image","info":"Optional image for this product page."},{"type":"textarea","id":"shipping_note","label":"Delivery information","info":"Use confirmed shipping information only."}]}{% endschema %}

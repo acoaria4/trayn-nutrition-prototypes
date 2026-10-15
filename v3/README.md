@@ -6,7 +6,7 @@ V3 is public at https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/, includi
 
 ## Preview
 
-Local revision awaiting review: the charcoal product reader now retains 8–12 px red side and bottom gutters on phones and tablets. Inner padding compensates to preserve the existing reading width; desktop retains its existing red surround. This revision is not published.
+The published charcoal product reader now retains 8–12 px red side and bottom gutters on phones and tablets. Inner padding compensates to preserve the existing reading width; desktop retains its existing red surround. The red gutters are included in Sites version 6.
 
 ```sh
 npm ci

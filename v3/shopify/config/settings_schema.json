@@ -1,0 +1,4 @@
+[
+ {"name":"theme_info","theme_name":"TRAYN Slipstream","theme_version":"0.1.0","theme_author":"TRAYN Nutrition","theme_documentation_url":"https://shopify.dev/docs/storefronts/themes","theme_support_url":"https://traynnutrition.com"},
+ {"name":"Featured product","settings":[{"type":"product","id":"featured_product","label":"Featured product","info":"Uses Shopify prices, variants and availability. Packaging artwork is a separate reference."}]}
+]
