@@ -33,7 +33,8 @@ Production comparison links use `../v2/` alongside V3. The version chooser and b
 
 - The header stays visible and its measured height drives pinning and anchor offsets.
 - The two-part hero has 2,040 px of reversible scroll on all supported screen sizes. Its light sweep starts after the pouch moves. Short landscape and reduced-motion views use normal flow.
-- Desktop uses a second bounded 1,800 px GET BUILT-to-packaging scene. Phones retain natural, content-sized chapters with scroll-driven artwork.
+- GET BUILT uses opposing typography travel that settles into a red poster. It has no pouch or pinned scene. Packaging pulls back from a close crop of the actual pouch artwork, then holds still when a visitor uses the inspection controls.
+- Every chapter after the hero follows natural content height on desktop and phones. The hero is the only pinned sequence; its motion and 2,040 px scroll distance are unchanged.
 - The rectangular frame and detached foreground foil tile are removed. Native SVG clip paths follow the actual pouch silhouettes without changing the supplied raster artwork.
 - Native packaging inspection supports front/back/original label, zoom, Escape, focus restoration and touch scrolling.
 - Label tabs, a full amino-acid profile, source usage notes, native questions and email contact remain usable by keyboard. Printed values do not animate. No-JavaScript HTML retains all reading content and direct artwork/PDF links.

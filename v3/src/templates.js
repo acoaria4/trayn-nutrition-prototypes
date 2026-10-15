@@ -24,9 +24,6 @@ const stream = (
 <path d="M-180 1070C500 1015 1110 705 1580-50L1585-8C1100 760 490 1050-180 1090Z" fill="#c8c4c0"/>
 <path d="M-180 965C450 895 1050 560 1560-300" stroke="#f82030" stroke-width="3"/>
 </svg>`;
-const art = (priority = false) =>
-  `<figure class="chapter-art"><img class="mobile-foil" src="/images/campaign/tension-hero-960.webp" width="960" height="540" alt="" aria-hidden="true">${stream("mobile-stream")}<div class="mobile-product"><div class="pouch-pair">${pouch("front", priority)}${pouch("back")}</div></div></figure>`;
-
 const navigation = () =>
   `<a href="#mindset" data-study-jump="0">Our Story</a><a href="#packaging" data-study-jump="0.88">The Packaging</a><a href="#product">The Product</a><a href="#questions">Questions</a><a href="#contact">Contact</a>`;
 const table = (rows, caption) =>
@@ -84,22 +81,14 @@ export function slipstreamDocument({ v2Site = "../v2/" } = {}) {
  </div></div>
 </section>
 <div class="study-story">
- <div class="study-stage">
-  <div class="foil-plane foil-far" aria-hidden="true"><img src="/images/campaign/tension-hero-1672.webp" width="1672" height="941" alt=""></div>
-  ${stream("stream-far")}
-  <div class="study-product"><div class="product-pose">${pouch("front")}${pouch("back")}</div></div>
-  ${stream("stream-near")}
-  <div class="study-copy-shade" aria-hidden="true"></div>
-  <div class="scene-progress" aria-hidden="true"><span>THE MINDSET</span><div><i></i></div><span>THE PACKAGING</span></div>
- </div>
- <section class="study-chapter chapter-mindset" id="mindset" aria-labelledby="study-mindset-heading">
-  <div class="chapter-heading"><p class="eyebrow"><span>03</span> / The TRAYN mindset</p><h2 id="study-mindset-heading">GET<br>BUILT.</h2></div>
-  ${art()}
-  <div class="chapter-copy"><h3>Built for those<br>who show up.</h3><p>Discipline. Grit. The drive to show up every day. That’s the spirit behind TRAYN.</p><a href="#packaging" data-study-jump="0.88" class="study-link">Meet the pack <span aria-hidden="true">↓</span></a></div>
+ <section class="study-chapter chapter-mindset" id="mindset" tabindex="-1" aria-labelledby="study-mindset-heading">
+  <p class="eyebrow"><span>03</span> / The TRAYN mindset</p>
+  <div class="mindset-poster"><h2 id="study-mindset-heading"><span class="mindset-word mindset-get">GET</span><span class="mindset-word mindset-built">BUILT.</span></h2><div class="mindset-rule" aria-hidden="true"></div></div>
+  <div class="mindset-copy"><h3>Built for those<br>who show up.</h3><div><p>Discipline. Grit. The drive to show up every day. That’s the spirit behind TRAYN.</p><a href="#packaging" class="study-link">Meet the pack <span aria-hidden="true">↓</span></a></div></div>
  </section>
- <section class="study-chapter chapter-packaging" id="packaging" aria-labelledby="study-packaging-heading">
+ <section class="study-chapter chapter-packaging" id="packaging" tabindex="-1" aria-labelledby="study-packaging-heading">
   <div class="chapter-heading"><p class="eyebrow"><span>04</span> / The packaging</p><h2 id="study-packaging-heading">A CLOSER<br>LOOK.</h2></div>
-  ${art()}
+  <figure class="packaging-art" aria-label="Belgian Chocolate pouch"><div class="packaging-reveal"><div class="pouch-pair">${pouch("front")}${pouch("back")}</div></div></figure>
   <div class="chapter-copy"><p>Belgian Chocolate.<br>Whey protein concentrate. 500 g.</p><div class="study-views" role="group" aria-label="Pouch view"><a href="${front}" data-study-view="front" aria-current="true">Front</a><a href="${back}" data-study-view="back" aria-current="false">Back</a></div><a class="study-link" data-study-inspect href="${front}">Inspect the packaging ${arrow}</a><a class="original-label" href="${featuredProduct.backLabelPdf}" target="_blank" rel="noopener noreferrer">Read the original back label ${arrow}</a><p class="small-note">Front and back pouch visualisations. Packaging concept. Not for sale.</p></div>
  </section>
 </div>

@@ -31,7 +31,10 @@ async function overflow(page) {
 }
 async function packaging(page, testInfo) {
   if (testInfo.project.use.viewport.width >= 900) {
-    await progress(page, ".study-story", 0.9);
+    await page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "The Packaging", exact: true })
+      .click();
   } else {
     await page.locator(".site-menu summary").click();
     await page
@@ -98,95 +101,95 @@ test("hero fits the measured header, scrubs 2040 px, delays light, and reverses"
   await overflow(page);
 });
 
-test("desktop product travels to a clean packaging scene and keeps controls clear", async ({
+async function chapterProgress(page, selector, fraction, offset) {
+  const y = await page.locator(selector).evaluate(
+    (el, { fraction, offset }) => {
+      const top = el.getBoundingClientRect().top + scrollY;
+      const start = top - innerHeight * 0.95;
+      const end = top - document.querySelector("header").offsetHeight - offset;
+      return start + (end - start) * fraction;
+    },
+    { fraction, offset },
+  );
+  await page.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), y);
+  const attribute =
+    selector === ".mindset-poster"
+      ? "data-motion-progress"
+      : "data-reveal-progress";
+  await expect
+    .poll(async () =>
+      Number(await page.locator(selector).getAttribute(attribute)),
+    )
+    .toBeCloseTo(fraction, 2);
+}
+
+test("GET BUILT moves in opposite directions and locks without another pin or pouch", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.use.viewport.width < 900);
   await ready(page);
-  await expect(page.locator(".pin-spacer")).toHaveCount(2);
-  const rect = () =>
-    page
-      .locator(".study-product")
-      .evaluate((el) => el.getBoundingClientRect().x);
-  await progress(page, ".study-story", 0);
-  const start = await rect();
-  await progress(page, ".study-story", 0.45);
-  const middle = await rect();
-  expect(start - middle).toBeGreaterThan(100);
-  await progress(page, ".study-story", 0.9);
-  expect(middle - (await rect())).toBeGreaterThan(100);
-  const copy = await page.locator("#packaging").evaluate((el) => ({
-    top: el.getBoundingClientRect().top,
-    header: document.querySelector("header").offsetHeight,
-    headingBottom: el.querySelector(".chapter-heading").getBoundingClientRect()
-      .bottom,
-    copyTop: el.querySelector(".chapter-copy").getBoundingClientRect().top,
-    copyBottom: el.querySelector(".chapter-copy").getBoundingClientRect()
-      .bottom,
-    viewport: innerHeight,
-  }));
-  expect(Math.abs(copy.top - copy.header)).toBeLessThan(2);
-  expect(copy.headingBottom).toBeLessThan(copy.copyTop);
-  expect(copy.copyBottom).toBeLessThan(copy.viewport);
-  await page.screenshot({ path: testInfo.outputPath("full-v3-packaging.png") });
-  await page.setViewportSize({ ...testInfo.project.use.viewport, height: 620 });
-  await expect
-    .poll(() =>
-      page
-        .locator(".study-story")
-        .evaluate((el) =>
-          Math.abs(
-            el.getBoundingClientRect().height +
-              document.querySelector("header").offsetHeight -
-              innerHeight,
-          ),
-        ),
-    )
-    .toBeLessThan(2);
-  await progress(page, ".study-story", 0.9);
-  const short = await page.locator("#packaging").evaluate((el) => ({
-    bottom: el.querySelector(".chapter-heading").getBoundingClientRect().bottom,
-    top: el.querySelector(".chapter-copy").getBoundingClientRect().top,
-  }));
-  expect(short.bottom).toBeLessThan(short.top);
+  await expect(page.locator(".pin-spacer")).toHaveCount(1);
+  await expect(
+    page.locator(".study-story .pin-spacer, #mindset .pouch-image"),
+  ).toHaveCount(0);
+  await chapterProgress(page, ".mindset-poster", 0.05, 140);
+  const positions = () =>
+    page.locator(".mindset-poster").evaluate((el) => {
+      return [".mindset-get", ".mindset-built"].map(
+        (selector) =>
+          new DOMMatrix(getComputedStyle(el.querySelector(selector)).transform)
+            .m41,
+      );
+    });
+  const beginning = await positions();
+  expect(beginning[0]).toBeLessThan(-5);
+  expect(beginning[1]).toBeGreaterThan(5);
+  await chapterProgress(page, ".mindset-poster", 1, 140);
+  const end = await positions();
+  expect(Math.abs(end[0])).toBeLessThan(1);
+  expect(Math.abs(end[1])).toBeLessThan(1);
+  await page.screenshot({ path: testInfo.outputPath("typography-poster.png") });
+  await chapterProgress(page, ".mindset-poster", 0.05, 140);
+  expect((await positions())[0]).toBeLessThan(-5);
   await overflow(page);
 });
 
-test("phones keep content-sized chapters and visibly scrub the artwork", async ({
+test("packaging pulls back from a macro crop, holds still for inspection and follows natural flow", async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.use.viewport.width >= 900);
   await ready(page);
+  await chapterProgress(page, ".packaging-art", 0.1, 40);
+  const scale = () =>
+    page
+      .locator(".packaging-reveal")
+      .evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m11);
+  expect(await scale()).toBeGreaterThan(2.5);
+  await chapterProgress(page, ".packaging-art", 1, 40);
+  expect(await scale()).toBeCloseTo(1, 2);
+  const matrix = await page.locator(".packaging-reveal").evaluate((el) => {
+    const m = new DOMMatrix(getComputedStyle(el).transform);
+    return { x: m.m41, y: m.m42, rotation: m.m12 };
+  });
+  expect(matrix).toEqual({ x: 0, y: 0, rotation: 0 });
+  await chapterProgress(page, ".packaging-art", 0.2, 40);
+  expect(await scale()).toBeGreaterThan(2);
+  await page.locator('[data-study-view="back"]').focus();
+  expect(await scale()).toBeCloseTo(1, 2);
+  await page.keyboard.press("Enter");
+  await expect(page.locator("body")).toHaveAttribute("data-pack-view", "back");
   await expect(page.locator(".pin-spacer")).toHaveCount(1);
-  const art = page.locator(".chapter-mindset .chapter-art");
-  await art.evaluate((el) =>
-    scrollTo({
-      top: el.getBoundingClientRect().top + scrollY - innerHeight + 30,
-      behavior: "instant",
-    }),
-  );
-  const initial = await art
-    .locator(".mobile-stream")
-    .evaluate((el) => getComputedStyle(el).transform);
-  await art.evaluate((el) =>
-    scrollTo({
-      top: el.getBoundingClientRect().top + scrollY - 80,
-      behavior: "instant",
-    }),
-  );
-  await expect
-    .poll(() =>
-      art
-        .locator(".mobile-stream")
-        .evaluate((el) => getComputedStyle(el).transform),
-    )
-    .not.toBe(initial);
+  await expect(page.locator("#packaging")).not.toHaveAttribute("inert");
+  const desktop = testInfo.project.use.viewport.width >= 900;
   await packaging(page, testInfo);
-  const pos = await page.locator("#packaging").evaluate((el) => ({
-    top: el.getBoundingClientRect().top,
-    header: document.querySelector("header").offsetHeight,
-  }));
-  expect(pos.top).toBeGreaterThanOrEqual(pos.header - 1);
+  if (desktop) {
+    const layout = await page.locator("#packaging").evaluate((el) => ({
+      headingBottom: el
+        .querySelector(".chapter-heading")
+        .getBoundingClientRect().bottom,
+      copyTop: el.querySelector(".chapter-copy").getBoundingClientRect().top,
+    }));
+    expect(layout.headingBottom).toBeLessThan(layout.copyTop);
+  }
+  await page.screenshot({ path: testInfo.outputPath("macro-packaging.png") });
   await overflow(page);
 });
 
@@ -303,7 +306,7 @@ test("lower sections move their artwork while all content remains accessible", a
   await overflow(page);
 });
 
-test("reduced motion and short landscape release both scenes with readable content", async ({
+test("reduced motion and short landscape keep all chapters readable without pinning", async ({
   page,
 }) => {
   await ready(page);
