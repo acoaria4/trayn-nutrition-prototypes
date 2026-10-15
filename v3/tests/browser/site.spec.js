@@ -1,120 +1,178 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const path = "/";
-const overflow = async (page) =>
+async function ready(page) {
+  await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator("body")).toHaveClass(/has-hero-motion/);
+}
+async function progress(page, selector, value) {
+  const top = await page
+    .locator(selector)
+    .evaluate(
+      (el, p) =>
+        Number(el.dataset.scrollStart) +
+        (Number(el.dataset.scrollEnd) - Number(el.dataset.scrollStart)) * p,
+      value,
+    );
+  await page.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), top);
+  const name =
+    selector === ".hero-story" ? "data-hero-progress" : "data-study-progress";
+  await expect
+    .poll(async () => Number(await page.locator(selector).getAttribute(name)))
+    .toBeCloseTo(value, 2);
+}
+async function overflow(page) {
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth + 1,
     ),
   ).toBe(true);
-const productPosition = (page) =>
-  page.locator(".study-product").evaluate((el) => {
-    const rect = el.getBoundingClientRect();
-    return {
-      x: rect.x,
-      width: rect.width,
-      transform: getComputedStyle(el).transform,
-    };
-  });
-const move = async (page, progress) => {
-  await page.evaluate(
-    (value) => scrollTo({ top: 1800 * value, behavior: "instant" }),
-    progress,
-  );
-  await expect
-    .poll(async () =>
-      Number(
-        await page.locator(".study-story").getAttribute("data-study-progress"),
-      ),
-    )
-    .toBeCloseTo(progress, 2);
-};
+}
+async function packaging(page, testInfo) {
+  if (testInfo.project.use.viewport.width >= 900) {
+    await progress(page, ".study-story", 0.9);
+  } else {
+    await page.locator(".site-menu summary").click();
+    await page
+      .getByRole("navigation", { name: "Mobile navigation" })
+      .getByRole("link", { name: "The Packaging", exact: true })
+      .click();
+    await expect(page.locator(".site-menu")).not.toHaveAttribute("open", "");
+  }
+}
 
-test("graphic stage moves the pouch and material layers, reverses, and retains a stable inspection beat", async ({
+test("hero fits the measured header, scrubs 2040 px, delays light, and reverses", async ({
   page,
-}, testInfo) => {
-  test.skip(testInfo.project.use.viewport.width < 900);
-  await page.goto(path);
-  await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator("body")).toHaveClass(/is-cinematic/);
-  await expect(page.locator(".pin-spacer")).toHaveCount(1);
-  const start = await productPosition(page);
-  const ribbon = await page
-    .locator(".stream-far")
-    .evaluate((el) => getComputedStyle(el).transform);
-  await move(page, 0.45);
-  const middle = await productPosition(page);
-  expect(start.x - middle.x).toBeGreaterThan(100);
-  expect(middle.width).toBeGreaterThan(start.width);
+}) => {
+  await ready(page);
   expect(
     await page
-      .locator(".stream-far")
+      .locator(".hero-story")
+      .evaluate(
+        (el) => Number(el.dataset.scrollEnd) - Number(el.dataset.scrollStart),
+      ),
+  ).toBeCloseTo(2040, 1);
+  const initial = await page
+    .locator(".hero-product")
+    .evaluate((el) => getComputedStyle(el).transform);
+  await expect(page.locator(".hero-light")).toHaveCSS("opacity", "0");
+  await progress(page, ".hero-story", 0.3);
+  expect(
+    await page
+      .locator(".hero-product")
       .evaluate((el) => getComputedStyle(el).transform),
-  ).not.toBe(ribbon);
-  await move(page, 0.9);
-  const end = await productPosition(page);
-  expect(middle.x - end.x).toBeGreaterThan(100);
-  await expect(page.locator("#packaging")).not.toHaveAttribute("inert");
-  await page.locator('[data-study-view="back"]').click();
-  await expect(page.locator("body")).toHaveAttribute("data-pack-view", "back");
-  await expect(page.locator(".study-product [data-study-back]")).toHaveCSS(
-    "opacity",
-    "1",
-  );
-  await expect(page.locator("[data-study-inspect]")).toHaveAttribute(
-    "href",
-    /wpc-back-1024/,
-  );
-  const layout = await page.locator("#packaging").evaluate((el) => {
-    const heading = el
-      .querySelector(".chapter-heading")
-      .getBoundingClientRect();
-    const copy = el.querySelector(".chapter-copy").getBoundingClientRect();
-    return { headingBottom: heading.bottom, copyTop: copy.top };
-  });
-  expect(layout.headingBottom).toBeLessThan(layout.copyTop);
-  await page.screenshot({
-    path: testInfo.outputPath("slipstream-packaging.png"),
-  });
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
-  expect(results.violations).toEqual([]);
-  await page.setViewportSize({ ...testInfo.project.use.viewport, height: 620 });
-  await move(page, 0.9);
-  const shortLayout = await page.locator("#packaging").evaluate((el) => ({
-    heading: el.querySelector(".chapter-heading").getBoundingClientRect()
-      .bottom,
-    copy: el.querySelector(".chapter-copy").getBoundingClientRect().top,
+  ).not.toBe(initial);
+  await expect(page.locator(".hero-light")).toHaveCSS("opacity", "0");
+  await progress(page, ".hero-story", 0.63);
+  expect(
+    Number(
+      await page
+        .locator(".hero-light")
+        .evaluate((el) => getComputedStyle(el).opacity),
+    ),
+  ).toBeGreaterThan(0.5);
+  await progress(page, ".hero-story", 0.9);
+  const fit = await page.locator(".hero-scene").evaluate((el) => ({
+    top: el.getBoundingClientRect().top,
+    bottom: el.getBoundingClientRect().bottom,
+    header: document.querySelector("header").offsetHeight,
+    height: innerHeight,
   }));
-  expect(shortLayout.heading).toBeLessThan(shortLayout.copy);
-  await page.setViewportSize(testInfo.project.use.viewport);
-  await move(page, 0);
-  expect(Math.abs((await productPosition(page)).x - start.x)).toBeLessThan(2);
-  await page.screenshot({
-    path: testInfo.outputPath("slipstream-mindset.png"),
-  });
+  expect(Math.abs(fit.top - fit.header)).toBeLessThan(2);
+  expect(Math.abs(fit.bottom - fit.height)).toBeLessThan(2);
+  await expect(page.locator(".hero-light")).toHaveCSS("opacity", "0");
+  await expect(page.locator(".hero-flavour")).not.toHaveAttribute("inert");
+  await progress(page, ".hero-story", 0);
+  expect(
+    await page
+      .locator(".hero-product")
+      .evaluate((el) => getComputedStyle(el).transform),
+  ).toBe(initial);
+  expect(
+    await page
+      .locator(".hero-product .pouch-image")
+      .evaluate((el) => getComputedStyle(el).clipPath),
+  ).toContain("pouch-front-mask");
+  await expect(page.locator(".study-frame,.foil-near")).toHaveCount(0);
   await overflow(page);
 });
 
-test("phone chapters keep natural flow while pouch and ribbon move with scroll", async ({
+test("desktop product travels to a clean packaging scene and keeps controls clear", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.use.viewport.width < 900);
+  await ready(page);
+  await expect(page.locator(".pin-spacer")).toHaveCount(2);
+  const rect = () =>
+    page
+      .locator(".study-product")
+      .evaluate((el) => el.getBoundingClientRect().x);
+  await progress(page, ".study-story", 0);
+  const start = await rect();
+  await progress(page, ".study-story", 0.45);
+  const middle = await rect();
+  expect(start - middle).toBeGreaterThan(100);
+  await progress(page, ".study-story", 0.9);
+  expect(middle - (await rect())).toBeGreaterThan(100);
+  const copy = await page.locator("#packaging").evaluate((el) => ({
+    top: el.getBoundingClientRect().top,
+    header: document.querySelector("header").offsetHeight,
+    headingBottom: el.querySelector(".chapter-heading").getBoundingClientRect()
+      .bottom,
+    copyTop: el.querySelector(".chapter-copy").getBoundingClientRect().top,
+    copyBottom: el.querySelector(".chapter-copy").getBoundingClientRect()
+      .bottom,
+    viewport: innerHeight,
+  }));
+  expect(Math.abs(copy.top - copy.header)).toBeLessThan(2);
+  expect(copy.headingBottom).toBeLessThan(copy.copyTop);
+  expect(copy.copyBottom).toBeLessThan(copy.viewport);
+  await page.screenshot({ path: testInfo.outputPath("full-v3-packaging.png") });
+  await page.setViewportSize({ ...testInfo.project.use.viewport, height: 620 });
+  await expect
+    .poll(() =>
+      page
+        .locator(".study-story")
+        .evaluate((el) =>
+          Math.abs(
+            el.getBoundingClientRect().height +
+              document.querySelector("header").offsetHeight -
+              innerHeight,
+          ),
+        ),
+    )
+    .toBeLessThan(2);
+  await progress(page, ".study-story", 0.9);
+  const short = await page.locator("#packaging").evaluate((el) => ({
+    bottom: el.querySelector(".chapter-heading").getBoundingClientRect().bottom,
+    top: el.querySelector(".chapter-copy").getBoundingClientRect().top,
+  }));
+  expect(short.bottom).toBeLessThan(short.top);
+  await overflow(page);
+});
+
+test("phones keep content-sized chapters and visibly scrub the artwork", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.use.viewport.width >= 900);
-  await page.goto(path);
-  await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator(".pin-spacer")).toHaveCount(0);
+  await ready(page);
+  await expect(page.locator(".pin-spacer")).toHaveCount(1);
   const art = page.locator(".chapter-mindset .chapter-art");
   await art.evaluate((el) =>
-    scrollTo(0, el.getBoundingClientRect().top + scrollY - innerHeight + 30),
+    scrollTo({
+      top: el.getBoundingClientRect().top + scrollY - innerHeight + 30,
+      behavior: "instant",
+    }),
   );
-  await page.waitForTimeout(100);
   const initial = await art
     .locator(".mobile-stream")
     .evaluate((el) => getComputedStyle(el).transform);
   await art.evaluate((el) =>
-    scrollTo(0, el.getBoundingClientRect().top + scrollY - 90),
+    scrollTo({
+      top: el.getBoundingClientRect().top + scrollY - 80,
+      behavior: "instant",
+    }),
   );
   await expect
     .poll(() =>
@@ -123,47 +181,121 @@ test("phone chapters keep natural flow while pouch and ribbon move with scroll",
         .evaluate((el) => getComputedStyle(el).transform),
     )
     .not.toBe(initial);
-  await page.locator('header a[href="#packaging"]').click();
-  await page.locator('[data-study-view="back"]').click();
-  await expect(page.locator("body")).toHaveAttribute("data-pack-view", "back");
-  await expect(page.locator(".chapter-packaging [data-study-back]")).toHaveCSS(
-    "opacity",
-    "1",
-  );
-  await page
-    .locator("#packaging")
-    .evaluate((el) =>
-      el.scrollIntoView({ block: "start", behavior: "instant" }),
-    );
-  await page.screenshot({ path: testInfo.outputPath("slipstream-phone.png") });
+  await packaging(page, testInfo);
+  const pos = await page.locator("#packaging").evaluate((el) => ({
+    top: el.getBoundingClientRect().top,
+    header: document.querySelector("header").offsetHeight,
+  }));
+  expect(pos.top).toBeGreaterThanOrEqual(pos.header - 1);
   await overflow(page);
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-    .analyze();
-  expect(results.violations).toEqual([]);
 });
 
-test("reduced motion releases the stage and keeps keyboard views and content readable", async ({
+test("front/back inspection, original artwork, zoom and rapid reopening retain focus and scroll", async ({
   page,
-}) => {
-  await page.goto(path);
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.locator(".pin-spacer")).toHaveCount(0);
-  await expect(page.locator("#mindset")).not.toHaveAttribute("inert");
-  await expect(page.locator("#packaging")).not.toHaveAttribute("inert");
-  await expect(page.locator("#study-mindset-heading")).toBeVisible();
+}, testInfo) => {
+  await ready(page);
+  await packaging(page, testInfo);
   const back = page.locator('[data-study-view="back"]');
   await back.focus();
   await page.keyboard.press("Enter");
-  await expect(page.locator(".chapter-packaging [data-study-back]")).toHaveCSS(
-    "opacity",
-    "1",
+  await expect(page.locator("body")).toHaveAttribute("data-pack-view", "back");
+  const opener = page.locator("[data-study-inspect]");
+  await opener.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute("data-view", "back");
+  await dialog.getByRole("button", { name: "Back Label", exact: true }).click();
+  await expect(dialog.locator("[data-inspector-image]")).toHaveAttribute(
+    "src",
+    /back-label.webp$/,
   );
+  await dialog.getByRole("button", { name: "Zoom In" }).click();
+  await expect(dialog).toHaveClass(/is-zoomed/);
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(opener).toBeFocused();
+  await page.evaluate(() => {
+    const link = document.querySelector("[data-study-inspect]");
+    link.click();
+    document.querySelector("dialog").close();
+    link.click();
+  });
+  await expect(dialog).toBeVisible();
   expect(
-    await page
-      .locator(".chapter-packaging .mobile-product")
-      .evaluate((el) => getComputedStyle(el).transform),
-  ).toBe("none");
+    await page.evaluate(() => document.documentElement.style.overflow),
+  ).toBe("hidden");
+  await page.keyboard.press("Escape");
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.style.overflow))
+    .toBe("");
+  await expect(opener).toBeFocused();
+});
+
+test("label tabs preserve printed values and questions interrupt cleanly", async ({
+  page,
+}) => {
+  await ready(page);
+  const tabs = page.locator("[data-label-tabs]");
+  await expect(
+    tabs.getByRole("row", { name: /Protein \(dry basis\)/ }),
+  ).toContainText("23.00");
+  const nutrition = tabs.getByRole("tab", { name: "Nutrition", exact: true });
+  await nutrition.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    tabs.getByRole("tab", { name: "Ingredients", exact: true }),
+  ).toBeFocused();
+  await expect(tabs.getByRole("tabpanel")).toContainText("Contains milk");
+  await expect(tabs.getByRole("tabpanel")).toContainText("Sweetener (INS 955)");
+  await page.keyboard.press("End");
+  await expect(tabs.getByRole("tabpanel")).toContainText(
+    "200 ml cold water or milk",
+  );
+  await expect(tabs.getByRole("tabpanel")).toContainText("Two servings daily");
+  const first = page.locator(".faq-list details").first();
+  await first.locator("summary").click();
+  await first.locator("summary").click();
+  await first.locator("summary").click();
+  await expect(first).toHaveAttribute("open", "");
+  await expect(first.locator(".faq-answer")).not.toHaveAttribute("inert");
+  await first.locator("summary").focus();
+  await page.keyboard.press("Enter");
+  await expect(first).not.toHaveAttribute("open", "");
+  await overflow(page);
+});
+
+test("lower sections move their artwork while all content remains accessible", async ({
+  page,
+}, testInfo) => {
+  await ready(page);
+  for (const [section, art] of [
+    ["#product", ".detail-pouch"],
+    ["#questions", ".question-art"],
+    ["#contact", ".contact-ribbon"],
+  ]) {
+    const el = page.locator(section);
+    await el.evaluate((el) =>
+      scrollTo({
+        top: el.getBoundingClientRect().top + scrollY - innerHeight + 20,
+        behavior: "instant",
+      }),
+    );
+    const initial = await page
+      .locator(art)
+      .evaluate((el) => getComputedStyle(el).transform);
+    await el.evaluate((el) =>
+      scrollTo({
+        top: el.getBoundingClientRect().top + scrollY - innerHeight * 0.2,
+        behavior: "instant",
+      }),
+    );
+    await expect
+      .poll(() =>
+        page.locator(art).evaluate((el) => getComputedStyle(el).transform),
+      )
+      .not.toBe(initial);
+  }
+  await page.screenshot({ path: testInfo.outputPath("full-v3-contact.png") });
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .analyze();
@@ -171,7 +303,32 @@ test("reduced motion releases the stage and keeps keyboard views and content rea
   await overflow(page);
 });
 
-test("without JavaScript both chapters and direct pack links remain available", async ({
+test("reduced motion and short landscape release both scenes with readable content", async ({
+  page,
+}) => {
+  await ready(page);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(page.locator(".pin-spacer")).toHaveCount(0);
+  for (const selector of [
+    ".hero-opening",
+    ".hero-flavour",
+    "#mindset",
+    "#packaging",
+  ]) {
+    await expect(page.locator(selector)).toBeVisible();
+    await expect(page.locator(selector)).not.toHaveAttribute("inert");
+  }
+  expect(
+    await page.locator(".detail-pouch").evaluate((el) => el.style.transform),
+  ).toBe("");
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await expect(page.locator(".pin-spacer")).toHaveCount(0);
+  await expect(page.locator("#study-packaging-heading")).toBeVisible();
+  await overflow(page);
+});
+
+test("no JavaScript retains the full story, original-label link and all information panels", async ({
   browser,
 }, testInfo) => {
   const context = await browser.newContext({
@@ -180,21 +337,74 @@ test("without JavaScript both chapters and direct pack links remain available", 
   });
   try {
     const page = await context.newPage();
-    await page.goto(
-      new URL(path, testInfo.project.use.baseURL || "http://127.0.0.1:4175")
-        .href,
-    );
-    await expect(page.locator("#study-mindset-heading")).toBeVisible();
-    await expect(page.locator("#study-packaging-heading")).toBeVisible();
+    await page.goto(testInfo.project.use.baseURL || "http://127.0.0.1:4175/");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    for (const id of [
+      "study-mindset-heading",
+      "study-packaging-heading",
+      "product-heading",
+      "questions-heading",
+      "contact-heading",
+    ]) {
+      await expect(page.locator(`#${id}`)).toBeVisible();
+    }
+    await expect(page.locator("[data-label-panel]")).toHaveCount(3);
+    await expect(page.locator("#label-ingredients")).toBeVisible();
+    await expect(page.locator("#label-usage")).toBeVisible();
     await expect(page.locator('[data-study-view="back"]')).toHaveAttribute(
       "href",
       /wpc-back-1024/,
     );
-    await expect(
-      page.locator(".chapter-packaging [data-study-front]"),
-    ).toBeVisible();
+    await expect(page.locator('.product-intro a[href$=".pdf"]')).toHaveCount(1);
     await overflow(page);
   } finally {
     await context.close();
   }
+});
+
+test("viewport changes preserve hero pacing and direct anchors clear the header", async ({
+  page,
+}, testInfo) => {
+  await ready(page);
+  await progress(page, ".hero-story", 0.2);
+  const initial = await page.evaluate(() => scrollY);
+  const viewport = testInfo.project.use.viewport;
+  await page.setViewportSize({ ...viewport, height: viewport.height + 100 });
+  await expect
+    .poll(() =>
+      page
+        .locator(".hero-scene")
+        .evaluate((el) =>
+          Math.abs(el.getBoundingClientRect().bottom - innerHeight),
+        ),
+    )
+    .toBeLessThan(2);
+  expect(
+    await page
+      .locator(".hero-story")
+      .evaluate(
+        (el) => Number(el.dataset.scrollEnd) - Number(el.dataset.scrollStart),
+      ),
+  ).toBeCloseTo(2040, 1);
+  expect(await page.evaluate(() => scrollY)).toBeCloseTo(initial, 0);
+  await page.setViewportSize(viewport);
+  await page.goto("/#product");
+  await page.evaluate(() => document.fonts.ready);
+  await expect
+    .poll(() =>
+      page
+        .locator("#product")
+        .evaluate((el) =>
+          Math.abs(
+            el.getBoundingClientRect().top -
+              document.querySelector("header").offsetHeight,
+          ),
+        ),
+    )
+    .toBeLessThan(2);
+  await page.goto("/");
+  await page.locator(".study-skip").focus();
+  await expect(page.locator(".study-skip")).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#product")).toBeFocused();
 });

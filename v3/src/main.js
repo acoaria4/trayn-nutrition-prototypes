@@ -1,5 +1,7 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { initializeInteractions } from "./interactions.js";
+import { initializeFullPageMotion } from "./motion.js";
 
 gsap.registerPlugin(ScrollTrigger);
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -79,30 +81,30 @@ const setup = () => {
             start: () => `top top+=${header.offsetHeight}`,
             end: "+=1800",
             pin: true,
+            refreshPriority: 5,
             scrub: true,
             invalidateOnRefresh: true,
+            onRefresh: (self) => {
+              story.dataset.scrollStart = String(self.start);
+              story.dataset.scrollEnd = String(self.end);
+            },
             onUpdate: (self) => {
               story.dataset.studyProgress = self.progress.toFixed(3);
               first.inert = self.progress > 0.48;
               second.inert = self.progress < 0.78;
               first.setAttribute("aria-hidden", String(self.progress > 0.48));
-              second.setAttribute("aria-hidden", String(self.progress < 0.58));
+              second.setAttribute("aria-hidden", String(self.progress < 0.78));
             },
           },
         });
         trigger = timeline.scrollTrigger;
+        story.dataset.scrollDistance = "1800";
         gsap.set(second, { autoAlpha: 0 });
-        gsap.set(".study-frame", { opacity: 0 });
         gsap.set(".study-copy-shade", { opacity: 0 });
         timeline
           .to(
             ".foil-far",
             { xPercent: -10, yPercent: -8, scale: 1.12, duration: 1 },
-            0,
-          )
-          .to(
-            ".foil-near",
-            { xPercent: -40, yPercent: -36, rotation: -2, duration: 1 },
             0,
           )
           .to(
@@ -137,7 +139,6 @@ const setup = () => {
             },
             0.52,
           )
-          .to(".study-frame", { opacity: 1, duration: 0.22 }, 0.58)
           .to(".study-copy-shade", { opacity: 1, duration: 0.2 }, 0.55)
           .fromTo(
             second,
@@ -192,9 +193,11 @@ const setup = () => {
     },
   );
 };
+initializeFullPageMotion({ header });
 setup();
+initializeInteractions();
 
-document.querySelectorAll("[data-study-jump], .study-skip").forEach((link) =>
+document.querySelectorAll("[data-study-jump]").forEach((link) =>
   link.addEventListener("click", (event) => {
     if (
       event.metaKey ||
@@ -205,9 +208,7 @@ document.querySelectorAll("[data-study-jump], .study-skip").forEach((link) =>
     )
       return;
     event.preventDefault();
-    const progress = link.classList.contains("study-skip")
-      ? 0.88
-      : Number(link.dataset.studyJump);
+    const progress = Number(link.dataset.studyJump);
     const target = progress ? second : first;
     history.replaceState(null, "", link.hash);
     scrollTo({
@@ -241,10 +242,26 @@ const resetPose = () => {
 };
 story.addEventListener("pointerleave", resetPose);
 reduced.addEventListener("change", resetPose);
-document.fonts.ready.then(() => {
+const restoreAnchor = () => {
+  if (!location.hash) return;
   ScrollTrigger.refresh();
-  if (location.hash === "#packaging" && trigger)
-    scrollTo(0, trigger.start + 1800 * 0.88);
+  if (trigger && ["#mindset", "#packaging"].includes(location.hash)) {
+    scrollTo(
+      0,
+      trigger.start + (location.hash === "#packaging" ? 1800 * 0.88 : 0),
+    );
+    return;
+  }
+  const target = document.getElementById(
+    decodeURIComponent(location.hash.slice(1)),
+  );
+  target?.scrollIntoView({ block: "start", behavior: "instant" });
+};
+window.addEventListener("hashchange", restoreAnchor);
+document.fonts.ready.then(() => {
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
+  restoreAnchor();
 });
 document.querySelectorAll("main img").forEach((image) =>
   image.addEventListener("load", () => ScrollTrigger.refresh(), {
