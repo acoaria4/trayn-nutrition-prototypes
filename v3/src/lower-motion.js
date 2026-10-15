@@ -5,8 +5,8 @@ gsap.registerPlugin(ScrollTrigger);
 const motionOff = new URLSearchParams(location.search).get("motion") === "off";
 
 export function initializeLowerMotion({ header }) {
-  const label = document.querySelector(".label-assembly");
-  const reader = document.querySelector(".label-reader");
+  const product = document.querySelector(".product-section");
+  const curtain = product.querySelector(".product-curtain");
   const email = document.querySelector(".contact-email");
   let media;
   const setup = () => {
@@ -20,48 +20,30 @@ export function initializeLowerMotion({ header }) {
       ({ conditions }) => {
         if (!conditions.motion || motionOff) return;
         const wide = conditions.desktop;
-        const assembly = gsap.timeline({
-          defaults: { ease: "none" },
+        // The red reading surface is the base state. Only its cover moves,
+        // and clears early, before the visitor starts reading the data.
+        gsap.set(curtain, { display: "block" });
+        const takeover = gsap.fromTo(curtain, { xPercent: 0 }, {
+          xPercent: 100,
+          ease: "none",
           scrollTrigger: {
-            trigger: label,
+            trigger: product,
             start: "top 95%",
-            end: () => `top top+=${header.offsetHeight + 100}`,
+            end: wide ? "top 72%" : "top 84%",
             scrub: true,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
-              label.dataset.assemblyProgress = self.progress.toFixed(3);
+              product.dataset.takeoverProgress = self.progress.toFixed(3);
             },
           },
         });
-        assembly
-          .fromTo(
-            ".label-fold-left",
-            { rotationY: wide ? -68 : -52, xPercent: -16, rotation: -4 },
-            { rotationY: 0, xPercent: 0, rotation: 0, duration: 0.8 },
-            0,
-          )
-          .fromTo(
-            ".label-fold-right",
-            { rotationY: wide ? 68 : 52, xPercent: 16, rotation: 4 },
-            { rotationY: 0, xPercent: 0, rotation: 0, duration: 0.8 },
-            0,
-          )
-          .fromTo(
-            ".label-fold-center",
-            { yPercent: 7, scaleY: 0.94 },
-            { yPercent: 0, scaleY: 1, duration: 0.8 },
-            0,
-          )
-          .fromTo(".label-region", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.8);
-
-        const settleLabel = () => {
-          assembly.progress(1);
-          assembly.scrollTrigger.disable(false);
-          label.dataset.assemblyProgress = "1";
+        const settleProduct = () => {
+          takeover.progress(1);
+          takeover.scrollTrigger.disable(false);
+          product.dataset.takeoverProgress = "1";
         };
-        reader.addEventListener("focusin", settleLabel);
-        reader.addEventListener("pointerdown", settleLabel);
-        reader.addEventListener("labelselect", settleLabel);
+        product.addEventListener("focusin", settleProduct);
+        product.addEventListener("pointerdown", settleProduct);
 
         const rules = [];
         document.querySelectorAll(".faq-rule").forEach((rule) => {
@@ -70,7 +52,7 @@ export function initializeLowerMotion({ header }) {
             scaleX: 1,
             ease: "none",
             scrollTrigger: {
-              trigger: details,
+              trigger: details ?? rule.parentElement,
               start: "top 95%",
               end: "top 72%",
               scrub: true,
@@ -80,6 +62,8 @@ export function initializeLowerMotion({ header }) {
             tween.progress(1);
             tween.scrollTrigger.disable(false);
           };
+          // The final divider has its own scroll trigger after the last row.
+          if (!details) return;
           const summary = details.querySelector("summary");
           summary.addEventListener("focusin", settle);
           summary.addEventListener("pointerdown", settle);
@@ -119,13 +103,12 @@ export function initializeLowerMotion({ header }) {
         email.addEventListener("focusin", settleContact);
         email.addEventListener("pointerdown", settleContact);
         return () => {
-          reader.removeEventListener("focusin", settleLabel);
-          reader.removeEventListener("pointerdown", settleLabel);
-          reader.removeEventListener("labelselect", settleLabel);
+          product.removeEventListener("focusin", settleProduct);
+          product.removeEventListener("pointerdown", settleProduct);
           email.removeEventListener("focusin", settleContact);
           email.removeEventListener("pointerdown", settleContact);
           rules.forEach((remove) => remove());
-          label.removeAttribute("data-assembly-progress");
+          product.removeAttribute("data-takeover-progress");
           email.removeAttribute("data-closing-progress");
         };
       },

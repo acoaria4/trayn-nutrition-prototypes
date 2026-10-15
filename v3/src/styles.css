@@ -549,7 +549,7 @@ html {
   transform-origin: left;
 }
 
-/* 05: readable label data, with supplied artwork alongside. */
+/* 05: source-backed label information on the packaging-red surface. */
 .section-shell {
   padding: 120px var(--gutter);
 }
@@ -557,9 +557,19 @@ html {
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   gap: 8%;
-  background: var(--white);
+  background: var(--red-accent);
   color: var(--black);
   position: relative;
+  overflow: clip;
+  isolation: isolate;
+}
+.product-curtain {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--black);
+  pointer-events: none;
 }
 .product-intro h2,
 .questions-heading h2 {
@@ -807,12 +817,6 @@ tbody th {
 .faq-list details {
   border-top: 1px solid #ffffff35;
   position: relative;
-}
-.faq-list details:last-child {
-  border-bottom: 1px solid #ffffff35;
-}
-.faq-list details[open]::before {
-  transform: scaleX(1);
 }
 .faq-list summary {
   display: grid;
@@ -1441,7 +1445,6 @@ summary::-webkit-details-marker {
     min-height: 26px;
   }
 }
-.faq-list details.is-instant::before,
 .faq-list details.is-instant .faq-icon {
   transition: none;
 }
@@ -1636,100 +1639,15 @@ html {
   }
 }
 
-/* 05: three contiguous slices of the original back-label image unfold into
-   one flat reference. The separate information reader never transforms. */
-.label-study {
-  width: min(100%, 320px);
-  margin: 34px 0 20px;
-}
-.label-assembly {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 2711 / 3600;
-  perspective: 850px;
-}
-.label-fold {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: calc(100% / 3);
-  background-image: url('/images/products/belgian-chocolate-wpc-back-label.webp');
-  background-size: 300% 100%;
-  background-repeat: no-repeat;
-  backface-visibility: hidden;
-}
-.label-fold-left {
-  left: 0;
-  background-position: left top;
-  transform-origin: right center;
-}
-.label-fold-center {
-  left: calc(100% / 3);
-  background-position: center top;
-}
-.label-fold-right {
-  left: calc(100% * 2 / 3);
-  background-position: right top;
-  transform-origin: left center;
-}
-.label-region {
-  display: none;
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.label-study[data-enhanced] .label-region { display: block; }
-.label-region i {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--red-accent);
-  border-right: 0;
-  border-bottom: 0;
-  transition: transform 200ms var(--ease-out);
-}
-.label-region i:nth-child(2) { margin-left: -12px; border-left: 0; border-right: 2px solid var(--red-accent); }
-.label-region i:nth-child(3) { margin-top: -12px; border-top: 0; border-bottom: 2px solid var(--red-accent); }
-.label-region i:nth-child(4) { margin-left: -12px; margin-top: -12px; border-left: 0; border-top: 0; border-right: 2px solid var(--red-accent); border-bottom: 2px solid var(--red-accent); }
-.label-study figcaption {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin-top: 14px;
-  font-size: 10px;
-  font-weight: 600;
-  color: #625b57;
-}
-.label-study figcaption span:first-child { color: #b20c20; }
 
-/* 06: rules establish the index, then the visitor controls the sequence. */
-.question-index {
-  margin-top: 42px;
-  display: flex;
-  align-items: end;
-  gap: 24px;
-  color: var(--silver);
-}
-.question-index > span {
-  font: 800 clamp(120px, 15vw, 220px)/0.8 Barlow, Impact, sans-serif;
-  letter-spacing: -0.03em;
-}
-.question-index small {
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding-bottom: 8px;
-}
-.question-index[data-active="true"] > span { color: var(--red-accent); }
+/* 06: all five dividers, including the closing rule, share the same fill. */
 .faq-rule {
   position: absolute;
   top: -1px;
   left: 0;
   width: 100%;
   height: 1px;
-  background: var(--silver);
+  background: var(--white);
   transform-origin: left;
   pointer-events: none;
   z-index: 1;
@@ -1775,20 +1693,68 @@ html {
 .contact-stroke-red { left: 0; background: var(--red-accent); transform-origin: right center; }
 .contact-stroke-silver { right: 0; background: var(--silver); transform-origin: left center; }
 .contact-note { margin-top: 100px; }
-.label-study.is-instant .label-region i,
 .faq-list details.is-instant::after,
 .faq-list details.is-instant .faq-icon i {
   transition: none;
 }
 @media (max-width: 899px) {
   .product-intro { display: block; }
-  .label-study { width: min(68%, 280px); margin: 30px auto; }
   .questions-heading { min-height: 0; }
-  .question-index { display: none; }
   .contact-note { margin-top: 75px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .label-region i,
   .faq-list details::after,
   .faq-icon i { transition: none; }
+}
+
+/* Black reading type keeps the red field legible; white is reserved for the
+   large PACK headline. No light panels or moving label values. */
+.product-section .product-intro h2 > span {
+  color: var(--white);
+}
+.product-section .eyebrow > span,
+.product-section .reading-copy,
+.product-section .source-note,
+.product-section .label-panel p,
+.product-section .label-notes,
+.product-section caption,
+.product-section .label-tabs a,
+.product-section .product-intro .study-link span,
+.product-section .ingredients-list li > span,
+.product-section .usage-steps > li > span,
+.product-section .amino-details summary span {
+  color: var(--black);
+}
+.product-section .label-tabs a[aria-selected='true'] {
+  font-weight: 800;
+}
+.product-section .tab-indicator,
+.product-section .allergen span {
+  background: var(--black);
+}
+.product-section .allergen span {
+  color: var(--red-accent);
+}
+.product-section thead {
+  background: transparent;
+}
+.product-section th,
+.product-section td,
+.product-section .label-tabs,
+.product-section .ingredients-list li,
+.product-section .usage-steps > li,
+.product-section .amino-details,
+.product-section .study-link {
+  border-color: #09090970;
+}
+.product-section :focus-visible {
+  outline-color: var(--black);
+}
+.faq-end {
+  position: relative;
+  height: 1px;
+  background: #ffffff35;
+}
+.faq-end .faq-rule {
+  top: 0;
 }

@@ -289,63 +289,75 @@ async function entryProgress(page, selector, fraction, startViewport, endViewpor
   await page.evaluate(y => scrollTo({ top: y, behavior: "instant" }), top);
 }
 
-test("back-label assembly unfolds, stays clear of reading data and follows tab selection", async ({ page }, testInfo) => {
+test("red takeover clears early, settles for input and keeps every information panel readable", async ({ page }, testInfo) => {
   await ready(page);
-  const sheet = page.locator(".label-assembly");
-  await entryProgress(page, ".label-assembly", 0.05, 0.95, 0, 100);
-  await expect.poll(async () => Number(await sheet.getAttribute("data-assembly-progress"))).toBeCloseTo(0.05, 2);
-  const transform = () => page.locator(".label-fold-left").evaluate(el => getComputedStyle(el).transform);
-  const folded = await transform();
-  await entryProgress(page, ".label-assembly", 1, 0.95, 0, 100);
-  await expect.poll(async () => Number(await sheet.getAttribute("data-assembly-progress"))).toBe(1);
-  expect(await transform()).not.toBe(folded);
-  const flat = await page.locator(".label-fold-left").evaluate(el => {
-    const m = new DOMMatrix(getComputedStyle(el).transform);
-    return [m.m11, m.m22, m.m33, m.m41, m.m42];
-  });
-  expect(flat).toEqual([1, 1, 1, 0, 0]);
-  await expect(page.locator(".label-fold-center")).toHaveCSS("background-image", /wpc-back-label.webp/);
-  await entryProgress(page, ".label-assembly", 0.1, 0.95, 0, 100);
-  await page.getByRole("tab", { name: "Ingredients", exact: true }).click();
-  await expect(sheet).toHaveAttribute("data-assembly-progress", "1");
-  await expect(page.locator(".label-study")).toHaveAttribute("data-label-view", "ingredients");
-  const corner = page.locator(".label-region i").first();
-  const ingredientsCorner = await corner.evaluate(el => el.style.transform);
+  const product = page.locator("#product");
+  const end = testInfo.project.use.viewport.width >= 900 ? 0.72 : 0.84;
+  const curtain = page.locator(".product-curtain");
+  await expect(product).toHaveCSS("background-color", "rgb(248, 32, 48)");
+  await expect(product.locator("img,.label-study,.label-assembly")).toHaveCount(0);
+  await entryProgress(page, "#product", 0.15, 0.95, end);
+  await expect.poll(async () => Number(await product.getAttribute("data-takeover-progress"))).toBeGreaterThan(0.02);
+  const travel = () => curtain.evaluate(el => new DOMMatrix(getComputedStyle(el).transform).m41 / el.clientWidth);
+  expect(await travel()).toBeLessThan(0.3);
+  await entryProgress(page, "#product", 1, 0.95, end);
+  await expect.poll(travel).toBeCloseTo(1, 2);
+  await entryProgress(page, "#product", 0.15, 0.95, end);
+  await expect.poll(travel).toBeLessThan(0.3);
   await page.getByRole("tab", { name: "Ingredients", exact: true }).focus();
+  await expect(product).toHaveAttribute("data-takeover-progress", "1");
   await page.keyboard.press("ArrowRight");
-  await expect(page.locator(".label-study")).toHaveAttribute("data-label-view", "usage");
-  expect(await corner.evaluate(el => el.style.transform)).not.toBe(ingredientsCorner);
-  await expect(corner).toHaveCSS("transition-duration", "0s");
-  await expect(page.getByRole("tabpanel")).toHaveCSS("transform", "none");
   await expect(page.getByRole("tabpanel")).toContainText("200 ml cold water or milk");
-  await page.screenshot({ path: testInfo.outputPath("label-assembly.png") });
+  await expect(page.locator(".tab-indicator")).toHaveCSS("transition-duration", "0s");
+  for (const name of ["Nutrition", "Ingredients", "How to Use"]) {
+    await page.getByRole("tab", { name, exact: true }).click();
+    await expect(page.getByRole("tabpanel")).toHaveCSS("transform", "none");
+    await expect(page.getByRole("tabpanel").locator("p").first()).toHaveCSS("color", "rgb(9, 9, 9)");
+    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    expect(results.violations).toEqual([]);
+  }
+  await page.getByRole("tab", { name: "Nutrition", exact: true }).click();
+  for (const heading of await page.getByRole("tabpanel").locator("thead").all()) {
+    await expect(heading).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  }
+  await expect(product.locator('a[href$=".pdf"]')).toHaveCount(1);
+  await page.screenshot({ path: testInfo.outputPath("red-product.png") });
   await expect(page.locator(".pin-spacer")).toHaveCount(1);
   await overflow(page);
 });
 
-test("questions extend their rules and track the open row without floating artwork", async ({ page }, testInfo) => {
+test("all five question dividers fill, including the final line after answer expansion", async ({ page }, testInfo) => {
   await ready(page);
+  await expect(page.locator(".faq-rule")).toHaveCount(5);
+  await expect(page.locator(".question-index,[data-question-caption]")).toHaveCount(0);
   const row = page.locator(".faq-list details").first();
   const rule = row.locator(".faq-rule");
   await expect(rule).toBeVisible();
   await entryProgress(page, ".faq-list details", 0.05, 0.95, 0.72);
-  const scale = () => rule.evaluate(el => new DOMMatrix(getComputedStyle(el).transform).m11);
-  await expect.poll(scale).toBeLessThan(0.3);
+  const scale = el => el.evaluate(node => new DOMMatrix(getComputedStyle(node).transform).m11);
+  await expect.poll(() => scale(rule)).toBeLessThan(0.3);
   await entryProgress(page, ".faq-list details", 1, 0.95, 0.72);
-  await expect.poll(scale).toBeCloseTo(1, 2);
-  const second = page.locator(".faq-list details").nth(1);
-  await second.locator("summary").click();
-  await expect(second).toHaveAttribute("data-expanded", "true");
-  await expect(page.locator("[data-question-index]")).toHaveText("02");
-  await expect(second.locator(".faq-icon i").last()).toHaveCSS("opacity", "0");
-  await expect(page.locator(".question-art")).toHaveCount(0);
-  await second.locator("summary").focus();
+  await expect.poll(() => scale(rule)).toBeCloseTo(1, 2);
+  const final = page.locator(".faq-rule-final");
+  await expect(final).toBeVisible();
+  await entryProgress(page, ".faq-end", 0.05, 0.95, 0.72);
+  await expect.poll(() => scale(final)).toBeLessThan(0.3);
+  await entryProgress(page, ".faq-end", 1, 0.95, 0.72);
+  await expect.poll(() => scale(final)).toBeCloseTo(1, 2);
+  await expect(final).toHaveCSS("background-color", "rgb(245, 244, 240)");
+  const last = page.locator(".faq-list details").last();
+  await last.locator("summary").click();
+  await expect(last).toHaveAttribute("data-expanded", "true");
+  await expect(last.locator(".faq-icon i").last()).toHaveCSS("opacity", "0");
+  await expect.poll(() => last.evaluate(el => el.getAnimations().length)).toBe(0);
+  await entryProgress(page, ".faq-end", 1, 0.95, 0.72);
+  await expect.poll(() => scale(final)).toBeCloseTo(1, 2);
+  await last.locator("summary").focus();
   await page.keyboard.press("Enter");
-  await expect(second).not.toHaveAttribute("open", "");
-  await expect(page.locator("[data-question-index]")).toHaveText("—");
-  if (testInfo.project.use.viewport.width < 900) await expect(page.locator(".question-index")).toBeHidden();
-  else await expect(page.locator(".question-index")).toBeVisible();
-  await page.screenshot({ path: testInfo.outputPath("question-index.png") });
+  await expect(last).not.toHaveAttribute("open", "");
+  await entryProgress(page, ".faq-end", 1, 0.95, 0.72);
+  await expect.poll(() => scale(final)).toBeCloseTo(1, 2);
+  await page.screenshot({ path: testInfo.outputPath("complete-question-rules.png") });
   await overflow(page);
 });
 
@@ -388,9 +400,11 @@ test("reduced motion and short landscape keep all chapters readable without pinn
     await expect(page.locator(selector)).toBeVisible();
     await expect(page.locator(selector)).not.toHaveAttribute("inert");
   }
-  for (const selector of [".label-fold-left", ".label-fold-right", ".faq-rule", ".contact-stroke-red"]) {
+  for (const selector of [".product-curtain", ".faq-rule", ".contact-stroke-red"]) {
     expect(await page.locator(selector).first().evaluate(el => el.style.transform)).toBe("");
   }
+  await expect(page.locator(".product-curtain")).toBeHidden();
+  await expect(page.locator("#product")).toHaveCSS("background-color", "rgb(248, 32, 48)");
   await page.setViewportSize({ width: 844, height: 390 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(page.locator(".pin-spacer")).toHaveCount(0);
@@ -418,6 +432,8 @@ test("no JavaScript retains the full story, original-label link and all informat
     ]) {
       await expect(page.locator(`#${id}`)).toBeVisible();
     }
+    await expect(page.locator(".product-curtain")).toBeHidden();
+    await expect(page.locator("#product")).toHaveCSS("background-color", "rgb(248, 32, 48)");
     await expect(page.locator("[data-label-panel]")).toHaveCount(3);
     await expect(page.locator("#label-ingredients")).toBeVisible();
     await expect(page.locator("#label-usage")).toBeVisible();

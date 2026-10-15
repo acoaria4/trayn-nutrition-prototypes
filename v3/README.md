@@ -2,7 +2,7 @@
 
 A complete TRAYN product showcase: FUEL YOUR POTENTIAL → Belgian Chocolate → GET BUILT → packaging → product information → questions → contact. V2 keeps its current design. V3 owns its source, assets, dependencies, tests and build output.
 
-The current V3 showcase is published at https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/. This publication updated only V3; the chooser, V1, V2 and drafts were preserved byte for byte in the deployment snapshot. No build or test command publishes anything; later changes still require an explicit publication request. See [deployment record](docs/SITES_DEPLOYMENT.md).
+The last published V3 snapshot is at https://trayn-nutrition-v2.blondridge1.chatgpt.site/v3/. The current red product section and completed question dividers are **local and unpublished**. The previous publication updated only V3; the chooser, V1, V2 and drafts were preserved byte for byte in that deployment snapshot. No build or test command publishes anything; later changes still require an explicit publication request. See [deployment record](docs/SITES_DEPLOYMENT.md).
 
 ## Preview
 
@@ -38,8 +38,8 @@ Production comparison links use `../v2/` alongside V3. The version chooser and b
 - The rectangular frame and detached foreground foil tile are removed. Native SVG clip paths follow the actual pouch silhouettes without changing the supplied raster artwork.
 - Native packaging inspection supports front/back/original label, zoom, Escape, focus restoration and touch scrolling.
 - Label tabs, a full amino-acid profile, source usage notes, native questions and email contact remain usable by keyboard. Printed values do not animate. No-JavaScript HTML retains all reading content and direct artwork/PDF links.
-- Product details unfold three contiguous slices of the original back-label artwork into one flat reference. Its red corner marker follows Nutrition, Ingredients and How to Use; the separate reading panels and printed values stay still.
-- Questions extend their dividing rules, then respond to the visitor: an active red edge, plus-to-minus feedback and a selected-question index on desktop. Phones keep this feedback within the rows.
+- Product details use packaging red with black reading type and a white PACK headline. A black cover retracts early on entry; it clears over a shorter scroll interval on phones and settles immediately for focus/touch. Text and printed values stay still. The original PDF link and source transcription remain available; the folding artwork is removed.
+- Questions extend all five dividing rules, including the final line below the last question. Open rows retain their red edge and plus-to-minus feedback. The extra question counter and caption are removed.
 - Contact brings two red/silver strokes together beneath the email, with one short arrow gesture. Reading copy remains stationary. There is no snap scrolling or wheel interception. Reduced motion shows the settled artwork and removes decorative travel.
 
 ## Product information
