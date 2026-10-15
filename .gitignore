@@ -21,3 +21,6 @@ Thumbs.db
 Desktop.ini
 .idea/
 .vscode/
+
+# Independent Sites source checkout (has its own remote repository).
+/sites/trayn-nutrition-v2/

@@ -1,0 +1,1045 @@
+diff --git a/v2/src/interactions.js b/v2/src/interactions.js
+index 011a039..4272ffd 100644
+--- a/v2/src/interactions.js
++++ b/v2/src/interactions.js
+@@ -9,6 +9,23 @@ function initializeLabelTabs() {
+     const list = root.querySelector(".label-tabs");
+     const tabs = [...root.querySelectorAll("[data-label-tab]")];
+     const panels = [...root.querySelectorAll("[data-label-panel]")];
++    const indicator = document.createElement("span");
++    indicator.className = "label-tab-indicator";
++    indicator.setAttribute("aria-hidden", "true");
++    list.append(indicator);
++    list.classList.add("has-tab-indicator");
++    let activeIndex = -1;
++    let panelAnimation;
++    const settlePanel = () => {
++      panelAnimation?.cancel();
++      panelAnimation = undefined;
++    };
++    const positionIndicator = (instant) => {
++      list.classList.toggle("is-instant", instant || !canAnimate());
++      const bounds = list.getBoundingClientRect();
++      const tab = tabs[activeIndex].getBoundingClientRect();
++      indicator.style.transform = `translateX(${tab.left - bounds.left}px) scaleX(${tab.width})`;
++    };
+     list.setAttribute("role", "tablist");
+     tabs.forEach((tab, index) => {
+       tab.id = `${panels[index].id}-tab`;
+@@ -18,12 +35,23 @@ function initializeLabelTabs() {
+       panels[index].setAttribute("aria-labelledby", tab.id);
+       panels[index].tabIndex = 0;
+     });
+-    const activate = (index) => {
++    const activate = (index, instant = true) => {
++      const changed = activeIndex !== index;
++      settlePanel();
++      activeIndex = index;
+       tabs.forEach((tab, i) => {
+         tab.setAttribute("aria-selected", String(i === index));
+         tab.tabIndex = i === index ? 0 : -1;
+         panels[i].hidden = i !== index;
+       });
++      positionIndicator(instant);
++      if (changed && !instant && canAnimate()) {
++        // Only the mask moves: label values and controls keep their positions.
++        panelAnimation = panels[index].animate(
++          [{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)" }],
++          { duration: 220, easing: easeOut },
++        );
++      }
+     };
+     const hashIndex = panels.findIndex(
+       (panel) => `#${panel.id}` === location.hash,
+@@ -34,7 +62,7 @@ function initializeLabelTabs() {
+         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+           return;
+         event.preventDefault();
+-        activate(index);
++        activate(index, event.detail === 0);
+       });
+       tab.addEventListener("keydown", (event) => {
+         const keys = {
+@@ -56,6 +84,27 @@ function initializeLabelTabs() {
+       );
+       if (index >= 0) activate(index);
+     });
++    root.addEventListener("pointerdown", settlePanel);
++    root.addEventListener("focusin", settlePanel);
++    reduced.addEventListener("change", () => {
++      if (!canAnimate()) {
++        settlePanel();
++        positionIndicator(true);
++      }
++    });
++    const resize = new ResizeObserver(() => positionIndicator(true));
++    resize.observe(list);
++    tabs.forEach((tab) => resize.observe(tab));
++    window.addEventListener("pagehide", () => {
++      resize.disconnect();
++      settlePanel();
++    });
++    window.addEventListener("pageshow", (event) => {
++      if (event.persisted) {
++        resize.observe(list);
++        tabs.forEach((tab) => resize.observe(tab));
++      }
++    });
+   });
+ }
+ 
+@@ -113,6 +162,10 @@ function initializeFaqMotion() {
+       body.inert = false;
+     };
+     summary.addEventListener("click", (event) => {
++      details.classList.toggle(
++        "is-instant",
++        event.detail === 0 || !canAnimate(),
++      );
+       if (event.detail === 0 || !canAnimate()) {
+         if (animation) finish();
+         targetOpen = details.open;
+@@ -152,46 +205,276 @@ function initializeFaqMotion() {
+   });
+ }
+ 
+-function initializeMindsetReveal() {
+-  const section = document.querySelector(".trayn-mindset");
+-  if (!section || !("IntersectionObserver" in window)) return;
+-  const heading = section.querySelector("h2");
+-  let animation;
++// Each composition gets its own entrance: on a phone the copy may be a full
++// screen below its heading or image. No hidden "waiting for JS" state, no pin.
++function initializeSectionSequence() {
++  if (!("IntersectionObserver" in window)) return;
++  const groups = new Map();
+   const observer = new IntersectionObserver(
+     (entries) => {
+-      if (!entries.some((entry) => entry.isIntersecting)) return;
+-      observer.disconnect();
+-      if (!canAnimate() || section.contains(document.activeElement)) return;
+-      section.classList.add("mindset-entered");
+-      animation = heading.animate(
++      for (const entry of entries) {
++        if (!entry.isIntersecting) continue;
++        observer.unobserve(entry.target);
++        const group = groups.get(entry.target);
++        if (!canAnimate()) continue;
++        entry.target.dataset.entrance = "running";
++        group.play(group.animate);
++        Promise.allSettled([...group.animations].map((a) => a.finished)).then(
++          () => {
++            entry.target.dataset.entrance = "complete";
++          },
++        );
++      }
++    },
++    { rootMargin: "0px 0px -12% 0px", threshold: 0.18 },
++  );
++  const register = (target, play) => {
++    if (!target) return;
++    const animations = new Set();
++    const finish = () => {
++      animations.forEach((animation) => animation.cancel());
++      animations.clear();
++    };
++    const animate = (element, frames, duration, delay = 0) => {
++      const animation = element.animate(frames, {
++        duration,
++        delay,
++        easing: easeOut,
++        fill: "backwards",
++      });
++      animations.add(animation);
++      animation.onfinish = () => animations.delete(animation);
++    };
++    groups.set(target, { play, animate, animations, finish });
++    // Focusing an actual control or touching the pouch settles its entrance.
++    // A navigation anchor focusing the section itself must NOT skip the reveal.
++    target.addEventListener("focusin", (event) => {
++      if (event.target.matches("a, button, input, summary")) finish();
++    });
++    target.addEventListener("pointerdown", finish);
++    observer.observe(target);
++  };
++  const revealLines = (root, animate, delay = 0) => {
++    root.querySelectorAll(".motion-line > span").forEach((line, index) => {
++      animate(
++        line,
+         [
+-          { opacity: 0.75, transform: "translateY(12px)" },
+-          { opacity: 1, transform: "translateY(0)" },
++          { transform: "translateY(108%) rotate(3deg)" },
++          { transform: "translateY(0) rotate(0deg)" },
+         ],
+-        { duration: 450, easing: easeOut },
++        900,
++        delay + index * 80,
+       );
+-    },
+-    { rootMargin: "-12% 0px -12% 0px", threshold: 0.15 },
+-  );
+-  observer.observe(heading);
++    });
++  };
++  const revealCopy = (elements, animate, delay = 0) => {
++    elements.forEach((element, index) => {
++      // Keep touch/keyboard targets stationary and available throughout entry.
++      if (element.matches("a, button, .pack-view-controls")) return;
++      animate(
++        element,
++        [
++          { clipPath: "inset(0 0 100% 0)", transform: "translateY(28px)" },
++          { clipPath: "inset(0 0 0% 0)", transform: "translateY(0)" },
++        ],
++        650,
++        delay + index * 60,
++      );
++    });
++  };
++  const title = document.querySelector(".mindset-title");
++  register(title, (animate) => {
++    revealCopy([title.querySelector(".eyebrow")], animate);
++    revealLines(title, animate, 60);
++    animate(
++      title.querySelector(".mindset-trail"),
++      [
++        { clipPath: "inset(0 100% 0 0)", transform: "translateX(-20px)" },
++        { clipPath: "inset(0 0% 0 0)", transform: "translateX(0)" },
++      ],
++      1000,
++      220,
++    );
++  });
++  const mindsetCopy = document.querySelector(".trayn-mindset-copy");
++  register(mindsetCopy, (animate) => {
++    revealCopy([...mindsetCopy.children], animate);
++  });
++  const pack = document.querySelector("[data-pack-preview]");
++  register(pack, (animate) => {
++    const mobile = matchMedia("(max-width: 800px)").matches;
++    animate(
++      pack.querySelector(".pack-preview-images"),
++      [
++        {
++          transform: `translate(${mobile ? "6%, 8%" : "12%, 12%"}) rotate(6deg) scale(1.08)`,
++          opacity: 0,
++        },
++        { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
++      ],
++      1100,
++    );
++    revealCopy([pack.querySelector(".pack-preview-enlarge")], animate, 180);
++  });
++  const packCopy = document.querySelector(".wpc-pack-copy");
++  register(packCopy, (animate) => {
++    revealCopy([packCopy.querySelector(".eyebrow")], animate);
++    revealLines(packCopy, animate, 60);
++    revealCopy(
++      [...packCopy.children].filter((child) => !child.matches("h2, .eyebrow")),
++      animate,
++      180,
++    );
++  });
++  const revealIntro = (root) =>
++    register(root, (animate) => {
++      revealLines(root, animate, 60);
++      revealCopy(
++        [...root.children].filter((child) => !child.matches("h2")),
++        animate,
++      );
++    });
++  revealIntro(document.querySelector(".product-details-intro"));
++  revealIntro(document.querySelector(".questions-intro"));
++  const detailsTop = document.querySelector(".wpc-product .section-top");
++  register(detailsTop, (animate) => {
++    animate(
++      document.querySelector(".wpc-product .section-motion-rule"),
++      [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
++      900,
++    );
++    revealCopy([...detailsTop.children], animate);
++  });
++  // Observe short summaries, not the potentially screen-tall open answer.
++  // Draw the row's divider without shifting a tappable summary or its text.
++  document
++    .querySelectorAll("#questions .faq-list details")
++    .forEach((details) => {
++      const rule = document.createElement("i");
++      rule.className = "faq-entry-rule";
++      rule.setAttribute("aria-hidden", "true");
++      const summary = details.querySelector("summary");
++      summary.append(rule);
++      register(summary, (animate) => {
++        animate(
++          rule,
++          [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
++          650,
++        );
++      });
++    });
++  const contact = document.querySelector(".contact-intro");
++  register(contact, (animate) => {
++    revealLines(contact, animate, 60);
++    revealCopy(
++      [...contact.children].filter((child) => !child.matches("h2")),
++      animate,
++    );
++    animate(
++      document.querySelector(".site-footer > .section-motion-rule"),
++      [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
++      1000,
++      120,
++    );
++  });
++  const contactLinks = document.querySelector(".footer-links");
++  register(contactLinks, (animate) => {
++    revealCopy([contactLinks.querySelector(".eyebrow")], animate);
++    contactLinks
++      .querySelectorAll("a > span[aria-hidden]")
++      .forEach((arrow, index) => {
++        animate(
++          arrow,
++          [
++            { transform: "translate(-10px, 10px)" },
++            { transform: "translate(0, 0)" },
++          ],
++          250,
++          index * 60,
++        );
++      });
++  });
++  const settle = () => groups.forEach((group) => group.finish());
+   reduced.addEventListener("change", () => {
+-    if (!canAnimate()) {
+-      animation?.cancel();
+-      section.classList.remove("mindset-entered");
+-    }
++    if (!canAnimate()) settle();
+   });
+   window.addEventListener("pagehide", () => {
+     observer.disconnect();
+-    animation?.cancel();
++    settle();
+   });
+   window.addEventListener("pageshow", (event) => {
+-    if (event.persisted) section.classList.remove("mindset-entered");
++    if (event.persisted)
++      groups.forEach((_, target) => {
++        if (!target.dataset.entrance) observer.observe(target);
++      });
++  });
++}
++
++// Keep the native dialog's focus, Escape and backdrop behaviour. Only its
++// presentation is enhanced; keyboard opening/closing remains immediate.
++export function packagingDialogMotion(dialog) {
++  let animation;
++  let closing = false;
++  const reset = () => {
++    animation?.cancel();
++    animation = undefined;
++    closing = false;
++    delete dialog.dataset.closing;
++  };
++  const close = (instant = false) => {
++    if (!dialog.open) return;
++    if (instant || !canAnimate()) {
++      reset();
++      dialog.close();
++      return;
++    }
++    if (closing) return;
++    const style = getComputedStyle(dialog);
++    const from = { transform: style.transform };
++    reset();
++    closing = true;
++    dialog.dataset.closing = "true";
++    animation = dialog.animate(
++      [from, { transform: "translateY(16px) scale(0.96)" }],
++      { duration: 200, easing: easeOut },
++    );
++    animation.onfinish = () => {
++      dialog.close();
++      reset();
++    };
++  };
++  dialog.addEventListener("close", () => {
++    if (!dialog.open) reset();
++  });
++  window.addEventListener("pagehide", () => {
++    if (dialog.open) dialog.close();
++    reset();
+   });
++  reduced.addEventListener("change", () => {
++    if (!canAnimate()) {
++      if (closing) dialog.close();
++      reset();
++    }
++  });
++  return {
++    open(instant = false) {
++      reset();
++      if (!canAnimate() || instant) return;
++      animation = dialog.animate(
++        [
++          { transform: "translateY(24px) scale(0.96)" },
++          { transform: "translateY(0) scale(1)" },
++        ],
++        { duration: 250, easing: easeOut },
++      );
++    },
++    close,
++  };
+ }
+ 
+ export function initializeInteractions() {
+   initializeLabelTabs();
+   initializePackPreview();
+   initializeFaqMotion();
+-  initializeMindsetReveal();
++  initializeSectionSequence();
+ }
+diff --git a/v2/src/main.js b/v2/src/main.js
+index e1d46ff..542ef35 100644
+--- a/v2/src/main.js
++++ b/v2/src/main.js
+@@ -1,4 +1,7 @@
+-import { initializeInteractions } from "./interactions.js";
++import {
++  initializeInteractions,
++  packagingDialogMotion,
++} from "./interactions.js";
+ import {
+   featuredProduct,
+   getProduct,
+@@ -258,6 +261,7 @@ window.addEventListener("popstate", () =>
+ 
+ // The anchor remains a direct image link when JavaScript or dialog support is absent.
+ const dialog = document.querySelector("#packaging-dialog");
++const dialogMotion = packagingDialogMotion(dialog);
+ let dialogOpener;
+ let dialogProduct;
+ function setDialogView(view) {
+@@ -304,6 +308,7 @@ function setDialogView(view) {
+   dialog.scrollTop = 0;
+ }
+ let priorBodyOverflow = "";
++let packagingScrollLocked = false;
+ if (typeof dialog.showModal === "function") {
+   document.querySelectorAll("[data-open-packaging]").forEach((link) =>
+     link.addEventListener("click", (event) => {
+@@ -319,9 +324,15 @@ if (typeof dialog.showModal === "function") {
+           ? "back"
+           : "front",
+       );
+-      priorBodyOverflow = document.body.style.overflow;
++      // Native close events are queued. A fast reopen must retain the original
++      // overflow value until the last dialog closes, rather than saving hidden.
++      if (!packagingScrollLocked) {
++        priorBodyOverflow = document.body.style.overflow;
++        packagingScrollLocked = true;
++      }
+       document.body.style.overflow = "hidden";
+       dialog.showModal();
++      dialogMotion.open(event.detail === 0);
+       dialog.querySelector(".dialog-close").focus();
+     }),
+   );
+@@ -335,7 +346,9 @@ if (typeof dialog.showModal === "function") {
+   });
+   dialog
+     .querySelector(".dialog-close")
+-    .addEventListener("click", () => dialog.close());
++    .addEventListener("click", (event) =>
++      dialogMotion.close(event.detail === 0),
++    );
+   dialog.addEventListener("click", (event) => {
+     const bounds = dialog.getBoundingClientRect();
+     if (
+@@ -345,10 +358,12 @@ if (typeof dialog.showModal === "function") {
+         event.clientY < bounds.top ||
+         event.clientY > bounds.bottom)
+     )
+-      dialog.close();
++      dialogMotion.close();
+   });
+   dialog.addEventListener("close", () => {
++    if (dialog.open) return; // Ignore a queued close from the previous opening.
+     document.body.style.overflow = priorBodyOverflow;
++    packagingScrollLocked = false;
+     dialogOpener?.focus({ preventScroll: true });
+   });
+ }
+diff --git a/v2/src/scroll-story.css b/v2/src/scroll-story.css
+index 1472c74..186d0ec 100644
+--- a/v2/src/scroll-story.css
++++ b/v2/src/scroll-story.css
+@@ -326,20 +326,6 @@ html.lenis {
+   border-block: 1px solid #ffffff25;
+   background: #151313;
+ }
+-.trayn-mindset::after {
+-  content: "";
+-  position: absolute;
+-  bottom: -26px;
+-  right: -36px;
+-  width: clamp(360px, 42vw, 650px);
+-  height: 160px;
+-  background: url("/images/brand/trayn-slipstream.svg") center / 100% 100%
+-    no-repeat;
+-  mask-image: linear-gradient(to right, transparent, #000 35%);
+-  opacity: 0.28;
+-  pointer-events: none;
+-  z-index: 0;
+-}
+ .trayn-mindset-inner {
+   position: relative;
+   z-index: 1;
+@@ -402,13 +388,6 @@ html.lenis {
+   font-size: 13px;
+ }
+ @media (max-width: 800px) {
+-  .trayn-mindset::after {
+-    bottom: -12px;
+-    right: -24px;
+-    width: 220px;
+-    height: 72px;
+-    opacity: 0.24;
+-  }
+   .trayn-mindset-inner,
+   .wpc-questions {
+     grid-template-columns: 1fr;
+diff --git a/v2/src/section-interactions.css b/v2/src/section-interactions.css
+index e7fdcbc..a824e9f 100644
+--- a/v2/src/section-interactions.css
++++ b/v2/src/section-interactions.css
+@@ -33,16 +33,23 @@
+   top: 0;
+   left: 4%;
+   margin: 8% 0 0;
+-  transition: opacity 200ms var(--ease-out);
++  transition:
++    opacity 280ms var(--ease-out),
++    transform 280ms var(--ease-out);
+ }
+ .pack-preview-back {
+   opacity: 0;
+ }
++[data-pack-preview] .pack-preview-back {
++  transform: translateX(6%) rotate(-4deg) scale(0.98);
++}
+ [data-pack-preview][data-view="back"] .pack-preview-front {
+   opacity: 0;
++  transform: translateX(-6%) rotate(-12deg) scale(0.98);
+ }
+ [data-pack-preview][data-view="back"] .pack-preview-back {
+   opacity: 1;
++  transform: rotate(-8deg);
+ }
+ [data-pack-preview].is-instant .pack-preview-images img {
+   transition: none;
+@@ -51,6 +58,7 @@
+   min-width: 0;
+ }
+ .label-tabs {
++  position: relative;
+   display: flex;
+   gap: 24px;
+   border-bottom: 1px solid var(--line);
+@@ -70,6 +78,23 @@
+   border-color: var(--red-accent);
+   color: var(--white);
+ }
++.label-tabs.has-tab-indicator [aria-selected="true"] {
++  border-color: transparent;
++}
++.label-tab-indicator {
++  position: absolute;
++  bottom: -1px;
++  left: 0;
++  width: 1px;
++  height: 2px;
++  background: var(--red-accent);
++  transform-origin: left center;
++  transition: transform 220ms var(--ease-out);
++  pointer-events: none;
++}
++.label-tabs.is-instant .label-tab-indicator {
++  transition: none;
++}
+ .label-panel {
+   scroll-margin-top: 12px;
+ }
+@@ -232,17 +257,87 @@
+ .faq-answer {
+   display: flow-root;
+ }
+-@keyframes slipstream-enter {
+-  from {
+-    transform: translate(20px, 4px);
+-  }
+-  to {
+-    transform: translate(0);
++.wpc-product,
++.site-footer,
++#questions summary {
++  position: relative;
++}
++.section-motion-rule,
++.faq-entry-rule {
++  display: block;
++  position: absolute;
++  left: 0;
++  right: 0;
++  top: 0;
++  height: 1px;
++  background: linear-gradient(90deg, var(--red-accent), #f8203000 85%);
++  transform-origin: left center;
++  pointer-events: none;
++}
++.faq-entry-rule {
++  top: auto;
++  bottom: -20px;
++  opacity: 0.55;
++}
++.faq-list summary > span[aria-hidden] {
++  transition: transform 160ms var(--ease-out);
++}
++.faq-list .is-instant summary > span[aria-hidden] {
++  transition: none;
++}
++.motion-line {
++  display: block;
++  overflow: clip;
++  /* Room for the tight editorial leading without cutting the letter edges. */
++  padding-block: 0.09em;
++  margin-block: -0.09em;
++}
++.motion-line > span {
++  display: block;
++  transform-origin: left bottom;
++}
++.mindset-title {
++  min-width: 0;
++}
++.mindset-trail {
++  display: block;
++  width: 100%;
++  max-width: 520px;
++  height: auto;
++  margin-top: 30px;
++  pointer-events: none;
++}
++.wpc-pack-detail {
++  position: relative;
++}
++.wpc-pack-detail::after {
++  content: "";
++  position: absolute;
++  inset: 0 0 auto;
++  height: 1px;
++  background: linear-gradient(90deg, var(--red-accent), #f8203000 80%);
++  pointer-events: none;
++}
++.packaging-dialog {
++  transform-origin: center;
++}
++.packaging-dialog::backdrop {
++  opacity: 1;
++  transition: opacity 250ms var(--ease-out);
++}
++.packaging-dialog[data-closing]::backdrop {
++  opacity: 0;
++  transition-duration: 200ms;
++}
++@starting-style {
++  .packaging-dialog[open]::backdrop {
++    opacity: 0;
+   }
+ }
+-@media (prefers-reduced-motion: no-preference) {
+-  .mindset-entered::after {
+-    animation: slipstream-enter 600ms var(--ease-out);
++@media (max-width: 800px) {
++  .mindset-trail {
++    max-width: 360px;
++    margin-top: 24px;
+   }
+ }
+ .contact-email span,
+@@ -256,6 +351,13 @@
+   }
+ }
+ @media (prefers-reduced-motion: reduce) {
++  .label-tab-indicator,
++  .faq-list summary > span[aria-hidden] {
++    transition: none;
++  }
++  .packaging-dialog::backdrop {
++    transition: none;
++  }
+   .pack-preview-images img,
+   .contact-email span,
+   .footer-links a span {
+@@ -265,6 +367,9 @@
+   .footer-links a:hover span {
+     transform: none;
+   }
++  [data-pack-preview] .pack-preview-images img {
++    transform: rotate(-8deg);
++  }
+ }
+ @media (max-width: 600px) {
+   .label-tabs {
+@@ -295,3 +400,14 @@ html[data-motion="reduced"] .footer-links a span {
+   transition: none;
+   transform: none;
+ }
++html[data-motion="reduced"] [data-pack-preview] .pack-preview-images img {
++  transform: rotate(-8deg);
++  transition: none;
++}
++html[data-motion="reduced"] .packaging-dialog::backdrop {
++  transition: none;
++}
++html[data-motion="reduced"] .label-tab-indicator,
++html[data-motion="reduced"] .faq-list summary > span[aria-hidden] {
++  transition: none;
++}
+diff --git a/v2/src/templates.js b/v2/src/templates.js
+index b364bcb..e25027c 100644
+--- a/v2/src/templates.js
++++ b/v2/src/templates.js
+@@ -35,15 +35,15 @@ export function header() {
+   return `<a class="skip-link" href="#main">Skip to content</a>
+   <header class="site-header"><div class="header-inner">
+     <a class="brand" href="/" aria-label="TRAYN Nutrition home"><img src="/images/brand/trayn-logo-256.webp" srcset="/images/brand/trayn-logo-256.webp 256w, /images/brand/trayn-logo.webp 740w" sizes="(max-width: 800px) 88px, 107px" alt="TRAYN Nutrition" width="740" height="440"></a>
+-    <nav class="main-nav" id="main-navigation" aria-label="Main navigation"><a href="/#about">Our story</a><a href="/#story">The packaging</a><a href="/#blend">The product</a><a href="/#contact">Contact</a></nav>
++    <nav class="main-nav" id="main-navigation" aria-label="Main navigation"><a href="/#about">Our Story</a><a href="/#story">The Packaging</a><a href="/#blend">The Product</a><a href="/#contact">Contact</a></nav>
+     <a class="header-cta" href="${productPath}">View product ${arrow}</a>
+     <button class="menu-toggle" aria-controls="main-navigation" aria-expanded="false" aria-label="Open menu"><span data-menu-label>Menu</span><span class="menu-bars" aria-hidden="true"></span></button>
+   </div></header>`;
+ }
+ 
+ export function footer() {
+-  return `<footer class="site-footer" id="contact"><div class="footer-top wrap">
+-    <div class="contact-intro"><p class="eyebrow">Contact TRAYN</p><h2>LET’S TALK.</h2><p class="contact-copy">Product questions or partnerships? Get in touch with TRAYN.</p><a class="contact-email" href="mailto:${brand.email}">${brand.email} ${arrow}</a></div>
++  return `<footer class="site-footer" id="contact"><span class="section-motion-rule" aria-hidden="true"></span><div class="footer-top wrap">
++    <div class="contact-intro"><p class="eyebrow">Contact TRAYN</p><h2><span class="motion-line"><span>LET’S TALK.</span></span></h2><p class="contact-copy">Product questions or partnerships? Get in touch with TRAYN.</p><a class="contact-email" href="mailto:${brand.email}">${brand.email} ${arrow}</a></div>
+     <div class="footer-links"><p class="eyebrow">Get in touch</p><a href="tel:${brand.phone}">${brand.phoneDisplay}</a><a href="${brand.instagram}" target="_blank" rel="noopener noreferrer">Instagram ${arrow}</a><a href="${productPath}">Belgian Chocolate ${arrow}</a><a href="/label-information.html">Product information ${arrow}</a><a href="/drafts/">Compare the three drafts ${arrow}</a></div>
+     <a class="back-top" href="#top" aria-label="Back to top"><span aria-hidden="true">↑</span><span>Back to top</span></a>
+   </div><div class="footer-bottom wrap"><a href="/" aria-label="TRAYN Nutrition home"><img src="/images/brand/trayn-logo-256.webp" width="740" height="440" alt="TRAYN Nutrition" loading="lazy"></a><p>© 2026 TRAYN Nutrition</p><p>Packaging concept. Not for sale.</p><a href="/label-information.html">Product information</a></div></footer>`;
+@@ -98,20 +98,20 @@ export function home() {
+   </section>
+   <section class="trayn-mindset section-space" id="about" aria-labelledby="mindset-heading">
+     <div class="trayn-mindset-inner wrap">
+-      <div><p class="eyebrow"><span class="section-index">03</span> / The TRAYN mindset</p><h2 id="mindset-heading">GET<br>BUILT.</h2></div>
++      <div class="mindset-title"><p class="eyebrow"><span class="section-index">03</span> / The TRAYN mindset</p><h2 id="mindset-heading"><span class="motion-line"><span>GET</span></span> <span class="motion-line"><span>BUILT.</span></span></h2><svg class="mindset-trail" viewBox="0 0 520 64" fill="none" aria-hidden="true"><path d="M1 52C192 52 348 39 519 5" stroke="var(--red-accent)" stroke-width="5"/><path d="M1 59C208 59 380 46 519 24" stroke="#b6b3af" stroke-width="1"/><path d="M190 45C313 35 424 20 519 1" stroke="var(--red-accent)" stroke-width="1"/></svg></div>
+       <div class="trayn-mindset-copy"><p class="eyebrow">TRAYN by gLitCh</p><h3>Built for those<br>who show up.</h3><p>Discipline. Grit. The drive to show up every day. That’s the spirit behind TRAYN.</p><p>For regular gym goers, competitive athletes and people starting their first training routine. Wherever you begin, keep showing up.</p><a class="text-link" href="#contact">Get to know TRAYN ${arrow}</a></div>
+     </div>
+   </section>
+   <section class="wpc-packaging wrap" id="story" aria-labelledby="packaging-heading">
+     <figure class="wpc-pack-detail" data-pack-preview><a href="${featuredProduct.image}-1024.webp" data-open-packaging aria-label="Inspect Belgian Chocolate packaging"><span class="pack-preview-images">${productImage(featuredProduct, { className: "pack-preview-front" })}${productImage(featuredProduct, { className: "pack-preview-back", back: true }).replace("<img ", "<img hidden ")}</span><span class="pack-preview-enlarge" aria-hidden="true">Inspect packaging +</span></a></figure>
+-    <div class="wpc-pack-copy"><p class="eyebrow"><span class="section-index">04</span> / The packaging</p><h2 id="packaging-heading">A CLOSER<br>LOOK.</h2><div class="pack-view-controls" role="group" aria-label="Pouch preview"><a href="${featuredProduct.image}-1024.webp" data-pack-view="front" aria-current="true">Front</a><a href="${featuredProduct.backImage}-1024.webp" data-pack-view="back" aria-current="false">Back</a></div><p class="body-copy">Explore the Belgian Chocolate pouch from both sides. Inspect the front design, then turn to the back for the supplied label artwork.</p><a class="text-link" href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging>See the pack up close ${arrow}</a><p class="small-note">Front and back pouch visualisations. Open the original back label in the inspector to read the small print.</p></div>
++    <div class="wpc-pack-copy"><p class="eyebrow"><span class="section-index">04</span> / The packaging</p><h2 id="packaging-heading"><span class="motion-line"><span>A CLOSER</span></span> <span class="motion-line"><span>LOOK.</span></span></h2><div class="pack-view-controls" role="group" aria-label="Pouch preview"><a href="${featuredProduct.image}-1024.webp" data-pack-view="front" aria-current="true">Front</a><a href="${featuredProduct.backImage}-1024.webp" data-pack-view="back" aria-current="false">Back</a></div><p class="body-copy">Explore the Belgian Chocolate pouch from both sides. Inspect the front design, then turn to the back for the supplied label artwork.</p><a class="text-link" href="/images/products/belgian-chocolate-wpc-1024.webp" data-open-packaging>See the pack up close ${arrow}</a><p class="small-note">Front and back pouch visualisations. Open the original back label in the inspector to read the small print.</p></div>
+   </section>
+-  <section class="wpc-product section-space wrap" id="blend" aria-labelledby="blend-heading">
++  <section class="wpc-product section-space wrap" id="blend" aria-labelledby="blend-heading"><span class="section-motion-rule" aria-hidden="true"></span>
+     <div class="section-top"><p class="eyebrow"><span class="section-index">05</span> / The details</p><span class="section-caption">Belgian Chocolate / 500 g</span></div>
+-    <div class="wpc-product-layout"><div><h2 id="blend-heading">KNOW YOUR<br>PROTEIN.</h2><p class="body-copy">WPC stands for whey protein concentrate. It’s the protein source in our Belgian Chocolate pack.</p><p class="body-copy">Explore the nutrition, ingredients and preparation directions from our supplied back label.</p><a class="text-link" href="${productPath}">View product details ${arrow}</a></div>${labelDetails("home-label")}</div>
++    <div class="wpc-product-layout"><div class="product-details-intro"><h2 id="blend-heading"><span class="motion-line"><span>KNOW YOUR</span></span> <span class="motion-line"><span>PROTEIN.</span></span></h2><p class="body-copy">WPC stands for whey protein concentrate. It’s the protein source in our Belgian Chocolate pack.</p><p class="body-copy">Explore the nutrition, ingredients and preparation directions from our supplied back label.</p><a class="text-link" href="${productPath}">View product details ${arrow}</a></div>${labelDetails("home-label")}</div>
+   </section>
+   <section class="wpc-questions section-space wrap" id="questions" aria-labelledby="questions-heading">
+-    <div><p class="eyebrow"><span class="section-index">06</span> / Before your next scoop</p><h2 id="questions-heading">KNOW<br>YOUR PACK.</h2><p class="body-copy">Clear product information belongs alongside the training mindset.</p><a class="text-link" href="/label-information.html">Read the product information ${arrow}</a></div>
++    <div class="questions-intro"><p class="eyebrow"><span class="section-index">06</span> / Before your next scoop</p><h2 id="questions-heading"><span class="motion-line"><span>KNOW</span></span> <span class="motion-line"><span>YOUR PACK.</span></span></h2><p class="body-copy">Clear product information belongs alongside the training mindset.</p><a class="text-link" href="/label-information.html">Read the product information ${arrow}</a></div>
+     <div class="faq-list">
+       <details open><summary>What does WPC mean?<span aria-hidden="true">+</span></summary><p>WPC means whey protein concentrate. The current TRAYN product direction is Belgian Chocolate WPC in a 500 g pack.</p></details>
+       <details><summary>Does this product contain milk?<span aria-hidden="true">+</span></summary><p>Yes. The supplied back label states “Contains Milk”. You can read its ingredient list in the product-details section.</p></details>
+@@ -123,7 +123,7 @@ export function home() {
+ }
+ 
+ export function productPage(product = featuredProduct) {
+-  return `<main id="main" class="product-page wrap"><div class="breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/#blend">The product</a><span aria-hidden="true">/</span><span>${escapeHtml(product.flavor)}</span></div>
++  return `<main id="main" class="product-page wrap"><div class="breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/#blend">The Product</a><span aria-hidden="true">/</span><span>${escapeHtml(product.flavor)}</span></div>
+   <section class="product-explorer detail-explorer" data-product-explorer aria-labelledby="product-heading"><div class="product-gallery"><div class="gallery-stage"><span class="gallery-word" aria-hidden="true">WHEY</span>${productImage(product, { interactive: true, priority: true })}<a class="gallery-enlarge" href="${product.image}-1024.webp" data-open-packaging aria-label="Enlarge packaging concept"><span aria-hidden="true">+</span></a></div><div class="gallery-controls"><a href="${product.image}-1024.webp" data-gallery-view="front" aria-current="true">Front concept</a><a ${product.backImage ? `href="${product.backImage}-1024.webp"` : "hidden"} data-gallery-view="back" aria-current="false">Back concept</a><span>Concept artwork</span></div><p class="small-note">${product.archived ? "Earlier packaging study, separate from the current WPC product." : "Belgian Chocolate. Current WPC packaging concept."}</p></div>
+   <div class="product-information"><p class="eyebrow"><span class="signal"></span><span data-product-status>${escapeHtml(product.status)}</span></p><h1 id="product-heading" data-product-type>${escapeHtml(product.name)}</h1><h2 data-product-name>${escapeHtml(product.flavor)}</h2><p class="body-copy" data-product-description>${escapeHtml(product.description)}</p><p class="selection-status" data-flavor-status aria-live="polite">${escapeHtml(product.status)} · Not for sale</p>${specificationRows(product)}<a class="button button-primary" href="mailto:${brand.email}?subject=TRAYN%20product%20enquiry">Enquire about TRAYN ${arrow}</a><p class="small-note">Opens your email app. This concept is not available to purchase.</p></div></section>
+   <section class="product-facts" aria-labelledby="facts-heading"><h2 id="facts-heading">PRODUCT INFORMATION.</h2><div class="faq-list"><details open><summary>What is this product?<span aria-hidden="true">+</span></summary><p>${product.archived ? "This is an archived 500 g whey concentrate and isolate blend concept. It is separate from the current Belgian Chocolate WPC product." : "The current product direction is Belgian Chocolate whey protein concentrate (WPC), in a 500 g pack. The image is a packaging concept, not a final retail label."}</p></details><details><summary>Where are the ingredients and nutrition facts?<span aria-hidden="true">+</span></summary><p>${product.archived ? "No matching back label is supplied for this earlier concept." : "Read the supplied back-label artwork in the packaging inspector, or use the readable Nutrition, Ingredients and How to use section below."}</p></details><details><summary>Is it available to buy?<span aria-hidden="true">+</span></summary><p>This is a product showcase. Sales, pricing and a launch date have not been announced here. Contact TRAYN for product enquiries.</p></details></div></section>
+diff --git a/v2/tests/browser/interactions.spec.js b/v2/tests/browser/interactions.spec.js
+index a6a078a..275b91d 100644
+--- a/v2/tests/browser/interactions.spec.js
++++ b/v2/tests/browser/interactions.spec.js
+@@ -14,6 +14,233 @@ async function accessible(page) {
+   ).toBe(true);
+ }
+ 
++test("details, question rows and contact share the section sequence without moving controls", async ({
++  page,
++}, testInfo) => {
++  await page.goto("/");
++  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
++  const menu = page.locator(".menu-toggle");
++  if (await menu.isVisible()) await menu.click();
++  await page.locator('header a[href$="#blend"]').click();
++  await expect(page.locator(".product-details-intro")).toHaveAttribute(
++    "data-entrance",
++    "complete",
++  );
++  await expect(page.locator("#blend")).toBeFocused();
++  await expect(page.locator("#blend .label-table").first()).toHaveCSS(
++    "transform",
++    "none",
++  );
++  if (["laptop", "mobile"].includes(testInfo.project.name)) {
++    await page.screenshot({
++      path: testInfo.outputPath("product-details-motion.png"),
++    });
++  }
++  await page.locator(".questions-intro").scrollIntoViewIfNeeded();
++  await expect(page.locator(".questions-intro")).toHaveAttribute(
++    "data-entrance",
++    "complete",
++  );
++  const summary = page.locator("#questions details").nth(1).locator("summary");
++  await summary.evaluate((el) =>
++    el.scrollIntoView({ block: "center", behavior: "instant" }),
++  );
++  await expect(summary).toHaveAttribute("data-entrance", "complete");
++  await expect(summary.locator(".faq-entry-rule")).toBeVisible();
++  await expect(summary).toHaveCSS("transform", "none");
++  await summary.click();
++  await expect(page.locator("#questions details").nth(1)).toHaveAttribute(
++    "open",
++    "",
++  );
++  if (["laptop", "mobile"].includes(testInfo.project.name)) {
++    await page.screenshot({
++      path: testInfo.outputPath("questions-motion.png"),
++    });
++  }
++  if (await menu.isVisible()) await menu.click();
++  await page.locator('header a[href$="#contact"]').click();
++  await expect(page.locator(".contact-intro")).toHaveAttribute(
++    "data-entrance",
++    "complete",
++  );
++  await page.locator(".footer-links").scrollIntoViewIfNeeded();
++  await expect(page.locator(".footer-links")).toHaveAttribute(
++    "data-entrance",
++    "complete",
++  );
++  await expect(page.locator(".contact-email")).toHaveCSS("transform", "none");
++  if (["laptop", "mobile"].includes(testInfo.project.name)) {
++    await page.screenshot({ path: testInfo.outputPath("contact-motion.png") });
++  }
++  await accessible(page);
++});
++
++test("label motion follows rapid selection, resizing, keyboard and reduced motion", async ({
++  page,
++}) => {
++  await page.goto("/");
++  const root = page.locator("[data-label-tabs]");
++  const ingredients = root.getByRole("tab", {
++    name: "Ingredients",
++    exact: true,
++  });
++  const nutrition = root.getByRole("tab", { name: "Nutrition", exact: true });
++  const preparation = root.getByRole("tab", {
++    name: "How to use",
++    exact: true,
++  });
++  await ingredients.click();
++  await nutrition.click();
++  await preparation.click();
++  await expect(root.getByRole("tabpanel")).toContainText(
++    "200 ml cold water or milk",
++  );
++  await expect(root.getByRole("tabpanel")).toHaveCSS("clip-path", "none");
++  const indicatorError = () =>
++    root.evaluate((el) => {
++      const list = el.querySelector(".label-tabs").getBoundingClientRect();
++      const tab = el
++        .querySelector('[aria-selected="true"]')
++        .getBoundingClientRect();
++      const indicator = el
++        .querySelector(".label-tab-indicator")
++        .getBoundingClientRect();
++      return Math.max(
++        Math.abs(tab.left - indicator.left),
++        Math.abs(tab.width - indicator.width),
++        Math.abs(list.bottom - indicator.bottom),
++      );
++    });
++  await expect.poll(indicatorError).toBeLessThan(2);
++  const size = page.viewportSize();
++  await page.setViewportSize({ ...size, width: size.width + 40 });
++  await expect.poll(indicatorError).toBeLessThan(2);
++  await preparation.focus();
++  await page.keyboard.press("Home");
++  await expect(nutrition).toBeFocused();
++  expect(
++    await root
++      .getByRole("tabpanel")
++      .evaluate((el) => el.getAnimations().length),
++  ).toBe(0);
++  expect(
++    await root
++      .locator(".label-tab-indicator")
++      .evaluate((el) => el.getAnimations().length),
++  ).toBe(0);
++  await ingredients.click();
++  await page.emulateMedia({ reducedMotion: "reduce" });
++  await expect(root.getByRole("tabpanel")).toContainText("Contains milk");
++  await expect(root.getByRole("tabpanel")).toHaveCSS("clip-path", "none");
++  expect(
++    await root
++      .getByRole("tabpanel")
++      .evaluate((el) => el.getAnimations().length),
++  ).toBe(0);
++});
++
++test("section entrances play through header navigation and settle without replaying", async ({
++  page,
++}, testInfo) => {
++  await page.goto("/");
++  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
++  await page.evaluate(() => {
++    window.entranceStarts = [];
++    new MutationObserver((records) => {
++      for (const { target } of records) {
++        if (target.dataset.entrance === "running") {
++          window.entranceStarts.push({
++            name: target.className,
++            frames: target
++              .getAnimations({ subtree: true })
++              .flatMap((animation) => animation.effect.getKeyframes()),
++          });
++        }
++      }
++    }).observe(document.querySelector("main"), {
++      subtree: true,
++      attributes: true,
++      attributeFilter: ["data-entrance"],
++    });
++  });
++  const menu = page.locator(".menu-toggle");
++  if (await menu.isVisible()) await menu.click();
++  await page.locator('header a[href$="#about"]').click();
++  const title = page.locator(".mindset-title");
++  await expect(title).toHaveAttribute("data-entrance", "complete");
++  await expect(page.locator("#about")).toBeFocused();
++  const entrance = await page.evaluate(() =>
++    window.entranceStarts.find((entry) => entry.name.includes("mindset-title")),
++  );
++  expect(
++    entrance.frames.some((frame) => frame.transform?.includes("108%")),
++  ).toBe(true);
++  expect(
++    entrance.frames.some((frame) => frame.clipPath?.includes("100%")),
++  ).toBe(true);
++  if (["laptop", "mobile"].includes(testInfo.project.name)) {
++    await page.screenshot({
++      path: testInfo.outputPath("get-built-sequence.png"),
++    });
++  }
++  await page.locator(".wpc-pack-detail").scrollIntoViewIfNeeded();
++  await expect(page.locator(".wpc-pack-detail")).toHaveAttribute(
++    "data-entrance",
++    "complete",
++  );
++  const packEntrance = await page.evaluate(() =>
++    window.entranceStarts.find((entry) =>
++      entry.name.includes("wpc-pack-detail"),
++    ),
++  );
++  expect(
++    packEntrance.frames.some((frame) =>
++      frame.transform?.includes("scale(1.08)"),
++    ),
++  ).toBe(true);
++  await title.scrollIntoViewIfNeeded();
++  expect(
++    await page.evaluate(
++      () =>
++        window.entranceStarts.filter((entry) =>
++          entry.name.includes("mindset-title"),
++        ).length,
++    ),
++  ).toBe(1);
++  expect(
++    await title.evaluate((el) => el.getAnimations({ subtree: true }).length),
++  ).toBe(0);
++  await accessible(page);
++});
++
++test("changing reduced motion during an entrance immediately restores readable content", async ({
++  page,
++}) => {
++  await page.goto("/");
++  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
++  await page.evaluate(() => document.fonts.ready);
++  await page.locator(".mindset-title").scrollIntoViewIfNeeded();
++  await expect(page.locator(".mindset-title")).toHaveAttribute(
++    "data-entrance",
++    "running",
++  );
++  await page.emulateMedia({ reducedMotion: "reduce" });
++  await expect(page.locator(".mindset-title")).toHaveAttribute(
++    "data-entrance",
++    "complete",
++  );
++  expect(
++    await page
++      .locator("#about")
++      .evaluate((el) => el.getAnimations({ subtree: true }).length),
++  ).toBe(0);
++  await expect(
++    page.locator("#mindset-heading .motion-line > span").first(),
++  ).toHaveCSS("transform", "none");
++  await expect(page.locator(".mindset-trail")).toHaveCSS("clip-path", "none");
++});
++
+ test("label tabs show source-backed information and support keyboard navigation", async ({
+   page,
+ }, testInfo) => {
+@@ -110,6 +337,39 @@ test("front/back section preview keeps inspection in sync through rapid changes"
+   }
+ });
+ 
++test("packaging inspector survives an interrupted close and restores keyboard focus", async ({
++  page,
++}) => {
++  await page.goto("/");
++  const opener = page.locator(".wpc-pack-copy [data-open-packaging]");
++  const dialog = page.locator("#packaging-dialog");
++  await opener.click();
++  await expect(dialog).toBeVisible();
++  await dialog.locator(".dialog-close").click();
++  await page.keyboard.press("Escape");
++  await expect(dialog).not.toBeVisible();
++  await expect(opener).toBeFocused();
++  await page.keyboard.press("Enter");
++  await expect(dialog).toBeVisible();
++  await expect(dialog.locator(".dialog-close")).toBeFocused();
++  await expect(dialog).not.toHaveAttribute("data-closing");
++  expect(await dialog.evaluate((el) => el.getAnimations().length)).toBe(0);
++  await page.keyboard.press("Enter");
++  await expect(dialog).not.toBeVisible();
++  await expect(opener).toBeFocused();
++  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
++  // Reopen within the same task, before the native queued close event runs.
++  await opener.evaluate((link) => {
++    link.click();
++    document.querySelector("#packaging-dialog").close();
++    link.click();
++  });
++  await expect(dialog).toBeVisible();
++  await page.keyboard.press("Escape");
++  await expect(dialog).not.toBeVisible();
++  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
++});
++
+ test("FAQ pointer animations reverse cleanly and keyboard toggles remain native", async ({
+   page,
+ }) => {

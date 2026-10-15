@@ -14,107 +14,6 @@ async function accessible(page) {
   ).toBe(true);
 }
 
-test("section entrances play through header navigation and settle without replaying", async ({
-  page,
-}, testInfo) => {
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
-  await page.evaluate(() => {
-    window.entranceStarts = [];
-    new MutationObserver((records) => {
-      for (const { target } of records) {
-        if (target.dataset.entrance === "running") {
-          window.entranceStarts.push({
-            name: target.className,
-            frames: target
-              .getAnimations({ subtree: true })
-              .flatMap((animation) => animation.effect.getKeyframes()),
-          });
-        }
-      }
-    }).observe(document.querySelector("main"), {
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["data-entrance"],
-    });
-  });
-  const menu = page.locator(".menu-toggle");
-  if (await menu.isVisible()) await menu.click();
-  await page.locator('header a[href$="#about"]').click();
-  const title = page.locator(".mindset-title");
-  await expect(title).toHaveAttribute("data-entrance", "complete");
-  await expect(page.locator("#about")).toBeFocused();
-  const entrance = await page.evaluate(() =>
-    window.entranceStarts.find((entry) => entry.name.includes("mindset-title")),
-  );
-  expect(
-    entrance.frames.some((frame) => frame.transform?.includes("108%")),
-  ).toBe(true);
-  expect(
-    entrance.frames.some((frame) => frame.clipPath?.includes("100%")),
-  ).toBe(true);
-  if (["laptop", "mobile"].includes(testInfo.project.name)) {
-    await page.screenshot({
-      path: testInfo.outputPath("get-built-sequence.png"),
-    });
-  }
-  await page.locator(".wpc-pack-detail").scrollIntoViewIfNeeded();
-  await expect(page.locator(".wpc-pack-detail")).toHaveAttribute(
-    "data-entrance",
-    "complete",
-  );
-  const packEntrance = await page.evaluate(() =>
-    window.entranceStarts.find((entry) =>
-      entry.name.includes("wpc-pack-detail"),
-    ),
-  );
-  expect(
-    packEntrance.frames.some((frame) =>
-      frame.transform?.includes("scale(1.08)"),
-    ),
-  ).toBe(true);
-  await title.scrollIntoViewIfNeeded();
-  expect(
-    await page.evaluate(
-      () =>
-        window.entranceStarts.filter((entry) =>
-          entry.name.includes("mindset-title"),
-        ).length,
-    ),
-  ).toBe(1);
-  expect(
-    await title.evaluate((el) => el.getAnimations({ subtree: true }).length),
-  ).toBe(0);
-  await accessible(page);
-});
-
-test("changing reduced motion during an entrance immediately restores readable content", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-motion", "enabled");
-  await page.evaluate(() => document.fonts.ready);
-  await page.locator(".mindset-title").scrollIntoViewIfNeeded();
-  await expect(page.locator(".mindset-title")).toHaveAttribute(
-    "data-entrance",
-    "running",
-  );
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.locator(".mindset-title")).toHaveAttribute(
-    "data-entrance",
-    "complete",
-  );
-  expect(
-    await page
-      .locator("#about")
-      .evaluate((el) => el.getAnimations({ subtree: true }).length),
-  ).toBe(0);
-  await expect(
-    page.locator("#mindset-heading .motion-line > span").first(),
-  ).toHaveCSS("transform", "none");
-  await expect(page.locator(".mindset-trail")).toHaveCSS("clip-path", "none");
-});
-
 test("label tabs show source-backed information and support keyboard navigation", async ({
   page,
 }, testInfo) => {
@@ -211,39 +110,6 @@ test("front/back section preview keeps inspection in sync through rapid changes"
   }
 });
 
-test("packaging inspector survives an interrupted close and restores keyboard focus", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const opener = page.locator(".wpc-pack-copy [data-open-packaging]");
-  const dialog = page.locator("#packaging-dialog");
-  await opener.click();
-  await expect(dialog).toBeVisible();
-  await dialog.locator(".dialog-close").click();
-  await page.keyboard.press("Escape");
-  await expect(dialog).not.toBeVisible();
-  await expect(opener).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(dialog).toBeVisible();
-  await expect(dialog.locator(".dialog-close")).toBeFocused();
-  await expect(dialog).not.toHaveAttribute("data-closing");
-  expect(await dialog.evaluate((el) => el.getAnimations().length)).toBe(0);
-  await page.keyboard.press("Enter");
-  await expect(dialog).not.toBeVisible();
-  await expect(opener).toBeFocused();
-  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
-  // Reopen within the same task, before the native queued close event runs.
-  await opener.evaluate((link) => {
-    link.click();
-    document.querySelector("#packaging-dialog").close();
-    link.click();
-  });
-  await expect(dialog).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(dialog).not.toBeVisible();
-  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
-});
-
 test("FAQ pointer animations reverse cleanly and keyboard toggles remain native", async ({
   page,
 }) => {
@@ -322,4 +188,37 @@ test("without JavaScript all label panels and direct packaging links remain read
     ),
   ).toBe(true);
   await context.close();
+});
+
+test("packaging inspector survives an interrupted close and restores keyboard focus", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const opener = page.locator(".wpc-pack-copy [data-open-packaging]");
+  const dialog = page.locator("#packaging-dialog");
+  await opener.click();
+  await expect(dialog).toBeVisible();
+  await dialog.locator(".dialog-close").click();
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(opener).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".dialog-close")).toBeFocused();
+  await expect(dialog).not.toHaveAttribute("data-closing");
+  expect(await dialog.evaluate((el) => el.getAnimations().length)).toBe(0);
+  await page.keyboard.press("Enter");
+  await expect(dialog).not.toBeVisible();
+  await expect(opener).toBeFocused();
+  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+  // Reopen within the same task, before the native queued close event runs.
+  await opener.evaluate((link) => {
+    link.click();
+    document.querySelector("#packaging-dialog").close();
+    link.click();
+  });
+  await expect(dialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
 });

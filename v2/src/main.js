@@ -1,7 +1,4 @@
-import {
-  initializeInteractions,
-  packagingDialogMotion,
-} from "./interactions.js";
+import { initializeInteractions } from "./interactions.js";
 import {
   featuredProduct,
   getProduct,
@@ -261,7 +258,6 @@ window.addEventListener("popstate", () =>
 
 // The anchor remains a direct image link when JavaScript or dialog support is absent.
 const dialog = document.querySelector("#packaging-dialog");
-const dialogMotion = packagingDialogMotion(dialog);
 let dialogOpener;
 let dialogProduct;
 function setDialogView(view) {
@@ -332,7 +328,6 @@ if (typeof dialog.showModal === "function") {
       }
       document.body.style.overflow = "hidden";
       dialog.showModal();
-      dialogMotion.open(event.detail === 0);
       dialog.querySelector(".dialog-close").focus();
     }),
   );
@@ -346,9 +341,7 @@ if (typeof dialog.showModal === "function") {
   });
   dialog
     .querySelector(".dialog-close")
-    .addEventListener("click", (event) =>
-      dialogMotion.close(event.detail === 0),
-    );
+    .addEventListener("click", (event) => dialog.close());
   dialog.addEventListener("click", (event) => {
     const bounds = dialog.getBoundingClientRect();
     if (
@@ -358,7 +351,7 @@ if (typeof dialog.showModal === "function") {
         event.clientY < bounds.top ||
         event.clientY > bounds.bottom)
     )
-      dialogMotion.close();
+      dialog.close();
   });
   dialog.addEventListener("close", () => {
     if (dialog.open) return; // Ignore a queued close from the previous opening.

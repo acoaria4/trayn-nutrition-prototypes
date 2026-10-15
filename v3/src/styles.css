@@ -1,0 +1,524 @@
+@font-face {
+  font-family: Barlow;
+  src: url("/fonts/barlow-800.woff2") format("woff2");
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: Manrope;
+  src: url("/fonts/manrope-variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+:root {
+  --red-accent: #f82030;
+  --white: #f5f4f0;
+  --silver: #c8c4c0;
+  --black: #090909;
+  --header-height: 80px;
+  --gutter: clamp(24px, 4.4vw, 76px);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--black);
+  scroll-padding-top: calc(var(--header-height) + 16px);
+}
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--white);
+  font:
+    400 15px/1.7 Manrope,
+    Arial,
+    sans-serif;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 6px;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+[hidden] {
+  display: none !important;
+}
+::selection {
+  background: var(--red-accent);
+  color: var(--white);
+}
+.study-skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  padding: 10px 16px;
+  background: var(--white);
+  color: var(--black);
+  z-index: 30;
+  transform: translateY(-180%);
+}
+.study-skip:focus {
+  transform: none;
+}
+.study-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 80px;
+  padding: 10px var(--gutter);
+  background: #090909;
+  border-bottom: 1px solid #ffffff20;
+}
+.study-header > a img {
+  width: 94px;
+  height: auto;
+}
+.study-header nav {
+  display: flex;
+  gap: clamp(22px, 4vw, 60px);
+  font-size: 12px;
+}
+.study-header nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+}
+.study-header nav a:last-child span,
+.study-link span,
+.study-footer a span {
+  color: var(--red-accent);
+}
+.eyebrow {
+  margin: 0 0 28px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.study-story {
+  position: relative;
+}
+.study-stage {
+  display: none;
+}
+.study-chapter {
+  padding: 65px var(--gutter) 85px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px 9%;
+  align-items: center;
+  border-bottom: 1px solid #ffffff22;
+  overflow: clip;
+}
+.chapter-heading h1 {
+  margin: 0;
+  color: var(--red-accent);
+  font:
+    800 clamp(120px, 18vw, 260px)/0.82 Barlow,
+    Impact,
+    sans-serif;
+  letter-spacing: -0.035em;
+}
+.chapter-heading h2 {
+  margin: 0;
+  font:
+    800 clamp(65px, 8vw, 120px)/0.9 Barlow,
+    Impact,
+    sans-serif;
+  letter-spacing: -0.035em;
+}
+.chapter-copy {
+  grid-column: 1;
+  max-width: 36ch;
+}
+.chapter-copy h2 {
+  font-size: 26px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  margin: 0 0 18px;
+}
+.chapter-copy p {
+  color: var(--silver);
+  margin: 0 0 22px;
+}
+.chapter-art {
+  margin: 0;
+  grid-column: 2;
+  grid-row: 1 / 3;
+  position: relative;
+  height: 620px;
+  overflow: hidden;
+  background: #131111;
+}
+.mobile-foil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+}
+.mobile-stream {
+  position: absolute;
+  width: 140%;
+  height: 135%;
+  left: -20%;
+  top: -10%;
+}
+.mobile-product {
+  position: absolute;
+  inset: 7% 16% 0;
+}
+.mobile-product img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: rotate(-7deg);
+}
+[data-study-back] {
+  opacity: 0;
+}
+body[data-pack-view="back"] [data-study-front] {
+  opacity: 0;
+}
+body[data-pack-view="back"] [data-study-back] {
+  opacity: 1;
+}
+[data-study-front],
+[data-study-back] {
+  transition: opacity 250ms var(--ease-out);
+}
+body.is-instant [data-study-front],
+body.is-instant [data-study-back] {
+  transition: none;
+}
+.study-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 38px;
+  min-height: 48px;
+  border-bottom: 1px solid #ffffff65;
+  font-size: 13px;
+}
+.study-views {
+  display: flex;
+  gap: 10px;
+  margin: 30px 0 20px;
+}
+.study-views a {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  min-width: 82px;
+  padding: 10px 22px;
+  border: 1px solid #ffffff40;
+  font-size: 12px;
+}
+.study-views a[aria-current="true"] {
+  border-color: var(--red-accent);
+  background: #f8203010;
+}
+.chapter-copy .small-note {
+  font-size: 11px;
+  margin-top: 22px;
+  max-width: 34ch;
+}
+.study-end {
+  padding: 100px var(--gutter);
+  background: #151313;
+}
+.study-end h2 {
+  font:
+    800 clamp(56px, 9vw, 130px)/0.9 Barlow,
+    Impact,
+    sans-serif;
+  letter-spacing: -0.03em;
+  margin: 0 0 50px;
+}
+.study-end > div {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.study-footer {
+  padding: 28px var(--gutter);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 11px;
+  color: var(--silver);
+}
+
+/* Desktop is one moving product stage. The semantic chapters remain the
+   content layer; their titles travel with the composition, not on entry. */
+.is-cinematic .study-story {
+  height: calc(100svh - var(--header-height));
+  min-height: 540px;
+  overflow: clip;
+  isolation: isolate;
+}
+.is-cinematic .study-stage {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.is-cinematic .study-chapter {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border: 0;
+  padding: 0;
+  overflow: visible;
+}
+.is-cinematic .chapter-art {
+  display: none;
+}
+.is-cinematic .chapter-heading {
+  position: absolute;
+  left: var(--gutter);
+  top: 9%;
+}
+.is-cinematic .chapter-mindset .chapter-heading {
+  top: 6%;
+}
+.is-cinematic .chapter-mindset h1 {
+  font-size: clamp(150px, 16vw, 240px);
+}
+.is-cinematic .chapter-mindset .chapter-copy h2 {
+  display: none;
+}
+.is-cinematic .chapter-copy {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 12%;
+  max-width: 31ch;
+}
+.is-cinematic .chapter-copy h2 {
+  font-size: 24px;
+}
+.is-cinematic .chapter-copy > p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.is-cinematic .chapter-mindset .chapter-copy {
+  max-width: 45ch;
+}
+.is-cinematic .chapter-mindset .study-link {
+  margin-top: 4px;
+}
+.is-cinematic .chapter-packaging .chapter-heading {
+  left: 58%;
+  top: 8%;
+}
+.is-cinematic .chapter-packaging .chapter-heading h2 {
+  font-size: clamp(64px, 7vw, 105px);
+}
+.is-cinematic .chapter-packaging .chapter-copy {
+  left: 58%;
+  bottom: 15%;
+}
+.foil-plane {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+.foil-plane img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.foil-far {
+  inset: -20% -15%;
+  opacity: 0.45;
+}
+.foil-near {
+  width: 100%;
+  height: 52%;
+  left: -10%;
+  bottom: -30%;
+  transform: rotate(-10deg);
+}
+.foil-near img {
+  object-position: center 70%;
+}
+.stream-far {
+  position: absolute;
+  inset: -12% -10%;
+  width: 120%;
+  height: 125%;
+}
+.stream-near {
+  position: absolute;
+  inset: 25% auto auto -35%;
+  width: 150%;
+  height: 150%;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.study-copy-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 42%, #090909eb 66%);
+  pointer-events: none;
+}
+.study-product {
+  position: absolute;
+  left: 75%;
+  top: 48%;
+  height: 78%;
+  width: min(35vw, 500px);
+  transform: translate(-50%, -50%) rotate(9deg);
+}
+.product-pose {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 180ms var(--ease-out);
+}
+.product-pose img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.study-frame {
+  position: absolute;
+  left: 9%;
+  top: 8%;
+  width: 39%;
+  height: 81%;
+  border: 1px solid #bcb9b54a;
+  background: #09090925;
+}
+.scene-progress {
+  position: absolute;
+  bottom: 26px;
+  left: var(--gutter);
+  right: var(--gutter);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: center;
+  color: var(--silver);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+.scene-progress > div {
+  height: 1px;
+  background: #ffffff30;
+}
+.scene-progress i {
+  display: block;
+  height: 100%;
+  background: var(--red-accent);
+  transform-origin: left;
+}
+@media (max-width: 899px) {
+  .study-header {
+    height: 72px;
+    padding-block: 8px;
+    gap: 12px;
+  }
+  .study-header > a img {
+    width: 76px;
+  }
+  .study-header nav {
+    gap: 18px;
+    font-size: 10px;
+  }
+  .study-header nav a:first-child {
+    display: none;
+  }
+  .study-chapter {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 30px;
+    padding-top: 42px;
+    padding-bottom: 60px;
+  }
+  .chapter-heading h1 {
+    font-size: clamp(105px, 31vw, 210px);
+  }
+  .chapter-heading h2 {
+    font-size: clamp(66px, 16vw, 110px);
+  }
+  .eyebrow {
+    font-size: 10px;
+    margin-bottom: 24px;
+  }
+  .chapter-art {
+    height: clamp(340px, 105vw, 560px);
+    margin-inline: calc(var(--gutter) * -1);
+  }
+  .mobile-product {
+    inset: 7% 16% 2%;
+  }
+  .chapter-packaging .mobile-product {
+    inset: -9% 9% -18%;
+  }
+  .chapter-copy {
+    max-width: 39ch;
+  }
+  .chapter-copy h2 {
+    font-size: 28px;
+  }
+  .chapter-copy p {
+    font-size: 14px;
+  }
+  .study-end {
+    padding-block: 64px;
+  }
+  .study-end > div {
+    flex-direction: column;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .study-footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+@media (min-width: 900px) and (max-height: 720px) {
+  .is-cinematic .chapter-mindset h1 {
+    font-size: min(16vw, 25svh);
+  }
+  .is-cinematic .chapter-packaging .chapter-heading {
+    top: 6%;
+  }
+  .is-cinematic .chapter-packaging .chapter-heading h2 {
+    font-size: 10svh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-study-front],
+  [data-study-back],
+  .product-pose {
+    transition: none;
+  }
+}
+@media (min-width: 900px) and (max-height: 660px) {
+  .is-cinematic .chapter-packaging .chapter-heading h2 {
+    font-size: 8.8svh;
+  }
+}

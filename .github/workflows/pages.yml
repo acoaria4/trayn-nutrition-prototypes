@@ -31,6 +31,7 @@ jobs:
           cache-dependency-path: |
             v1/package-lock.json
             v2/package-lock.json
+            v3/package-lock.json
             v2/prototypes/openings/package-lock.json
       - name: Read Pages configuration
         id: pages
@@ -39,20 +40,25 @@ jobs:
         run: |
           npm ci --prefix v1
           npm ci --prefix v2
+          npm ci --prefix v3
           npm ci --prefix v2/prototypes/openings
-      - name: Check both versions
+      - name: Check all versions
         run: |
           npm --prefix v1 run check
           npm --prefix v1 test
           npm --prefix v2 run check
           npm --prefix v2 test
-      - name: Build both versions
+          npm --prefix v3 run check
+          npm --prefix v3 test
+      - name: Build all versions
         env:
           PAGES_BASE: ${{ steps.pages.outputs.base_path }}
         run: |
           SITE_BASE_PATH="${PAGES_BASE%/}/v1/" npm --prefix v1 run build
           SITE_BASE_PATH="${PAGES_BASE%/}/v2/" npm --prefix v2 run build
           SITE_BASE_PATH="${PAGES_BASE%/}/v2/" npm --prefix v2 run test:hosting:static
+          SITE_BASE_PATH="${PAGES_BASE%/}/v3/" npm --prefix v3 run build
+          SITE_BASE_PATH="${PAGES_BASE%/}/v3/" npm --prefix v3 run test:hosting:static
       - name: Assemble the Pages artifact
         run: |
           mkdir -p dist
@@ -60,9 +66,11 @@ jobs:
           cp index.html dist/404.html
           cp -R v1/dist dist/v1
           cp -R v2/dist dist/v2
+          cp -R v3/dist dist/v3
           touch dist/.nojekyll
           test -f dist/v1/index.html
           test -f dist/v2/index.html
+          test -f dist/v3/index.html
           test -f dist/v2/drafts/index.html
           test -f dist/v2/drafts/quiet.html
           test -f dist/v2/drafts/tension.html
