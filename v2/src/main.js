@@ -1,4 +1,7 @@
-import { initializeInteractions } from "./interactions.js";
+import {
+  initializeInteractions,
+  packagingDialogMotion,
+} from "./interactions.js";
 import {
   featuredProduct,
   getProduct,
@@ -258,6 +261,7 @@ window.addEventListener("popstate", () =>
 
 // The anchor remains a direct image link when JavaScript or dialog support is absent.
 const dialog = document.querySelector("#packaging-dialog");
+const dialogMotion = packagingDialogMotion(dialog);
 let dialogOpener;
 let dialogProduct;
 function setDialogView(view) {
@@ -304,6 +308,7 @@ function setDialogView(view) {
   dialog.scrollTop = 0;
 }
 let priorBodyOverflow = "";
+let packagingScrollLocked = false;
 if (typeof dialog.showModal === "function") {
   document.querySelectorAll("[data-open-packaging]").forEach((link) =>
     link.addEventListener("click", (event) => {
@@ -319,9 +324,15 @@ if (typeof dialog.showModal === "function") {
           ? "back"
           : "front",
       );
-      priorBodyOverflow = document.body.style.overflow;
+      // Native close events are queued. A fast reopen must retain the original
+      // overflow value until the last dialog closes, rather than saving hidden.
+      if (!packagingScrollLocked) {
+        priorBodyOverflow = document.body.style.overflow;
+        packagingScrollLocked = true;
+      }
       document.body.style.overflow = "hidden";
       dialog.showModal();
+      dialogMotion.open(event.detail === 0);
       dialog.querySelector(".dialog-close").focus();
     }),
   );
@@ -335,7 +346,9 @@ if (typeof dialog.showModal === "function") {
   });
   dialog
     .querySelector(".dialog-close")
-    .addEventListener("click", () => dialog.close());
+    .addEventListener("click", (event) =>
+      dialogMotion.close(event.detail === 0),
+    );
   dialog.addEventListener("click", (event) => {
     const bounds = dialog.getBoundingClientRect();
     if (
@@ -345,10 +358,12 @@ if (typeof dialog.showModal === "function") {
         event.clientY < bounds.top ||
         event.clientY > bounds.bottom)
     )
-      dialog.close();
+      dialogMotion.close();
   });
   dialog.addEventListener("close", () => {
+    if (dialog.open) return; // Ignore a queued close from the previous opening.
     document.body.style.overflow = priorBodyOverflow;
+    packagingScrollLocked = false;
     dialogOpener?.focus({ preventScroll: true });
   });
 }

@@ -326,20 +326,6 @@ html.lenis {
   border-block: 1px solid #ffffff25;
   background: #151313;
 }
-.trayn-mindset::after {
-  content: "";
-  position: absolute;
-  bottom: -26px;
-  right: -36px;
-  width: clamp(360px, 42vw, 650px);
-  height: 160px;
-  background: url("/images/brand/trayn-slipstream.svg") center / 100% 100%
-    no-repeat;
-  mask-image: linear-gradient(to right, transparent, #000 35%);
-  opacity: 0.28;
-  pointer-events: none;
-  z-index: 0;
-}
 .trayn-mindset-inner {
   position: relative;
   z-index: 1;
@@ -402,13 +388,6 @@ html.lenis {
   font-size: 13px;
 }
 @media (max-width: 800px) {
-  .trayn-mindset::after {
-    bottom: -12px;
-    right: -24px;
-    width: 220px;
-    height: 72px;
-    opacity: 0.24;
-  }
   .trayn-mindset-inner,
   .wpc-questions {
     grid-template-columns: 1fr;

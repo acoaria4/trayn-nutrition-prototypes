@@ -33,16 +33,23 @@
   top: 0;
   left: 4%;
   margin: 8% 0 0;
-  transition: opacity 200ms var(--ease-out);
+  transition:
+    opacity 280ms var(--ease-out),
+    transform 280ms var(--ease-out);
 }
 .pack-preview-back {
   opacity: 0;
 }
+[data-pack-preview] .pack-preview-back {
+  transform: translateX(6%) rotate(-4deg) scale(0.98);
+}
 [data-pack-preview][data-view="back"] .pack-preview-front {
   opacity: 0;
+  transform: translateX(-6%) rotate(-12deg) scale(0.98);
 }
 [data-pack-preview][data-view="back"] .pack-preview-back {
   opacity: 1;
+  transform: rotate(-8deg);
 }
 [data-pack-preview].is-instant .pack-preview-images img {
   transition: none;
@@ -232,17 +239,59 @@
 .faq-answer {
   display: flow-root;
 }
-@keyframes slipstream-enter {
-  from {
-    transform: translate(20px, 4px);
-  }
-  to {
-    transform: translate(0);
+.motion-line {
+  display: block;
+  overflow: clip;
+  /* Room for the tight editorial leading without cutting the letter edges. */
+  padding-block: 0.09em;
+  margin-block: -0.09em;
+}
+.motion-line > span {
+  display: block;
+  transform-origin: left bottom;
+}
+.mindset-title {
+  min-width: 0;
+}
+.mindset-trail {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  margin-top: 30px;
+  pointer-events: none;
+}
+.wpc-pack-detail {
+  position: relative;
+}
+.wpc-pack-detail::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, var(--red-accent), #f8203000 80%);
+  pointer-events: none;
+}
+.packaging-dialog {
+  transform-origin: center;
+}
+.packaging-dialog::backdrop {
+  opacity: 1;
+  transition: opacity 250ms var(--ease-out);
+}
+.packaging-dialog[data-closing]::backdrop {
+  opacity: 0;
+  transition-duration: 200ms;
+}
+@starting-style {
+  .packaging-dialog[open]::backdrop {
+    opacity: 0;
   }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .mindset-entered::after {
-    animation: slipstream-enter 600ms var(--ease-out);
+@media (max-width: 800px) {
+  .mindset-trail {
+    max-width: 360px;
+    margin-top: 24px;
   }
 }
 .contact-email span,
@@ -256,6 +305,9 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .packaging-dialog::backdrop {
+    transition: none;
+  }
   .pack-preview-images img,
   .contact-email span,
   .footer-links a span {
@@ -264,6 +316,9 @@
   .contact-email:hover span,
   .footer-links a:hover span {
     transform: none;
+  }
+  [data-pack-preview] .pack-preview-images img {
+    transform: rotate(-8deg);
   }
 }
 @media (max-width: 600px) {
@@ -294,4 +349,11 @@ html[data-motion="reduced"] .contact-email span,
 html[data-motion="reduced"] .footer-links a span {
   transition: none;
   transform: none;
+}
+html[data-motion="reduced"] [data-pack-preview] .pack-preview-images img {
+  transform: rotate(-8deg);
+  transition: none;
+}
+html[data-motion="reduced"] .packaging-dialog::backdrop {
+  transition: none;
 }
