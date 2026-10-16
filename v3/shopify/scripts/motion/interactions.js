@@ -1,4 +1,4 @@
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { requestMotionRefresh } from "./refresh.js";
 
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 const motionOff = new URLSearchParams(location.search).get("motion") === "off";
@@ -63,7 +63,7 @@ function tabs() {
     root.dataset.nutritionBasis = basis;
     root.querySelector("[data-summary-basis]").textContent =
       basis === "100g" ? "Per 100 g" : "Per serving · 33 g";
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    requestMotionRefresh();
   });
   let selected = 0;
   const position = () => {
@@ -89,7 +89,7 @@ function tabs() {
       panels[i].hidden = i !== index;
     });
     position();
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    requestMotionRefresh();
   };
   links.forEach((link, index) => {
     link.addEventListener("click", (event) => {
@@ -137,7 +137,7 @@ function questions() {
       details.open = desired;
       details.style.overflow = "";
       answer.inert = false;
-      requestAnimationFrame(() => ScrollTrigger.refresh());
+      requestMotionRefresh();
     };
     summary.addEventListener("click", (event) => {
       const instant = event.detail === 0 || reduce.matches || motionOff;
@@ -168,7 +168,7 @@ function questions() {
       if (!animation) {
         desired = details.open;
         details.dataset.expanded = String(desired);
-        requestAnimationFrame(() => ScrollTrigger.refresh());
+        requestMotionRefresh();
       }
     });
     reduce.addEventListener("change", () => {
@@ -302,7 +302,7 @@ export function initializeInteractions() {
     if (details.dataset.bound) return;
     details.dataset.bound = "true";
     details.addEventListener("toggle", () =>
-      requestAnimationFrame(() => ScrollTrigger.refresh()),
+      requestMotionRefresh(),
     );
   });
 }

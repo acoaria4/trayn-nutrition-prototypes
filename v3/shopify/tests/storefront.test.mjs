@@ -5,14 +5,14 @@ import { chromium,webkit } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {createRenderer} from '../scripts/preview.mjs';
 const chromeOptions={executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true};
-async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference'}={}) {
- const renderer=createRenderer({available});let count=0,adds=0,changes=[];
+async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference',quantityRule={min:1,increment:1,max:null}}={}) {
+ const renderer=createRenderer({available});renderer.globals.product.variants[0].quantity_rule=quantityRule;let count=0,adds=0,changes=[];
  const context=await browser.newContext({viewport:{width,height},javaScriptEnabled:js,reducedMotion});
  const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
- const setCart=()=>{const cart={item_count:count,total_price:count*329900,currency:{iso_code:'INR'},cart_level_discount_applications:[],items:count?[{key:'test-key:abc',product:{title:'TRAYN Whey Belgian Chocolate',has_only_default_variant:true},variant:{title:'Default Title',quantity_rule:{increment:1}},quantity:count,url:'/products/trayn-whey-rich-chocolate',final_line_price:count*329900,properties:[],line_level_discount_allocations:[]}]:[]};Object.assign(renderer.globals.cart,cart);return cart;};
+ const setCart=()=>{const cart={item_count:count,total_price:count*329900,currency:{iso_code:'INR'},cart_level_discount_applications:[],items:count?[{key:'test-key:abc',product:{title:'TRAYN Whey Belgian Chocolate',handle:'trayn-whey-rich-chocolate',has_only_default_variant:true},variant:{title:'Default Title',quantity_rule:quantityRule},quantity:count,url:'/products/trayn-whey-rich-chocolate',final_line_price:count*329900,properties:[],line_level_discount_allocations:[]}]:[]};Object.assign(renderer.globals.cart,cart);return cart;};
  await context.route('https://theme.test/**',async route=>{
   const request=route.request(),url=new URL(request.url());
-  if(url.pathname.startsWith('/assets/')) {const name=url.pathname.split('/').at(-1);const type=name.endsWith('.css')?'text/css':name.endsWith('.js')?'text/javascript':name.endsWith('.woff2')?'font/woff2':name.endsWith('.webp')?'image/webp':'application/octet-stream';return route.fulfill({body:await readFile(`assets/${name}`),contentType:type});}
+  if(url.pathname.startsWith('/assets/')) {const name=url.pathname.split('/').at(-1);const type=name.endsWith('.css')?'text/css':name.endsWith('.js')?'text/javascript':name.endsWith('.woff2')?'font/woff2':name.endsWith('.svg')?'image/svg+xml':name.endsWith('.webp')?'image/webp':'application/octet-stream';return route.fulfill({body:await readFile(`assets/${name}`),contentType:type});}
   if(url.pathname==='/cart/add.js') {adds++;if(failAdd)return route.fulfill({status:422,json:{description:'The requested quantity is not available.'}});await new Promise(r=>setTimeout(r,60));count+=Number(request.postData()?.match(/name="quantity"\r\n\r\n(\d+)/)?.[1]||1);return route.fulfill({json:{items:[{id:51737000116512}]}});}
   if(url.pathname==='/cart/change.js') {const body=request.postDataJSON();assert.equal(body.id,'test-key:abc');changes.push(body.quantity);count=body.quantity;return route.fulfill({json:setCart()});}
   if(url.pathname==='/cart.js') return route.fulfill({json:setCart()});
@@ -29,6 +29,8 @@ for(const [name,engine,options,width] of [['desktop',chromium,chromeOptions,1440
   try {
    const {page,context,errors,state}=await mockPage(browser,{width});
    await page.waitForFunction(()=>document.querySelector('.hero-story').dataset.scrollDistance==='2040');
+   assert.equal(await page.locator('html.lenis').count(),width>=900?1:0);
+   await page.waitForFunction(()=>document.querySelector('.hero-stream img')?.naturalWidth>0);
    assert.equal(await page.locator('.pin-spacer').count(),2);
    await page.locator('[data-study-inspect]').click();
    await page.getByRole('button',{name:'Back Label',exact:true}).click();
@@ -46,10 +48,13 @@ for(const [name,engine,options,width] of [['desktop',chromium,chromeOptions,1440
    await page.locator('[data-cart-quantity]').fill('3');await page.locator('[data-cart-quantity]').dispatchEvent('change');
    await page.waitForFunction(()=>document.querySelector('[data-cart-count]').textContent==='3');
    assert.deepEqual(state().changes,[3]);
+   if(width===390 || width===1280) await page.screenshot({path:`artifacts/cart-filled-${name.replaceAll(' ','-')}.png`});
    await page.locator('[data-cart-remove]').click();
    await page.waitForFunction(()=>document.querySelector('[data-cart-count]').textContent==='0');
    assert.ok(await page.getByText('Your cart is empty.',{exact:true}).isVisible());
    assert.ok(await page.locator('[data-checkout]').isHidden());
+   assert.ok(await page.locator('[data-view-cart]').isHidden());
+   if(width===390 || width===1280) await page.screenshot({path:`artifacts/cart-empty-${name.replaceAll(' ','-')}.png`});
    await page.keyboard.press('Escape');
    await page.waitForFunction(()=>!document.querySelector('#cart-drawer').open);
    await page.waitForFunction(()=>document.activeElement===document.querySelector('[data-add-button]'));
@@ -74,6 +79,8 @@ test('sold-out variants, product page, accessibility and no-JavaScript forms',as
   assert.equal(await fallback.page.locator('[data-product-form]').getAttribute('action'),'/cart/add');
   assert.equal(await fallback.page.locator('[name=id]').inputValue(),'51737000116512');
   assert.ok(await fallback.page.locator('[data-add-button]').isEnabled());
+  assert.ok(await fallback.page.locator('[data-quantity-adjust]').first().isHidden());
+  assert.equal(await fallback.page.locator('[name=quantity]').getAttribute('type'),'number');
   await fallback.context.close();
  } finally {await browser.close();}
 });
@@ -86,6 +93,7 @@ for(const failure of ['stock','section']) test(`cart ${failure} failure is reada
   await page.waitForFunction(text=>document.querySelector('[data-purchase-status]').textContent===text,text);
   assert.equal(state().adds,1);assert.equal(state().count,failure==='stock'?0:1);
   assert.ok(await page.locator('[data-add-button]').isEnabled());
+  if(failure==='section'){assert.ok(await page.locator('[data-view-cart]').isVisible());assert.ok(await page.locator('[data-cart-content]').isHidden());}
  } finally {await browser.close();}
 });
 for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptions,1440,900],['short laptop',chromium,chromeOptions,1280,650],['tablet',chromium,chromeOptions,768,1024],['short phone',chromium,chromeOptions,390,600],['compact WebKit',webkit,{headless:true},320,640],['phone WebKit',webkit,{headless:true},390,844]]) {
@@ -96,15 +104,33 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
    await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(150);
    const art=page.locator('.purchase-flavour-image');
    await page.locator('#purchase').evaluate(el=>el.scrollIntoView());
-   await page.waitForFunction(()=>{const img=document.querySelector('.purchase-flavour-image');return img.complete && img.naturalWidth>0;});assert.equal(await art.getAttribute('alt'),'Dark chocolate pieces with a glossy chocolate ribbon and cocoa on a dark surface');
+   await page.waitForFunction(()=>{const img=document.querySelector('.purchase-flavour-image');return img.complete && img.naturalWidth>0;});await art.evaluate(el=>el.decode());assert.equal(await art.getAttribute('alt'),'Dark chocolate folds sweeping around two fractured chocolate pieces against black');
    assert.equal(await page.locator('.purchase-image-pending').count(),0);
    assert.equal(await art.evaluate(el=>getComputedStyle(el).transform),'none');
    assert.match(await art.getAttribute('src'),/belgian-chocolate-flavour/);
    await page.locator('#purchase').evaluate(el=>el.scrollIntoView());await page.waitForTimeout(150);
    await page.screenshot({path:`artifacts/shop-art-${name.replaceAll(' ','-')}.png`});
+   const shop=page.locator('.purchase-section--flavour');
+   const bounds=await shop.evaluate(el=>({top:el.getBoundingClientRect().top+scrollY,height:el.offsetHeight,gallery:el.querySelector('.purchase-gallery').getBoundingClientRect().toJSON(),copy:el.querySelector('.purchase-copy').getBoundingClientRect().toJSON(),border:getComputedStyle(el).borderTopWidth}));
+   assert.equal(bounds.border,'0px');assert.ok(Math.abs(bounds.gallery.width-width)<2);
+   if(width<900){assert.ok(bounds.gallery.height<=440);assert.ok(bounds.gallery.bottom<=bounds.copy.top+5);}
+   else {
+    assert.ok(bounds.copy.height<height-80,JSON.stringify(bounds.copy));
+    assert.ok(Math.abs((await art.boundingBox()).width/width-.84)<.01);
+   }
+   const drift=[];
+   for(const offset of [-height*.6,bounds.height*.3]){
+    await page.evaluate(y=>scrollTo(0,y),bounds.top+offset);await page.waitForTimeout(100);
+    drift.push(await shop.evaluate(el=>({art:new DOMMatrix(getComputedStyle(el.querySelector('.purchase-art-stage')).transform).m42,copy:el.querySelector('.purchase-copy').getBoundingClientRect().top-el.getBoundingClientRect().top})));
+   }
+   assert.ok(drift[0].art>drift[1].art);
+   assert.ok(drift.every(p=>Math.abs(p.art)<=18.1));assert.ok(Math.abs(drift[0].copy-drift[1].copy)<1);
+
    await page.waitForFunction(()=>document.querySelector('.mindset-poster').dataset.motionEnd);
-   const interval=await page.locator('.mindset-poster').evaluate(el=>({start:Number(el.dataset.motionStart),end:Number(el.dataset.motionEnd)}));
-   assert.ok(interval.end-interval.start>(width>=900?780:540),JSON.stringify(interval));
+   const interval=await page.locator('.mindset-poster').evaluate(el=>({start:Number(el.dataset.motionStart),end:Number(el.dataset.motionEnd),holdStart:Number(el.dataset.holdStart),holdEnd:Number(el.dataset.holdEnd)}));
+   assert.equal(interval.holdEnd-interval.holdStart,width>=900?320:210);
+   assert.ok(interval.holdStart-interval.start>120,JSON.stringify(interval));
+   assert.equal(await page.locator('.mindset-rule').count(),0);
    const positions=[];
    for(const phase of [.1,.5,.85]) {
     await page.evaluate(y=>window.scrollTo(0,y),interval.start+(interval.end-interval.start)*phase);await page.waitForTimeout(100);
@@ -118,11 +144,12 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
     positions.push(states.map(s=>s.x));
     await page.screenshot({path:`artifacts/mindset-${Math.round(phase*100)}-${name.replaceAll(' ','-')}.png`});
    }
-   assert.ok(positions[2][0]-positions[0][0]>(width>=900?210:100));
-   assert.ok(positions[0][1]-positions[2][1]>(width>=900?210:100));
+   assert.ok(positions[2][0]-positions[0][0]>(width>=900?200:100));
+   assert.ok(positions[0][1]-positions[2][1]>(width>=900?200:100));
    await page.screenshot({path:`artifacts/mindset-mid-${name.replaceAll(' ','-')}.png`});
    await page.evaluate(y=>window.scrollTo(0,y),interval.end+8);await page.waitForTimeout(100);
    assert.equal(await page.locator('.mindset-poster').getAttribute('data-motion-progress'),'1.000');
+   assert.ok((await page.locator('.mindset-word').evaluateAll(words=>words.map(el=>Math.abs(new DOMMatrix(getComputedStyle(el).transform).m41)))).every(x=>x<1));
    assert.ok((await page.locator('.mindset-poster').boundingBox()).y>60);
    await page.evaluate(y=>window.scrollTo(0,y),interval.start+(interval.end-interval.start)*.35);await page.waitForTimeout(100);
    const reverse=await page.locator('.mindset-word').evaluateAll(words=>words.map(el=>({x:new DOMMatrix(getComputedStyle(el).transform).m41,progress:Number(el.dataset.motionProgress)})));
@@ -153,9 +180,122 @@ test('reduced motion and no JavaScript retain the shop artwork and readable labe
    await page.locator('#purchase').evaluate(el=>el.scrollIntoView());
    await page.waitForFunction(()=>{const img=document.querySelector('.purchase-flavour-image');return img.complete && img.naturalWidth>0;});
    assert.equal(await page.locator('.pin-spacer').count(),0);
+   assert.equal(await page.locator('.purchase-art-stage').evaluate(el=>getComputedStyle(el).transform),'none');
+   assert.equal(await page.locator('html.lenis').count(),0);
    assert.equal(await page.locator('.product-curtain').evaluate(el=>getComputedStyle(el).display),'none');
    if(js){const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();assert.deepEqual(result.violations,[]);}
    assert.deepEqual(errors,[]);await context.close();
   }
  }finally{await browser.close();}
+});
+
+test('desktop wheel interpolation, reversal, keyboard, anchors and modal scroll isolation',async()=>{
+ const browser=await chromium.launch(chromeOptions);
+ try{
+  const {page,errors}=await mockPage(browser,{width:1280,available:false});
+  await page.waitForFunction(()=>document.documentElement.classList.contains('lenis'));
+  await page.waitForTimeout(350);
+  await page.mouse.move(600,450);
+  await page.evaluate(()=>{window.wheelFrames=[];const end=performance.now()+650;function sample(){window.wheelFrames.push(scrollY);if(performance.now()<end)requestAnimationFrame(sample)}requestAnimationFrame(sample)});
+  await page.mouse.wheel(0,360);
+  await page.waitForTimeout(700);
+  const frames=await page.evaluate(()=>window.wheelFrames);
+  assert.ok(new Set(frames.map(Math.round)).size>10,JSON.stringify(frames));
+  assert.ok(Math.abs((await page.evaluate(()=>scrollY))-360)<2);
+  assert.ok(Math.max(...frames.slice(1).map((y,i)=>Math.abs(y-frames[i])))<150);
+  await page.mouse.wheel(0,240);await page.waitForTimeout(50);await page.mouse.wheel(0,-360);await page.waitForTimeout(700);
+  assert.ok(Math.abs((await page.evaluate(()=>scrollY))-240)<2);
+  await page.mouse.wheel(0,240);await page.keyboard.press('Home');await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(()=>scrollY),0);
+  await page.locator('.desktop-navigation a').first().click();await page.waitForTimeout(300);
+  const purchaseY=await page.locator('#purchase').evaluate(el=>el.getBoundingClientRect().top);
+  assert.ok(purchaseY>=70&&purchaseY<110,String(purchaseY));
+  await page.locator('[data-cart-open]').click();await page.waitForTimeout(100);
+  const bodyY=await page.evaluate(()=>scrollY);
+  await page.mouse.move(500,450);await page.mouse.wheel(0,400);await page.waitForTimeout(250);
+  assert.equal(await page.evaluate(()=>scrollY),bodyY);
+  await page.keyboard.press('Escape');
+  await page.locator('[data-study-inspect]').click();
+  await page.getByRole('button',{name:'Zoom In'}).click();
+  const canvas=page.locator('.inspector-canvas');await canvas.hover();
+  const old=await canvas.evaluate(el=>el.scrollTop),background=await page.evaluate(()=>scrollY);
+  await page.mouse.wheel(0,180);await page.waitForTimeout(150);
+  assert.ok((await canvas.evaluate(el=>el.scrollTop))>old);
+  assert.equal(await page.evaluate(()=>scrollY),background);
+  await page.keyboard.press('Escape');
+  await page.emulateMedia({reducedMotion:'reduce'});await page.waitForTimeout(200);
+  assert.equal(await page.locator('html.lenis').count(),0);
+  await page.emulateMedia({reducedMotion:'no-preference'});await page.setViewportSize({width:390,height:844});await page.waitForTimeout(250);
+  assert.equal(await page.locator('html.lenis').count(),0);
+  await page.setViewportSize({width:1280,height:700});await page.waitForTimeout(250);
+  assert.equal(await page.locator('html.lenis').count(),1);
+  assert.equal(await page.locator('.pin-spacer').count(),2);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close()}
+});
+
+
+for(const [name,engine,options,width] of [['desktop',chromium,chromeOptions,1280],['WebKit phone',webkit,{headless:true},390]]) {
+ test(`${name}: brand, bounded quantity steppers, cart focus and return to shop`,async()=>{
+  const browser=await engine.launch(options);
+  try {
+   const {page,errors,state}=await mockPage(browser,{width,height:width<900?600:844,quantityRule:{min:5,increment:5,max:10}});
+   const mark=page.locator('.header-brand-mark');
+   assert.equal(await mark.evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(248, 32, 48)');
+   assert.match(await mark.evaluate(el=>getComputedStyle(el).maskImage),/trayn-logo-256/);
+   assert.equal(await page.locator('.study-footer img').evaluate(el=>getComputedStyle(el).opacity),'1');
+   const quantity=page.locator('[data-product-form] [name=quantity]');
+   const minus=page.locator('[data-product-form] [data-quantity-adjust="-1"]');
+   const plus=page.locator('[data-product-form] [data-quantity-adjust="1"]');
+   assert.equal(await quantity.inputValue(),'5');assert.ok(await minus.isDisabled());
+   await plus.focus();await page.keyboard.press('Enter');
+   assert.equal(await quantity.inputValue(),'10');assert.ok(await plus.isDisabled());
+   await minus.click();assert.equal(await quantity.inputValue(),'5');
+   await quantity.fill('7');assert.equal(await quantity.evaluate(el=>el.validity.stepMismatch),true);
+   await quantity.fill('5');await page.locator('[data-add-button]').click();
+   await page.waitForFunction(()=>document.querySelector('[data-cart-count]').textContent==='5');
+   assert.equal(state().count,5);assert.ok(await page.locator('.cart-item-media--flavour img').isVisible());
+   assert.ok(await page.locator('[data-view-cart]').isVisible());assert.ok(await page.locator('[data-checkout]').isVisible());
+   assert.equal(await page.locator('.cart-totals strong').innerText(),'₹16,495');
+   const checkout=await page.locator('[data-checkout]').boundingBox();assert.ok(checkout.y>=0&&checkout.y+checkout.height<=(width<900?600:844));
+   const cartQuantity=page.locator('[data-cart-quantity]');
+   await cartQuantity.fill('4');assert.equal(await cartQuantity.evaluate(el=>el.validationMessage),'Minimum quantity: 5');
+   await cartQuantity.dispatchEvent('change');assert.deepEqual(state().changes,[]);
+   await cartQuantity.fill('5');
+   const cartPlus=page.locator('#cart-drawer [data-quantity-adjust="1"]');
+   await cartPlus.focus();await page.keyboard.press('Enter');
+   await page.waitForFunction(()=>document.querySelector('[data-cart-count]').textContent==='10');
+   assert.ok(await cartPlus.isDisabled());
+   await page.waitForFunction(()=>document.activeElement.matches('[data-cart-quantity]'));
+   const cartMinus=page.locator('#cart-drawer [data-quantity-adjust="-1"]');
+   await cartMinus.focus();await page.keyboard.press('Enter');await page.waitForFunction(()=>document.querySelector('[data-cart-count]').textContent==='5');
+   await page.waitForFunction(()=>document.activeElement.dataset.quantityAdjust==='-1');
+   const audit=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();assert.deepEqual(audit.violations,[]);
+   await cartMinus.click();await page.waitForFunction(()=>document.querySelector('[data-cart-count]').textContent==='0');
+   assert.deepEqual(state().changes,[10,5,0]);assert.ok(await page.locator('[data-view-cart]').isHidden());
+   assert.ok(await page.locator('[data-checkout]').isHidden());
+   assert.equal(await page.locator('[data-cart-continue]>span').first().innerText(),'Shop Belgian Chocolate');
+   await page.locator('[data-cart-continue]').click();
+   await page.waitForFunction(()=>!document.querySelector('#cart-drawer').open && document.activeElement.id==='purchase');
+   assert.equal(await page.evaluate(()=>location.hash),'#purchase');
+   const top=await page.locator('#purchase').evaluate(el=>el.getBoundingClientRect().top);assert.ok(top>=70&&top<110,String(top));
+   const scrollBefore=await page.evaluate(()=>scrollY);const cartLink=await page.locator('[data-cart-open]').boundingBox();
+   await page.mouse.click(cartLink.x+cartLink.width/2,cartLink.y+cartLink.height/2);
+   await page.waitForFunction(()=>document.querySelector('#cart-drawer').open && document.querySelector('[data-cart-status]').textContent==='');
+   assert.ok(Math.abs((await page.evaluate(()=>scrollY))-scrollBefore)<1);
+   await page.keyboard.press('Escape');
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);
+  }finally{await browser.close();}
+ });
+}
+
+test('TRAYN Nutrition website naming and Shopify amount formatting retain fractions and currency',async()=>{
+ for(const [currency,amount,expected] of [['INR',329900,'₹3,299'],['INR',329950,'₹3,299.50'],['USD',329900,'$3,299.00 USD']]) {
+  const renderer=createRenderer({currency});renderer.globals.product.variants[0].price=amount;
+  renderer.globals.shop.name='Trayn Nutrition';renderer.globals.page_title='Trayn Nutrition';
+  const html=await renderer.renderPage();
+  assert.match(html,/<title>TRAYN Nutrition<\/title>/);
+  assert.match(html,/<meta property="og:site_name" content="TRAYN Nutrition">/);
+  assert.equal(html.match(/data-product-price>([\s\S]*?)<\/p>/)[1].trim(),expected);
+ }
 });

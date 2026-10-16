@@ -3,17 +3,35 @@
     "accessibility": {
       "skip_to_content": "Skip to content"
     },
-    "cart": "Cart"
+    "cart": "Cart",
+    "brand_name": "TRAYN Nutrition"
   },
   "products": {
     "product": {
       "add_to_cart": "Add to Cart",
       "sold_out": "Sold Out",
-      "quantity": "Quantity"
+      "quantity": "Quantity",
+      "decrease_quantity": "Decrease quantity",
+      "increase_quantity": "Increase quantity",
+      "minimum_quantity": "Minimum quantity"
     },
     "flavour_image": {
-      "alt": "Dark chocolate pieces with a glossy chocolate ribbon and cocoa on a dark surface",
-      "caption": "Belgian Chocolate / Flavour"
+      "alt": "Dark chocolate folds sweeping around two fractured chocolate pieces against black",
+      "caption": "Belgian Chocolate / Flavour",
+      "kicker": "TRAYN WHEY",
+      "title_first": "BELGIAN",
+      "title_second": "CHOCOLATE."
     }
+  },
+  "cart": {
+    "empty": "Your cart is empty.",
+    "shop_flavour": "Shop Belgian Chocolate",
+    "shop_collection": "Shop TRAYN",
+    "view_cart": "View cart",
+    "checkout": "Checkout",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "subtotal": "Subtotal",
+    "flavour_art": "Belgian Chocolate flavour artwork"
   }
 }

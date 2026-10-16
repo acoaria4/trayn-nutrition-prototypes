@@ -21,10 +21,14 @@ export function initializeChapterMotion({ header }) {
         if (!context.conditions.motion || motionOff) return;
         const wide = context.conditions.desktop;
         const usableHeight = () => innerHeight - header.offsetHeight;
+        const posterOffset = () => {
+          const centered = Math.max(16, (usableHeight() - poster.offsetHeight) / 2);
+          return Math.round(header.offsetHeight + (wide ? centered : Math.min(64, centered)));
+        };
         const hold = ScrollTrigger.create({
           trigger: poster.parentElement,
-          start: () => `top top+=${Math.round(header.offsetHeight + Math.max(16, (usableHeight() - poster.offsetHeight) / 2))}`,
-          end: wide ? "+=640" : "+=420",
+          start: () => `top top+=${posterOffset()}`,
+          end: wide ? "+=320" : "+=210",
           pin: poster.parentElement,
           pinSpacing: true,
           refreshPriority: 5,
@@ -58,14 +62,11 @@ export function initializeChapterMotion({ header }) {
         type
           .fromTo(".mindset-get",
             { x: () => -travel() },
-            { x: 0, duration: 0.85 }, 0,
+            { x: 0, duration: 1 }, 0,
           )
           .fromTo(".mindset-built",
             { x: travel },
-            { x: 0, duration: 0.85 }, 0,
-          )
-          .fromTo(".mindset-rule",
-            { scaleX: 0.05 }, { scaleX: 1, duration: 0.2 }, 0.8,
+            { x: 0, duration: 1 }, 0,
           );
 
         const reveal = gsap.fromTo(

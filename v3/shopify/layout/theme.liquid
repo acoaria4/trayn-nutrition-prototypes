@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#090909">
-<title>{{ page_title | escape }}{% unless page_title contains shop.name %} — {{ shop.name | escape }}{% endunless %}</title>
+{% assign brand_name = 'general.brand_name' | t %}{% assign display_title = page_title | replace: shop.name, brand_name | replace: 'Trayn Nutrition', brand_name %}
+<title>{{ display_title | escape }}{% unless display_title contains brand_name %} — {{ brand_name | escape }}{% endunless %}</title>
+<meta property="og:site_name" content="{{ brand_name | escape }}">
 {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
 <link rel="canonical" href="{{ canonical_url }}">
 <link rel="icon" href="{{ 'favicon.png' | asset_url }}" type="image/png">

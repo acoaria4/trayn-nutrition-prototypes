@@ -11,16 +11,12 @@ export function initializeFullPageMotion({ header }) {
   const opening = story.querySelector(".hero-opening");
   const flavour = story.querySelector(".hero-flavour");
   let media;
-  let resizeObserver;
-  let refreshFrame;
   const restore = () => {
     document.body.classList.remove("has-hero-motion");
     [opening, flavour].forEach((el) => {
       el.inert = false;
       el.removeAttribute("aria-hidden");
     });
-    resizeObserver?.disconnect();
-    cancelAnimationFrame(refreshFrame);
   };
   const setup = () => {
     media?.revert();
@@ -56,10 +52,16 @@ export function initializeFullPageMotion({ header }) {
               },
               onUpdate: (self) => {
                 story.dataset.heroProgress = self.progress.toFixed(3);
-                opening.inert = self.progress > 0.38;
-                flavour.inert = self.progress < 0.61;
-                opening.setAttribute("aria-hidden", String(opening.inert));
-                flavour.setAttribute("aria-hidden", String(flavour.inert));
+                const hideOpening = self.progress > 0.38;
+                const hideFlavour = self.progress < 0.61;
+                if (opening.inert !== hideOpening) {
+                  opening.inert = hideOpening;
+                  opening.setAttribute("aria-hidden", String(hideOpening));
+                }
+                if (flavour.inert !== hideFlavour) {
+                  flavour.inert = hideFlavour;
+                  flavour.setAttribute("aria-hidden", String(hideFlavour));
+                }
               },
             },
           });
@@ -108,20 +110,11 @@ export function initializeFullPageMotion({ header }) {
               { scaleX: 1, duration: 1 },
               0,
             );
-          let lastHeight = scene.offsetHeight;
-          resizeObserver = new ResizeObserver(() => {
-            const height = scene.offsetHeight;
-            if (height === lastHeight) return;
-            lastHeight = height;
-            cancelAnimationFrame(refreshFrame);
-            refreshFrame = requestAnimationFrame(() => ScrollTrigger.refresh());
-          });
-          resizeObserver.observe(scene);
+
         }
         return restore;
       },
     );
-    document.fonts.ready.then(() => ScrollTrigger.refresh());
   };
   setup();
   window.addEventListener("pagehide", () => {

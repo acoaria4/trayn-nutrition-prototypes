@@ -11,7 +11,9 @@
 {% assign image_priority = 'auto' %}
 {% if is_main %}{% assign image_loading = 'eager' %}{% assign image_priority = 'high' %}{% endif %}
 {% assign form_id = 'purchase-' | append: section_id %}
-<section class="purchase-section section-shell" id="purchase" aria-labelledby="purchase-title-{{ section_id }}" data-purchase>
+{% assign flavour_scene = false %}
+{% if purchase_product.handle == 'trayn-whey-rich-chocolate' and purchase_image == blank and purchase_product.media.size == 0 %}{% assign flavour_scene = true %}{% endif %}
+<section class="purchase-section section-shell{% if flavour_scene %} purchase-section--flavour{% endif %}" id="purchase" tabindex="-1" aria-labelledby="purchase-title-{{ section_id }}" data-purchase>
 <div class="purchase-gallery">
 {% if purchase_image != blank %}
 <figure>{{ purchase_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: image_loading, fetchpriority: image_priority, alt: purchase_product.title }}</figure>
@@ -20,18 +22,19 @@
 {% elsif purchase_product.handle == 'trayn-whey-rich-chocolate' %}{% render 'purchase-art', image_loading: image_loading, image_priority: image_priority %}
 {% else %}<div class="purchase-image-pending"><img src="{{ 'trayn-logo-256.webp' | asset_url }}" width="740" height="440" alt="TRAYN Nutrition"><p>{{ purchase_product.title | escape }}</p></div>{% endif %}
 </div>
-<div class="purchase-copy"><p class="eyebrow">TRAYN Nutrition / Shop</p>
-{% if is_main %}<h1 id="purchase-title-{{ section_id }}">{{ purchase_product.title | escape }}</h1>{% else %}<h2 id="purchase-title-{{ section_id }}">{% if purchase_product != blank %}{{ purchase_product.title | escape }}{% else %}FUEL YOUR<br><span>POTENTIAL.</span>{% endif %}</h2>{% endif %}
+<div class="purchase-copy"><p class="eyebrow">{% if flavour_scene %}{{ 'products.flavour_image.kicker' | t }}{% else %}TRAYN Nutrition / Shop{% endif %}</p>
+{% if is_main %}<h1 id="purchase-title-{{ section_id }}">{{ purchase_product.title | escape }}</h1>{% elsif flavour_scene %}<h2 id="purchase-title-{{ section_id }}"><span>{{ 'products.flavour_image.title_first' | t }}</span>
+<span>{{ 'products.flavour_image.title_second' | t }}</span></h2>{% else %}<h2 id="purchase-title-{{ section_id }}">{% if purchase_product != blank %}{{ purchase_product.title | escape }}{% else %}FUEL YOUR<br><span>POTENTIAL.</span>{% endif %}</h2>{% endif %}
 {% if purchase_product != blank %}
-<p class="purchase-price" data-product-price>{{ current_variant.price | money_with_currency }}</p>
+<p class="purchase-price" data-product-price>{% render 'price', amount: current_variant.price %}</p>
 {% if purchase_product.description != blank %}<div class="purchase-description rte">{{ purchase_product.description }}</div>{% endif %}
 {% form 'product', purchase_product, id: form_id, class: 'purchase-form', data-product-form: '', data-requires-selling-plan: purchase_product.requires_selling_plan %}
 {% if purchase_product.requires_selling_plan %}<p>Subscription purchase options are not available in this theme preview.</p>{% endif %}
 <label for="variant-{{ section_id }}" {% if purchase_product.has_only_default_variant %}hidden{% endif %}>{% if purchase_product.has_only_default_variant %}Product{% else %}Choose an option{% endif %}</label>
 <select id="variant-{{ section_id }}" name="id" data-variant-select {% if purchase_product.has_only_default_variant %}class="single-variant" hidden{% endif %}>
-{% for variant in purchase_product.variants %}<option value="{{ variant.id }}" data-price="{{ variant.price | money_with_currency | escape }}" data-available="{{ variant.available }}" data-min="{{ variant.quantity_rule.min }}" data-step="{{ variant.quantity_rule.increment }}" data-max="{{ variant.quantity_rule.max }}" {% if variant.id == current_variant.id %}selected{% endif %}>{{ variant.title | escape }}{% unless variant.available %} — Sold out{% endunless %}</option>{% endfor %}
+{% for variant in purchase_product.variants %}{% capture variant_price %}{% render 'price', amount: variant.price %}{% endcapture %}<option value="{{ variant.id }}" data-price="{{ variant_price | strip_html | strip | escape }}" data-available="{{ variant.available }}" data-min="{{ variant.quantity_rule.min }}" data-step="{{ variant.quantity_rule.increment }}" data-max="{{ variant.quantity_rule.max }}" {% if variant.id == current_variant.id %}selected{% endif %}>{{ variant.title | escape }}{% unless variant.available %} — Sold out{% endunless %}</option>{% endfor %}
 </select>
-<div class="purchase-actions"><div class="quantity-control"><label for="quantity-{{ section_id }}">Quantity</label><input id="quantity-{{ section_id }}" name="quantity" type="number" value="{{ current_variant.quantity_rule.min | default: 1 }}" min="{{ current_variant.quantity_rule.min | default: 1 }}" step="{{ current_variant.quantity_rule.increment | default: 1 }}" {% if current_variant.quantity_rule.max != null %}max="{{ current_variant.quantity_rule.max }}"{% endif %} inputmode="numeric"></div><button class="buy-button" type="submit" name="add" {% if purchase_product.available == false or purchase_product.requires_selling_plan %}disabled{% endif %} data-add-button><span data-add-label>{% if current_variant.available %}Add to Cart{% else %}Sold Out{% endif %}</span><span aria-hidden="true">↗</span></button></div>
+<div class="purchase-actions"><div class="quantity-control"><label for="quantity-{{ section_id }}">Quantity</label>{% assign quantity_id = 'quantity-' | append: section_id %}{% assign quantity_label = 'products.product.quantity' | t %}{% render 'quantity-control', input_id: quantity_id, input_name: 'quantity', quantity: current_variant.quantity_rule.min, minimum: current_variant.quantity_rule.min, increment: current_variant.quantity_rule.increment, maximum: current_variant.quantity_rule.max, label: quantity_label %}</div><button class="buy-button" type="submit" name="add" {% if purchase_product.available == false or purchase_product.requires_selling_plan %}disabled{% endif %} data-add-button><span data-add-label>{% if current_variant.available %}Add to Cart{% else %}Sold Out{% endif %}</span><span aria-hidden="true">↗</span></button></div>
 <p class="purchase-status" data-purchase-status role="status" aria-live="polite"></p>
 {{ form.errors | default_errors }}
 {% endform %}
@@ -42,4 +45,4 @@
 {% else %}<p class="purchase-description">Explore the TRAYN collection.</p><a class="study-link" href="{{ routes.all_products_collection_url }}">View all products <span aria-hidden="true">↗</span></a>{% endif %}
 </div>
 </section>
-{% if purchase_product != blank %}<div class="mobile-purchase" data-mobile-purchase hidden><div><span>{{ purchase_product.title | escape }}</span><strong data-mobile-price>{{ current_variant.price | money_with_currency }}</strong></div><button type="submit" form="{{ form_id }}" class="buy-button" {% unless current_variant.available %}disabled{% endunless %}><span data-add-label>{% if current_variant.available %}Add to Cart{% else %}Sold Out{% endif %}</span><span aria-hidden="true">↗</span></button></div>{% endif %}
+{% if purchase_product != blank %}<div class="mobile-purchase" data-mobile-purchase hidden><div><span>{{ purchase_product.title | escape }}</span><strong data-mobile-price>{% render 'price', amount: current_variant.price %}</strong></div><button type="submit" form="{{ form_id }}" class="buy-button" {% unless current_variant.available %}disabled{% endunless %}><span data-add-label>{% if current_variant.available %}Add to Cart{% else %}Sold Out{% endif %}</span><span aria-hidden="true">↗</span></button></div>{% endif %}
