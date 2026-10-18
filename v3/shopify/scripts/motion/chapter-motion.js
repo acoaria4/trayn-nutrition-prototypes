@@ -68,6 +68,13 @@ export function initializeChapterMotion({ header }) {
             { x: travel },
             { x: 0, duration: 1 }, 0,
           );
+        const brand = poster.parentElement.querySelector(".mindset-brand");
+        if (brand && CSS.supports("mask-image", 'url("trayn-logo-256.webp")')) {
+          type
+            .fromTo(brand, { autoAlpha: 0, x: wide ? 0 : 12, y: wide ? 8 : 0 },
+              { autoAlpha: wide ? 0.16 : 0.14, x: 0, y: 0, duration: 0.18 }, 0.56)
+            .to(brand, { autoAlpha: 0, duration: 0.12 }, 0.88);
+        }
 
         const reveal = gsap.fromTo(
           ".packaging-reveal",

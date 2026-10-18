@@ -18,7 +18,10 @@
 .purchase-gallery .purchase-art .purchase-flavour-image{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:50% 58%}
 .purchase-art figcaption{position:absolute;bottom:20px;left:24px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#f5f4f0}
 @media(max-width:899px){.purchase-art{grid-column:1/-1}.purchase-art-stage{aspect-ratio:1/1.05}.purchase-art figcaption{left:20px;bottom:16px;font-size:10px}}
-.mindset-pin{position:relative;width:100%;min-width:0}
+.mindset-pin{position:relative;width:100%;min-width:0;isolation:isolate}
+.mindset-poster{position:relative;z-index:1}
+.mindset-depth{position:absolute;bottom:100%;left:0;right:0;height:160px;overflow:clip;pointer-events:none}
+.mindset-brand{position:absolute;bottom:12px;right:0;width:clamp(160px,15vw,240px);aspect-ratio:740/440;background:var(--red-accent);-webkit-mask:url("trayn-logo-256.webp") center/contain no-repeat;mask:url("trayn-logo-256.webp") center/contain no-repeat;opacity:0;visibility:hidden}
 @media(min-width:900px){
  .mindset-poster h2{display:flex;align-items:baseline;justify-content:center;gap:.12em;font-size:clamp(135px,min(21.6vw,calc((100svh - var(--header-height) - 100px) * .81)),324px);line-height:.85}
  .mindset-built{margin-left:0}
@@ -26,6 +29,8 @@
 @media(max-width:899px){
  .mindset-poster h2{font-size:clamp(64px,min(26vw,calc((100svh - var(--header-height) - 90px) / 1.7)),220px);text-align:center}
  .mindset-word{margin-inline:auto}
+ .mindset-depth{top:4px;bottom:auto;left:calc(var(--gutter)*-1);right:calc(var(--gutter)*-1);height:100px}
+ .mindset-brand{top:0;bottom:auto;right:-32px;width:clamp(120px,36vw,170px)}
 }
 
 html.lenis,html.lenis body{height:auto}
@@ -53,23 +58,35 @@ html.lenis,html.lenis body{height:auto}
 @media(max-width:1100px) and (min-width:900px){.purchase-section--flavour{grid-template-columns:1fr 1fr;gap:5%}.purchase-section--flavour .purchase-art::after{background:linear-gradient(180deg,var(--black),transparent 19%,transparent 76%,var(--black)),linear-gradient(90deg,var(--black),transparent 8%,transparent 36%,var(--black) 58%)}}
 @media(min-width:900px) and (max-height:760px){.purchase-section--flavour{padding-block:40px}}
 @media(max-width:899px){
- .purchase-section--flavour{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:0;padding-bottom:64px}
- .purchase-section--flavour .purchase-gallery{position:relative;inset:auto;z-index:0;flex:none;width:calc(100% + var(--gutter)*2);height:clamp(280px,82vw,440px);margin-inline:calc(var(--gutter)*-1)}
- .purchase-section--flavour .purchase-art .purchase-flavour-image{width:175%;max-width:none;height:100%;object-fit:cover;object-position:left center}
+ .purchase-section--flavour{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:32px;padding-bottom:56px}
+ .purchase-section--flavour .purchase-gallery{position:relative;inset:auto;z-index:0;flex:none;order:0;width:calc(100% + var(--gutter)*2);height:clamp(190px,min(62vw,34svh),280px);margin-inline:calc(var(--gutter)*-1)}
+ .purchase-section--flavour .purchase-art .purchase-flavour-image{width:145%;max-width:none;height:100%;object-fit:cover;object-position:left center}
  .purchase-section--flavour .purchase-art::after{background:linear-gradient(180deg,var(--black),transparent 14%,transparent 66%,var(--black)),linear-gradient(90deg,var(--black),transparent 8%,transparent 85%,var(--black))}
- .purchase-section--flavour .purchase-copy{max-width:600px;margin-top:-4px}
- .purchase-section--flavour .purchase-copy>.eyebrow{font-size:9px;letter-spacing:.12em;margin-bottom:19px}
- .purchase-section--flavour .purchase-copy h2{font-size:clamp(58px,15vw,94px);margin-bottom:22px}
+ .purchase-section--flavour .purchase-copy{display:contents}
+ .purchase-section--flavour .purchase-copy>*{order:1}
+ .purchase-section--flavour .purchase-copy>.eyebrow{order:-2;font-size:9px;letter-spacing:.12em;margin-bottom:14px}
+ .purchase-section--flavour .purchase-copy h1,.purchase-section--flavour .purchase-copy h2{order:-1}
+ .purchase-section--flavour .purchase-copy h2{font-size:clamp(48px,12vw,74px);margin-bottom:0}
  .purchase-section--flavour .purchase-copy h1{font-size:clamp(48px,12vw,78px)}
- .purchase-section--flavour .purchase-price{font-size:24px;margin-bottom:26px}
+ .purchase-section--flavour .purchase-price{font-size:24px;margin-bottom:20px}
+}
+
+@media(max-width:899px){
+ .has-hero-motion .hero-story{--hero-mobile-height:calc(100lvh - var(--header-height));--hero-mobile-content:calc(100svh - var(--header-height));height:calc(var(--hero-mobile-height) + var(--hero-scroll-distance,2040px))}
+ .has-hero-motion .hero-pin{position:sticky;top:var(--header-height);height:var(--hero-mobile-height)}
+ .has-hero-motion .hero-scene{height:var(--hero-mobile-height);contain:paint}
+ .has-hero-motion .hero-opening{top:calc(var(--hero-mobile-content)*.06)}
+ .has-hero-motion .hero-product{top:calc(var(--hero-mobile-content)*.61);height:calc(var(--hero-mobile-content)*.56)}
+ .has-hero-motion .hero-flavour{top:calc(var(--hero-mobile-content)*.07)}
+ .has-hero-motion .hero-stream{height:auto;aspect-ratio:1440/900;transform-origin:50% calc(var(--hero-mobile-height)*.75);will-change:auto}
+ .purchase-section--flavour .purchase-copy>.study-link{align-self:flex-start}
+ .has-hero-motion .hero-bottom{bottom:calc(100lvh - 100dvh + 24px)}
+ .has-hero-motion .hero-scroll{bottom:calc(100lvh - 100dvh + 55px)}
+ .hero-story.is-hero-active .hero-foil,.hero-story.is-hero-active .hero-stream,.hero-story.is-hero-active .hero-product-pose{will-change:transform}
 }
 
 .header-brand-mark{display:block}
 .study-header>.header-brand img{width:100px}
-@supports (mask-image:url("trayn-logo-256.webp")) or (-webkit-mask-image:url("trayn-logo-256.webp")){
- .header-brand-mark{background:var(--red-accent);-webkit-mask:url("trayn-logo-256.webp") center/100% 100% no-repeat;mask:url("trayn-logo-256.webp") center/100% 100% no-repeat}
- .header-brand-mark img{opacity:0}
-}
 .purchase-section:focus{outline:none}
 .purchase-section--flavour .purchase-status{margin-block:4px}
 .purchase-section--flavour .purchase-tax{margin-block:8px}

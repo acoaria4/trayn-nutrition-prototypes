@@ -5,9 +5,9 @@ import { chromium,webkit } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {createRenderer} from '../scripts/preview.mjs';
 const chromeOptions={executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true};
-async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference',quantityRule={min:1,increment:1,max:null}}={}) {
+async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference',mobile=false,quantityRule={min:1,increment:1,max:null}}={}) {
  const renderer=createRenderer({available});renderer.globals.product.variants[0].quantity_rule=quantityRule;let count=0,adds=0,changes=[];
- const context=await browser.newContext({viewport:{width,height},javaScriptEnabled:js,reducedMotion});
+ const context=await browser.newContext({viewport:{width,height},javaScriptEnabled:js,reducedMotion,isMobile:mobile,hasTouch:mobile});
  const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const setCart=()=>{const cart={item_count:count,total_price:count*329900,currency:{iso_code:'INR'},cart_level_discount_applications:[],items:count?[{key:'test-key:abc',product:{title:'TRAYN Whey Belgian Chocolate',handle:'trayn-whey-rich-chocolate',has_only_default_variant:true},variant:{title:'Default Title',quantity_rule:quantityRule},quantity:count,url:'/products/trayn-whey-rich-chocolate',final_line_price:count*329900,properties:[],line_level_discount_allocations:[]}]:[]};Object.assign(renderer.globals.cart,cart);return cart;};
  await context.route('https://theme.test/**',async route=>{
@@ -31,7 +31,7 @@ for(const [name,engine,options,width] of [['desktop',chromium,chromeOptions,1440
    await page.waitForFunction(()=>document.querySelector('.hero-story').dataset.scrollDistance==='2040');
    assert.equal(await page.locator('html.lenis').count(),width>=900?1:0);
    await page.waitForFunction(()=>document.querySelector('.hero-stream img')?.naturalWidth>0);
-   assert.equal(await page.locator('.pin-spacer').count(),2);
+   assert.equal(await page.locator('.pin-spacer').count(),width>=900?2:1);
    await page.locator('[data-study-inspect]').click();
    await page.getByRole('button',{name:'Back Label',exact:true}).click();
    assert.ok((await page.locator('[data-inspector-image]').getAttribute('src')).includes('.webp?v='));
@@ -111,9 +111,9 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
    await page.locator('#purchase').evaluate(el=>el.scrollIntoView());await page.waitForTimeout(150);
    await page.screenshot({path:`artifacts/shop-art-${name.replaceAll(' ','-')}.png`});
    const shop=page.locator('.purchase-section--flavour');
-   const bounds=await shop.evaluate(el=>({top:el.getBoundingClientRect().top+scrollY,height:el.offsetHeight,gallery:el.querySelector('.purchase-gallery').getBoundingClientRect().toJSON(),copy:el.querySelector('.purchase-copy').getBoundingClientRect().toJSON(),border:getComputedStyle(el).borderTopWidth}));
+   const bounds=await shop.evaluate(el=>({top:el.getBoundingClientRect().top+scrollY,height:el.offsetHeight,gallery:el.querySelector('.purchase-gallery').getBoundingClientRect().toJSON(),copy:el.querySelector(innerWidth<900?'.purchase-copy h2':'.purchase-copy').getBoundingClientRect().toJSON(),border:getComputedStyle(el).borderTopWidth}));
    assert.equal(bounds.border,'0px');assert.ok(Math.abs(bounds.gallery.width-width)<2);
-   if(width<900){assert.ok(bounds.gallery.height<=440);assert.ok(bounds.gallery.bottom<=bounds.copy.top+5);}
+   if(width<900){assert.ok(bounds.gallery.height<=280);assert.ok(bounds.copy.bottom<=bounds.gallery.top+1);}
    else {
     assert.ok(bounds.copy.height<height-80,JSON.stringify(bounds.copy));
     assert.ok(Math.abs((await art.boundingBox()).width/width-.84)<.01);
@@ -121,7 +121,7 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
    const drift=[];
    for(const offset of [-height*.6,bounds.height*.3]){
     await page.evaluate(y=>scrollTo(0,y),bounds.top+offset);await page.waitForTimeout(100);
-    drift.push(await shop.evaluate(el=>({art:new DOMMatrix(getComputedStyle(el.querySelector('.purchase-art-stage')).transform).m42,copy:el.querySelector('.purchase-copy').getBoundingClientRect().top-el.getBoundingClientRect().top})));
+    drift.push(await shop.evaluate(el=>({art:new DOMMatrix(getComputedStyle(el.querySelector('.purchase-art-stage')).transform).m42,copy:el.querySelector(innerWidth<900?'.purchase-copy h2':'.purchase-copy').getBoundingClientRect().top-el.getBoundingClientRect().top})));
    }
    assert.ok(drift[0].art>drift[1].art);
    assert.ok(drift.every(p=>Math.abs(p.art)<=18.1));assert.ok(Math.abs(drift[0].copy-drift[1].copy)<1);
@@ -141,6 +141,12 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
      if(index===0 || phase>.8) assert.ok(state.bottom<height-24,JSON.stringify(state));
     }
     assert.equal(states[0].progress,states[1].progress);
+    if(phase>.8) {
+     const brand=await page.locator('.mindset-brand').evaluate(el=>({bounds:el.getBoundingClientRect().toJSON(),opacity:Number(getComputedStyle(el).opacity)}));
+     assert.ok(brand.opacity>.1 && brand.opacity<.2);
+     const words=await page.locator('.mindset-word').evaluateAll(elements=>elements.map(el=>el.getBoundingClientRect().toJSON()));
+     for(const word of words)assert.ok(brand.bounds.bottom<=word.top || brand.bounds.top>=word.bottom || brand.bounds.right<=word.left || brand.bounds.left>=word.right,JSON.stringify({brand,word}));
+    }
     positions.push(states.map(s=>s.x));
     await page.screenshot({path:`artifacts/mindset-${Math.round(phase*100)}-${name.replaceAll(' ','-')}.png`});
    }
@@ -149,6 +155,7 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
    await page.screenshot({path:`artifacts/mindset-mid-${name.replaceAll(' ','-')}.png`});
    await page.evaluate(y=>window.scrollTo(0,y),interval.end+8);await page.waitForTimeout(100);
    assert.equal(await page.locator('.mindset-poster').getAttribute('data-motion-progress'),'1.000');
+   assert.equal(await page.locator('.mindset-brand').evaluate(el=>getComputedStyle(el).opacity),'0');
    assert.ok((await page.locator('.mindset-word').evaluateAll(words=>words.map(el=>Math.abs(new DOMMatrix(getComputedStyle(el).transform).m41)))).every(x=>x<1));
    assert.ok((await page.locator('.mindset-poster').boundingBox()).y>60);
    await page.evaluate(y=>window.scrollTo(0,y),interval.start+(interval.end-interval.start)*.35);await page.waitForTimeout(100);
@@ -167,7 +174,7 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
    await page.screenshot({path:`artifacts/red-mid-${name.replaceAll(' ','-')}.png`});
    await page.locator('.label-tabs a').first().focus();
    assert.equal(await product.getAttribute('data-takeover-progress'),'1');
-   assert.equal(await page.locator('.pin-spacer').count(),2);
+   assert.equal(await page.locator('.pin-spacer').count(),width>=900?2:1);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);assert.deepEqual(errors,[]);
   } finally {await browser.close();}
  });
@@ -241,8 +248,8 @@ for(const [name,engine,options,width] of [['desktop',chromium,chromeOptions,1280
   try {
    const {page,errors,state}=await mockPage(browser,{width,height:width<900?600:844,quantityRule:{min:5,increment:5,max:10}});
    const mark=page.locator('.header-brand-mark');
-   assert.equal(await mark.evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(248, 32, 48)');
-   assert.match(await mark.evaluate(el=>getComputedStyle(el).maskImage),/trayn-logo-256/);
+   assert.equal(await mark.evaluate(el=>getComputedStyle(el).maskImage),'none');
+   assert.equal(await mark.locator('img').evaluate(el=>getComputedStyle(el).opacity),'1');
    assert.equal(await page.locator('.study-footer img').evaluate(el=>getComputedStyle(el).opacity),'1');
    const quantity=page.locator('[data-product-form] [name=quantity]');
    const minus=page.locator('[data-product-form] [data-quantity-adjust="-1"]');
@@ -299,3 +306,64 @@ test('TRAYN Nutrition website naming and Shopify amount formatting retain fracti
   assert.equal(html.match(/data-product-price>([\s\S]*?)<\/p>/)[1].trim(),expected);
  }
 });
+
+for(const [name,engine,options,width,height] of [['Chrome phone',chromium,chromeOptions,390,600],['WebKit phone',webkit,{headless:true},390,844],['WebKit compact',webkit,{headless:true},320,640]]) {
+ test(`${name}: native hero handoff, retained motion and an accessible shop entrance`,async()=>{
+  const browser=await engine.launch(options);
+  try {
+   const {page,errors}=await mockPage(browser,{width,height,mobile:true});
+   await page.evaluate(()=>document.fonts.ready);
+   await page.waitForFunction(()=>document.querySelector('.hero-story').dataset.scrollEnd);
+   const interval=await page.locator('.hero-story').evaluate(el=>({start:Number(el.dataset.scrollStart),end:Number(el.dataset.scrollEnd)}));
+   assert.equal(interval.end-interval.start,2040);
+   assert.equal(await page.locator('.hero-pin').evaluate(el=>getComputedStyle(el).position),'sticky');
+   const poses=[];
+   for(const phase of [.2,.55,.9,.35]) {
+    await page.evaluate(y=>scrollTo(0,y),interval.start+2040*phase);await page.waitForTimeout(100);
+    const state=await page.locator('.hero-story').evaluate(el=>({progress:Number(el.dataset.heroProgress),pin:el.querySelector('.hero-pin').getBoundingClientRect().top,header:document.querySelector('.study-header').offsetHeight,pouch:getComputedStyle(el.querySelector('.hero-product')).transform,stream:getComputedStyle(el.querySelector('.hero-stream')).transform,light:Number(getComputedStyle(el.querySelector('.hero-light')).opacity)}));
+    assert.ok(Math.abs(state.progress-phase)<.01);
+    assert.ok(Math.abs(state.pin-state.header)<1);
+    if(phase===.2)assert.equal(state.light,0);
+    if(phase===.55)assert.ok(state.light>.3);
+    poses.push(state);
+   }
+   assert.notEqual(poses[0].pouch,poses[1].pouch);
+   assert.notEqual(poses[0].stream,poses[1].stream);
+   if(engine===chromium) {
+    const session=await page.context().newCDPSession(page);
+    const originalHeight=await page.locator('.hero-pin').evaluate(el=>el.offsetHeight);
+    await session.send('Emulation.setSmallViewportHeightDifferenceOverride',{difference:100});
+    await page.waitForTimeout(100);
+    assert.equal(await page.locator('.hero-pin').evaluate(el=>el.offsetHeight),originalHeight);
+    const content=await page.locator('.hero-product').evaluate(el=>({height:el.offsetHeight,viewport:innerHeight,header:document.querySelector('.study-header').offsetHeight}));
+    assert.ok(Math.abs(content.height-(content.viewport-content.header-100)*.56)<1);
+    assert.equal(await page.locator('.hero-story').evaluate(el=>Number(el.dataset.scrollEnd)-Number(el.dataset.scrollStart)),2040);
+    await session.send('Emulation.setSmallViewportHeightDifferenceOverride',{difference:0});
+    await page.waitForTimeout(100);
+   }
+   for(const released of [0,60,200]) {
+    await page.evaluate(y=>scrollTo(0,y),interval.end+released);await page.waitForTimeout(100);
+    const seam=await page.evaluate(()=>({bottom:document.querySelector('.hero-pin').getBoundingClientRect().bottom,next:document.querySelector('#purchase').getBoundingClientRect().top}));
+    assert.ok(Math.abs(seam.next-seam.bottom)<1,JSON.stringify(seam));
+   }
+   await page.locator('#purchase').evaluate(el=>el.scrollIntoView());await page.waitForTimeout(100);
+   const shop=await page.locator('#purchase').evaluate(el=>({title:el.querySelector('h2').getBoundingClientRect().toJSON(),art:el.querySelector('.purchase-gallery').getBoundingClientRect().toJSON(),button:el.querySelector('[data-add-button]').getBoundingClientRect().toJSON(),header:document.querySelector('.study-header').offsetHeight}));
+   assert.ok(shop.title.top>=shop.header);
+   assert.ok(shop.title.bottom<=shop.art.top+1);
+   assert.ok(shop.button.bottom<=height,JSON.stringify(shop));
+   const entranceY=await page.locator('#purchase').evaluate(el=>el.getBoundingClientRect().top+scrollY-innerHeight*.55);
+   await page.evaluate(y=>scrollTo(0,y),entranceY);await page.waitForTimeout(100);
+   const before=await page.locator('.purchase-art-stage').evaluate(el=>new DOMMatrix(getComputedStyle(el).transform).m41);
+   assert.ok(before>5);
+   await page.locator('[data-product-form] [name=quantity]').focus();
+   const settled=await page.locator('.purchase-art-stage').evaluate(el=>{const m=new DOMMatrix(getComputedStyle(el).transform);return[m.a,m.d,m.m41,m.m42];});
+   assert.deepEqual(settled,[1,1,0,0]);
+   await page.setViewportSize({width:844,height:390});await page.waitForTimeout(300);
+   assert.equal(await page.locator('body.has-hero-motion').count(),0);
+   await page.setViewportSize({width,height});await page.waitForTimeout(300);
+   assert.equal(await page.locator('.hero-pin').evaluate(el=>getComputedStyle(el).position),'sticky');
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+   assert.deepEqual(errors,[]);
+  }finally{await browser.close();}
+ });
+}

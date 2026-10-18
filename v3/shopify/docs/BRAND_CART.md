@@ -1,6 +1,6 @@
 # Red header brand and commerce refinement — 16 October 2026
 
-Status: local review only. Live Shopify theme 192591069472 is unchanged. No theme upload, publication, store-name setting, payment setting, order, product, inventory or price record was changed.
+Status: published on 16 October 2026 as theme 192605356320 at https://traynnutrition.com/. Previous theme 192591069472 is retained for rollback. Current editor settings and other locale keys were preserved. No store-name setting, payment setting, order, product, inventory or price record was changed.
 
 Review: http://127.0.0.1:4180/?demo=cart&review=brand-cart#purchase
 
@@ -41,3 +41,5 @@ The apparent background shift in an initial screenshot came from Playwright loca
 Future publication must start from a fresh copy of the current live theme to preserve editor settings. Apply the reviewed layout/header/footer, cart/purchase snippets, new price/quantity snippets and rebuilt CSS/JS. Merge the new English locale keys with current live translations. Do not upload preview fixtures, documentation or tests.
 
 Sources: https://shopify.dev/docs/api/liquid/filters/money_without_trailing_zeros and https://shopify.dev/docs/api/liquid/objects/quantity_rule.
+
+Publication verification passed on the hosted draft and the public main domain in laptop Chrome/mobile WebKit. Both primary and www addresses return the new main theme and TRAYN Nutrition title. No local demo code was uploaded. See LIVE_DEPLOYMENT.md.

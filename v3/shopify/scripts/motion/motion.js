@@ -13,6 +13,8 @@ export function initializeFullPageMotion({ header }) {
   let media;
   const restore = () => {
     document.body.classList.remove("has-hero-motion");
+    story.classList.remove("is-hero-active");
+    story.style.removeProperty("--hero-scroll-distance");
     [opening, flavour].forEach((el) => {
       el.inert = false;
       el.removeAttribute("aria-hidden");
@@ -25,7 +27,7 @@ export function initializeFullPageMotion({ header }) {
     media.add(
       {
         motion: "(prefers-reduced-motion: no-preference)",
-        room: "(min-height: 520px)",
+        room: "(min-height: 520px), (max-width: 899px) and (orientation: portrait)",
         desktop: "(min-width: 900px)",
       },
       (context) => {
@@ -33,6 +35,7 @@ export function initializeFullPageMotion({ header }) {
         const desktop = context.conditions.desktop;
         if (context.conditions.room) {
           document.body.classList.add("has-hero-motion");
+          story.style.setProperty("--hero-scroll-distance", `${HERO_DISTANCE}px`);
           gsap.set(flavour, { autoAlpha: 0 });
           flavour.inert = true;
           flavour.setAttribute("aria-hidden", "true");
@@ -42,10 +45,13 @@ export function initializeFullPageMotion({ header }) {
               trigger: story,
               start: () => `top top+=${header.offsetHeight}`,
               end: `+=${HERO_DISTANCE}`,
-              pin: scene.parentElement,
+              pin: desktop ? scene.parentElement : false,
               refreshPriority: 10,
               scrub: true,
               invalidateOnRefresh: true,
+              onToggle: (self) => {
+                if (!desktop) story.classList.toggle("is-hero-active", self.isActive);
+              },
               onRefresh: (self) => {
                 story.dataset.scrollStart = String(self.start);
                 story.dataset.scrollEnd = String(self.end);
@@ -73,6 +79,9 @@ export function initializeFullPageMotion({ header }) {
               {
                 xPercent: desktop ? -24 : -12,
                 yPercent: 18,
+                ...(desktop ? {} : {
+                  y: () => scene.clientHeight * 0.27 - scene.querySelector(".hero-stream").clientHeight * 0.18,
+                }),
                 rotation: -6,
                 duration: 0.8,
               },

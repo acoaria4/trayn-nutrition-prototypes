@@ -1,10 +1,10 @@
 # TRAYN Shopify theme — V3 Slipstream
 
-An independent Shopify Online Store theme under `v3/shopify/`. Published to `traynnutrition.com` on 15 October 2026; the compact shop layout and shorter GET BUILT sequence went live on 16 October 2026 as theme `192591069472`, retaining the scroll-performance fixes. The previous live theme remains saved in Shopify; the V3 showcase and Sites collection are unchanged. Shopify renders the storefront with Liquid; existing GSAP sequences are bundled as theme assets. See docs/LIVE_DEPLOYMENT.md for the deployment record.
+An independent Shopify Online Store theme under `v3/shopify/`. Current live theme: `192621379872`, TRAYN V3 — Silver Identity, published to `traynnutrition.com` on 17 October 2026. It restores the silver header logo and adds a subtle red GET BUILT accent while retaining the phone scroll improvements, compact layout and commerce controls. The previous live theme remains saved in Shopify; the V3 showcase and Sites collection are unchanged. Shopify renders the storefront with Liquid; existing GSAP sequences are bundled as theme assets. See docs/LIVE_DEPLOYMENT.md for the deployment record.
 
 Published layout update: the shop artwork and desktop headings are smaller, purchase spacing is tighter, and GET BUILT has half its previous pinned distance. See docs/COMPACT_LAYOUT.md.
 
-Local review update (not published): red header logo, original silver footer logo, TRAYN Nutrition website naming, native quantity steppers, cleaner price formatting and refined empty/filled carts. Review at `http://127.0.0.1:4180/?demo=cart&review=brand-cart#purchase`; this opt-in demo uses sample prices/stock with checkout disabled. See docs/BRAND_CART.md.
+Published branding/cart update: red header logo, original silver footer logo, TRAYN Nutrition website naming, native quantity steppers, cleaner price formatting and refined empty/filled carts. Review at `http://127.0.0.1:4180/?demo=cart&review=brand-cart#purchase`; this opt-in demo uses sample prices/stock with checkout disabled. See docs/BRAND_CART.md.
 
 ## Store and scope
 

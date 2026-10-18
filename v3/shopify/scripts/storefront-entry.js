@@ -32,7 +32,7 @@ if(!window.Shopify?.designMode && header && document.querySelector('.mindset-pos
 initializeInteractions();
 if(!window.Shopify?.designMode && header && document.querySelector('.product-section') && document.querySelector('.contact-email')) initializeLowerMotion({header});
 initializeSmoothScroll();
-if(!window.Shopify?.designMode) initializeFlavourMotion();
+if(!window.Shopify?.designMode && header) initializeFlavourMotion({header});
 const restoreAnchor=()=> {
  if(!location.hash) return;
  ScrollTrigger.refresh();

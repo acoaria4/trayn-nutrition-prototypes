@@ -1,3 +1,47 @@
+# Silver identity publication — 17 October 2026
+
+Published theme: `192621379872`, TRAYN V3 — Silver Identity, at https://traynnutrition.com/. The previous live theme `192617939232`, TRAYN V3 — Phone Motion, is confirmed unpublished and retained for rollback.
+
+The release began with a fresh pull of the live theme. Only `assets/trayn.css`, `assets/trayn.js` and `sections/trayn-mindset.liquid` were replaced. The prior CSS/JS hashes matched the phone-motion release, and the prior section matched the reviewed baseline. The other 56 release files, including live settings, templates and translations, were preserved and checked by hash. Strict theme upload and local Theme Check passed.
+
+The header now shows the original silver logo. GET BUILT includes a low-opacity red logo that briefly appears clear of the typography, with a separate cropped phone placement. The footer remains silver. Hero pacing, the phone scroll fixes, commerce controls and other sections retain their existing behaviour. See SILVER_HEADER.md.
+
+Fresh laptop Chrome and mobile WebKit checks passed on the unpublished preview and on the public primary domain after publication. They verify the silver header image, original footer image, red accent visibility and clearance, theme identity, sticky header, hero pacing, typography motion, packaging inspection, product information controls, read-only cart rendering and the product route. No storefront errors or theme asset failures were reported. These browser checks do not constitute physical-phone performance measurements.
+
+No product, inventory, pricing, payment, checkout or domain settings were changed. V1, V2, the parent V3 showcase and Sites were not deployed. No real cart addition, order or payment was attempted. The release manifest is recorded in ignored artifacts/silver-logo-release-manifest.json.
+
+This record supersedes the historical publication records below.
+
+# Phone motion publication — 17 October 2026
+
+Published theme: `192617939232`, TRAYN V3 — Phone Motion, at https://traynnutrition.com/. The previous live theme `192605356320`, TRAYN V3 — Brand and Cart, is confirmed unpublished and retained for rollback.
+
+The release was prepared from a fresh pull of the current live theme. Its three changed files (`assets/trayn.css`, `assets/trayn.js`, `snippets/purchase-art.liquid`) matched the reviewed baseline before replacement; the other 56 files were preserved. No local fixture, demo, test or documentation files were uploaded. Strict theme upload and local Theme Check passed.
+
+Fresh laptop Chrome and mobile WebKit checks passed on both the unpublished preview and the published primary domain. They verified theme identity, hero pacing, persistent header, phone shop layout, artwork, GET BUILT, packaging inspection, red reveal, product information controls, read-only cart rendering and product route. No storefront errors or theme asset failures were reported. These checks do not establish a physical phone frame rate.
+
+The update retains the animations and the 2,040 px hero distance, uses native sticky positioning for the mobile hero, stabilizes its viewport sizing and portrait height gate, and coordinates the smaller mobile chocolate scene with its heading and purchase controls. Desktop layout and motion remain unchanged. See PHONE_MOTION.md and ignored artifacts/phone-motion-release-manifest.json.
+
+The local preview server on port 4180 was stopped at the user's request. No product, inventory, pricing, payment, checkout, domain, V1/V2, parent V3 showcase or Sites settings were changed. No real cart addition, order or payment was attempted.
+
+This record supersedes the historical publication records below.
+
+# Brand and cart publication — 16 October 2026
+
+Published theme: `192605356320`, TRAYN V3 — Brand and Cart, at https://traynnutrition.com/. The www alias redirects to the primary domain. Both domains returned HTTP 200 with the new theme in the main role and the page title TRAYN Nutrition.
+
+The release began with a fresh pull of live theme `192591069472`. Current editor config and templates were preserved. Ten reviewed theme files were overlaid (layout, header/footer, cart/purchase snippets, new quantity/price snippets and rebuilt CSS/JS); the eleventh file merges only the new English brand/quantity/cart keys into current live translations, preserving Shopify's generated comment header and other keys. Strict upload passed. The prior theme is confirmed unpublished and retained for rollback.
+
+The update includes the flat red header logo, original silver footer logo, TRAYN Nutrition website naming, native quantity steppers, cleaner Shopify-sourced prices and revised empty/filled cart layouts. Business/account store-name settings, products, inventory, prices, payment providers, checkout configuration, domains, V1/V2, the parent V3 showcase and Sites were not changed.
+
+Laptop Chrome and mobile WebKit checks passed on the unpublished theme and on the public main domain after publication. They verify theme identity, title/site name, the red mask asset, untouched footer image, quantity adjustment without cart mutation, actual variant price consistency, empty-cart controls/return focus, product route, hero pacing, sticky header, previous motion sequences, inspector, labels and cart rendering. No theme asset failures or storefront page errors were reported in the successful public runs. Native checkout is enabled; local demo markers and sample code are absent.
+
+The WebKit runtime had been removed from the temporary cache and was restored before mobile verification. One preview run blocked Shopify's event collection endpoint by browser access controls. Its origin was verified in Shopify's own cdn/shopifycloud/storefront/assets/storefront/event_observer_reporter script; that exact tracking failure is recorded separately from storefront errors. Both final public browser runs passed.
+
+Local demo fixtures, disabled-checkout behavior, documentation, test scripts and source assets were not uploaded. No real cart addition, order or payment was attempted. See BRAND_CART.md for implementation and local validation, and ignored artifacts/brand-cart-release-manifest.json for release and preserved-config hashes.
+
+This record supersedes the historical publication records below.
+
 # Compact layout publication — 16 October 2026
 
 Published theme: `192591069472`, TRAYN V3 — Compact Layout, at https://traynnutrition.com/. The www alias redirects to the primary domain. Both addresses returned HTTP 200 with the new theme in the main role.
