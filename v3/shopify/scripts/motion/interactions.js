@@ -204,9 +204,9 @@ function inspector() {
     },
     label: {
       src: labelSource.dataset.inspectorLabelImage,
-      alt: "Original back-label artwork supplied for the Belgian Chocolate WPC pouch",
+      alt: "Belgian Chocolate WPC back-label artwork; manufacturer details intentionally blank",
       caption:
-        "Original supplied back-label artwork. Transcribed information is not an approved retail specification.",
+        "Back-label visualisation; manufacturer details intentionally blank. Transcribed information is not an approved retail specification.",
     },
   };
   let opener;

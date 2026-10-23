@@ -7,7 +7,7 @@ The code can display approved content, but it cannot establish the retail facts 
 - Is the sold SKU whey concentrate only, or a concentrate/isolate blend? The public artwork says concentrate; older separate concepts described a blend. Confirm which applies to this actual SKU.
 - Confirm net quantity, serving size/count, ingredients in order, allergens, nutrition values and their measurement basis, directions, storage and applicable warnings.
 - Confirm that the supplied back-label PDF is approved for the actual retail SKU. If it is a design draft, provide the final approved version.
-- Supply any manufacturer/marketer and applicable licence/support details that should appear publicly, with the exact approved wording.
+- The manufacturer area in the public-facing pouch and enlarged label preview is intentionally blank, as requested on 23 October 2026. Do not insert a fixed manufacturer into those concept images. Supply exact approved marketer, licence and support wording for retail product content where needed. The original reference PDF is retained unmodified.
 - Supply a short approved product description and any substantiated differentiators. Testing/certification/performance claims need supporting evidence; no claims were added in this change.
 
 **Why this is still open:** the current catalogue description is empty, and the homepage explicitly describes its facts as a transcription of unapproved packaging artwork. That disclosure and the original values have been preserved. Do not remove the disclosure until the underlying approval is resolved.
