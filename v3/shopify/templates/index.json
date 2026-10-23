@@ -1,0 +1,54 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "trayn-hero",
+      "settings": {}
+    },
+    "purchase": {
+      "type": "featured-product",
+      "settings": {}
+    },
+    "mindset": {
+      "type": "trayn-mindset",
+      "settings": {}
+    },
+    "packaging": {
+      "type": "trayn-packaging",
+      "settings": {}
+    },
+    "artwork": {
+      "type": "trayn-label-artwork",
+      "settings": {
+        "heading": "KNOW"
+      }
+    },
+    "questions": {
+      "type": "trayn-questions",
+      "settings": {}
+    },
+    "contact": {
+      "type": "trayn-contact",
+      "settings": {
+        "intro": "For product enquiries.\nFor what comes next."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "purchase",
+    "mindset",
+    "packaging",
+    "artwork",
+    "questions",
+    "contact"
+  ]
+}

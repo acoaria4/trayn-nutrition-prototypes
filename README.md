@@ -1,6 +1,18 @@
 # TRAYN Nutrition prototypes
 
-Two independent website versions and three opening studies share one GitHub Pages deployment.
+V1 and V2 remain preserved as independent website previews. V3 includes the separate static Slipstream showcase and the source for the public Shopify store.
+
+## Current Shopify source
+
+The authoritative storefront theme is **[`v3/shopify/`](v3/shopify/README.md)**, synchronized from published theme **192621379872 — TRAYN V3 — Silver Identity** on 23 October 2026. All 59 native theme files, including editor settings and templates, were downloaded and compared. See the [sync record](v3/shopify/docs/REPO_SYNC_2026_10_23.md) and [SEO audit](v3/shopify/docs/SEO_AUDIT_2026_10_23.md).
+
+`v3/` is a separate static concept showcase; it does not contain the live Shopify catalogue or checkout. Use `v3/shopify/` for future changes to [traynnutrition.com](https://traynnutrition.com/). No `v2/shopify/` folder was found in the available repository history. Do not use the older `traynnutrition-website-v2` project or its `new_website_3` concept as this storefront's baseline.
+
+The sync is on `codex/sync-live-shopify-v3`. V1, V2, the version chooser and deployment workflow were left untouched. Main and public deployments are not updated by this sync branch. Product records, media, availability and policies remain managed in Shopify separately from theme source. Audit fixes have not started.
+
+## Existing preview deployment
+
+Two independent website versions and three opening studies share the existing GitHub Pages deployment.
 
 - [Choose a version](https://acoaria4.github.io/trayn-nutrition-prototypes/)
 - [V1 — After Dark](https://acoaria4.github.io/trayn-nutrition-prototypes/v1/), restored from commit `80ce629`.

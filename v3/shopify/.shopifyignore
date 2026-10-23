@@ -1,0 +1,11 @@
+node_modules/**
+scripts/**
+tests/**
+preview/**
+artifacts/**
+package*.json
+README.md
+.theme-check.yml
+.gitignore
+docs/**
+source-assets/**

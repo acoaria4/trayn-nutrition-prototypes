@@ -1,0 +1,258 @@
+{
+  "date": "2026-10-23",
+  "timezone": "Asia/Kolkata",
+  "theme": {
+    "id": 192621379872,
+    "name": "TRAYN V3 — Silver Identity",
+    "role": "live",
+    "store": "trayn-nutrition.myshopify.com"
+  },
+  "nativeDirectories": [
+    "assets",
+    "config",
+    "layout",
+    "locales",
+    "sections",
+    "snippets",
+    "templates"
+  ],
+  "sourceCommit": "d671be396715704ec73ce07e8b7dca3aafe562ef",
+  "files": [
+    {
+      "path": "assets/Barlow-Condensed-OFL.txt",
+      "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f"
+    },
+    {
+      "path": "assets/Manrope-OFL.txt",
+      "sha256": "58172e0c0fac2cda8a37b348164bb55e44b0e69051e557e92b1d3f6910141f7b"
+    },
+    {
+      "path": "assets/barlow-800.woff2",
+      "sha256": "c4f4e1f2d3995027ef74c38dca2590e880c07e30c046e3186add9caac379d376"
+    },
+    {
+      "path": "assets/belgian-chocolate-flavour-1120.webp",
+      "sha256": "7fd530ad568394d09e5e923a4e716553a2c98d22681b3dcfa1db0212c7415280"
+    },
+    {
+      "path": "assets/belgian-chocolate-flavour-640.webp",
+      "sha256": "744089741f4a1a8f189154b66a768147f01c38ba078d6f6e701672d914ca85ce"
+    },
+    {
+      "path": "assets/belgian-chocolate-flavour-flow-1536.webp",
+      "sha256": "74e0289aefc4578ddc451964be5b28b735b3a1ad901d32f9d704f018ffdc92b0"
+    },
+    {
+      "path": "assets/belgian-chocolate-flavour-flow-960.webp",
+      "sha256": "7f4a403153c5b77477c6e854bea6b80bc8f694d5631becaea8b8fcd7f32daa98"
+    },
+    {
+      "path": "assets/belgian-chocolate-wpc-1024.webp",
+      "sha256": "decdc3daa1a93429a78c5a462c8c6848412ae2ddfd92ee5a247bf9aee133846b"
+    },
+    {
+      "path": "assets/belgian-chocolate-wpc-back-1024.webp",
+      "sha256": "a02f89be4d47203457b487451c029bad003e7bc829fa31471cbf848ce4675c3e"
+    },
+    {
+      "path": "assets/belgian-chocolate-wpc-back-label.pdf",
+      "sha256": "92c06ec9b37d556da7dc5f57e2fe441d384a95179606645861ba693978ab8b60"
+    },
+    {
+      "path": "assets/belgian-chocolate-wpc-back-label.webp",
+      "sha256": "0c6d2d255f0f03ed6f7193dda5e5df6611bc431dda31508d0dcf828f7db10b56"
+    },
+    {
+      "path": "assets/favicon.png",
+      "sha256": "7f6d855770304b8f57b2df8a11b5da7e2f105c3d07fcdcfb580ce1f65e302dea"
+    },
+    {
+      "path": "assets/hero-slipstream.svg",
+      "sha256": "3bb554fa173ca1307964002304af2a8beb941de05352d033759fc8001f016727"
+    },
+    {
+      "path": "assets/manrope-variable.woff2",
+      "sha256": "25a74b06de915a3775de2a1f7a8e7c4ca77344c7eaeda14c8dccb52dd01b77ab"
+    },
+    {
+      "path": "assets/tension-detail-1672.webp",
+      "sha256": "9aac636831a826ccb52d12e36298c08c8f551c010c577bfde5d98db605a1dcaa"
+    },
+    {
+      "path": "assets/tension-detail-960.webp",
+      "sha256": "61c9877ec0efd69bf0befb5911af1225d7261e930c1afd16147287f53c818b3d"
+    },
+    {
+      "path": "assets/tension-hero-1672.webp",
+      "sha256": "ca8cfb968fc339e7845ef1cfb037955de6c82a4f9d07ca89646f56dd038c16b5"
+    },
+    {
+      "path": "assets/tension-hero-960.webp",
+      "sha256": "3ed9050e76811aa94b6177cafde821e3f7b612aa41285bdcbfe29e5d079c0742"
+    },
+    {
+      "path": "assets/trayn-logo-256.webp",
+      "sha256": "775df42336ad9b3bc18dc123d8cf3ef42eb3dcce836b64bfe33f5e134b8c07c9"
+    },
+    {
+      "path": "assets/trayn.css",
+      "sha256": "1b3290ef4586deac97ad40cba19c2ef1d6aeebfc29ff1204b45a6f4e7709748e"
+    },
+    {
+      "path": "assets/trayn.js",
+      "sha256": "ffa97017e93fffc82a01272f79509ffe6c4c00b2367b77426ca713b820eab5de"
+    },
+    {
+      "path": "config/settings_data.json",
+      "sha256": "9ca33e7ee394df226621669b2c6d032fa57d77ff2e4c91b9259dfef6a30c0935"
+    },
+    {
+      "path": "config/settings_schema.json",
+      "sha256": "6589394e621f5b1645e6b625a0373ff2fee66bfbaa19b4441b6ef0c57a7be828"
+    },
+    {
+      "path": "layout/password.liquid",
+      "sha256": "04a6d2f3e9715339786a9840837b163c8c01f429c0bf31e21f6929b50aa39808"
+    },
+    {
+      "path": "layout/theme.liquid",
+      "sha256": "a9f95201bd20916048ee6bd5859633cf70f83bafee3bc17d5590486acd7fa51f"
+    },
+    {
+      "path": "locales/en.default.json",
+      "sha256": "ccdb0049833079b2a8a9ca9ab24b448230b800c73acc305b90299e346f172521"
+    },
+    {
+      "path": "sections/cart-content.liquid",
+      "sha256": "46982c9c173c03d3a16e0864057b38a7735ff7afd0ca968c9abf5760d482c3e2"
+    },
+    {
+      "path": "sections/featured-product.liquid",
+      "sha256": "4124621ef7ec234adab2ea543d864398188935473bab6b3ce11cc8e8f208bcad"
+    },
+    {
+      "path": "sections/footer.liquid",
+      "sha256": "9072187703e0e4f19d8a00b017b4eac557540cf5cd1949090974618bd4132fee"
+    },
+    {
+      "path": "sections/header.liquid",
+      "sha256": "6568f5a4071aa99d93cbe9f7d0de7b21630dd4cc26f3d5950868210168595656"
+    },
+    {
+      "path": "sections/main-404.liquid",
+      "sha256": "568c8e1ee3b0d03d41bbfbbfe654728c05f987e01575311116a2fde25e92e4fb"
+    },
+    {
+      "path": "sections/main-cart.liquid",
+      "sha256": "d634b40f3b19dd36099af366f9deccabcb4975f789ab340c90eb6913c6d19826"
+    },
+    {
+      "path": "sections/main-collection.liquid",
+      "sha256": "c5cf66a1f6658e3875e48a14da5d926e581c5660b9223c3f5962ec7a9a4634a5"
+    },
+    {
+      "path": "sections/main-page.liquid",
+      "sha256": "62b49505527bdadf45155292b6e050c7b83eecb29de5c941384356f1aa540f1a"
+    },
+    {
+      "path": "sections/main-product.liquid",
+      "sha256": "9a226ca1ee99c18ab355cf44cd613e6fe26d1c87d5b3016363ac84cc73759623"
+    },
+    {
+      "path": "sections/main-search.liquid",
+      "sha256": "70cb685fd3f353d3e23fea832d1863e6b93374090aaad600d0954f889e5aefe7"
+    },
+    {
+      "path": "sections/trayn-contact.liquid",
+      "sha256": "4957a2e99ba93ea941effd4948dcdec339dde1a7a7002d16ed3c22f1dd67bb6d"
+    },
+    {
+      "path": "sections/trayn-hero.liquid",
+      "sha256": "fa99a4ab887668f0bfbf04e14f143ca8fc7d2250a9168f2bd8b4477fbeb2a15f"
+    },
+    {
+      "path": "sections/trayn-label-artwork.liquid",
+      "sha256": "4349ddf834819c0e7fdd02f045dd3f36868bb7bd7a9db2041da7bd2ceac4fbd5"
+    },
+    {
+      "path": "sections/trayn-mindset.liquid",
+      "sha256": "97ee5072cc0256ae1b406421b939ce9247c7be3f8f34e55a478ad079d27c8626"
+    },
+    {
+      "path": "sections/trayn-packaging.liquid",
+      "sha256": "9dc299d871699739c89d178162e2791b300bebf0764faa26f79158bff1a45841"
+    },
+    {
+      "path": "sections/trayn-questions.liquid",
+      "sha256": "9b0c36a240b10e08f2825860ab8276581b31e0950eff2025e104a1ea152824cb"
+    },
+    {
+      "path": "snippets/cart-drawer.liquid",
+      "sha256": "b017c8bf93c70edcf4c9f35770813e6f49040ba41653984c372936253e6b9880"
+    },
+    {
+      "path": "snippets/cart-items.liquid",
+      "sha256": "6f8038887c805332ee299de38b7d12534bc0d200b23abc34d2760785d86ee93c"
+    },
+    {
+      "path": "snippets/navigation.liquid",
+      "sha256": "d9703e315606bbc12b9ba7ba85451a9816f7ec269719f7b5b6062d0649783f12"
+    },
+    {
+      "path": "snippets/pack-inspector.liquid",
+      "sha256": "bde66d122299df7edd7490ed900ab6cb4d7af619297d7e1781b63308c3d2a92b"
+    },
+    {
+      "path": "snippets/pouch-masks.liquid",
+      "sha256": "728cdea0f732861a5476740d5552b8e94fd4167b335ef8fd6eca4e6fd0754202"
+    },
+    {
+      "path": "snippets/price.liquid",
+      "sha256": "e994366d595a5a22dab25f0c7518e84608ac27ac4a8a4cc659c1bef8c80baa31"
+    },
+    {
+      "path": "snippets/purchase-art.liquid",
+      "sha256": "19fca729c28a45b23b00654504772f5c38fca8db69c19e8f97043cf5dfa49237"
+    },
+    {
+      "path": "snippets/purchase-panel.liquid",
+      "sha256": "cef471f45b35055bde96fc3531f9ba3c17032e2d9b729c0e4c23aba4bd76a467"
+    },
+    {
+      "path": "snippets/quantity-control.liquid",
+      "sha256": "3d6d1a96f610e71ed2f19170185a1c6b952f42cf9136a075c5874a0c0eaa76ed"
+    },
+    {
+      "path": "templates/404.json",
+      "sha256": "9596218488a73382e05f401f343f211bbf0a250cd1feefd77ce532c30fb6bd91"
+    },
+    {
+      "path": "templates/cart.json",
+      "sha256": "310803b7d9bbf02e74f026a9addecf3eaca20b584baf37d8f8c25a802a8a68a5"
+    },
+    {
+      "path": "templates/collection.json",
+      "sha256": "101760ec8d09028c774bd1e8c42c5c76ecc1eb2ca6312bb1ebd369b9f3f21711"
+    },
+    {
+      "path": "templates/index.json",
+      "sha256": "4ab7242d271c8a987b72e1a42b33c057b51d5dd9ab0f818fa89cd904911970d0"
+    },
+    {
+      "path": "templates/page.json",
+      "sha256": "e0120354c1c87714bb146c1843b03873e5d2ca3245b387b29e015684fbfd6c0c"
+    },
+    {
+      "path": "templates/password.liquid",
+      "sha256": "e3dae00da796b14ebb8536022057d132465e3ae67ac42a0c9a75ed0f757a1bc9"
+    },
+    {
+      "path": "templates/product.json",
+      "sha256": "3e71f6f5c3ea8ce393e2b7aaa7a3e9d6fac2c4eeba254c97deaf074241fc224b"
+    },
+    {
+      "path": "templates/search.json",
+      "sha256": "7634939ae6d401f761747dbf2b497bfd54f8579bfd81232822e8d3a374cc2ec4"
+    }
+  ]
+}
