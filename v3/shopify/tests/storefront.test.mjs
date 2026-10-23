@@ -4,7 +4,7 @@ import {readFile,mkdir} from 'node:fs/promises';
 import { chromium,webkit } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {createRenderer} from '../scripts/preview.mjs';
-const chromeOptions={executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true};
+const chromeOptions={...(process.env.PLAYWRIGHT_CHROME_PATH?{executablePath:process.env.PLAYWRIGHT_CHROME_PATH}:process.platform==='darwin'?{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'}:process.platform==='win32'?{channel:'chrome'}:{}),headless:true};
 async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference',mobile=false,quantityRule={min:1,increment:1,max:null}}={}) {
  const renderer=createRenderer({available});renderer.globals.product.variants[0].quantity_rule=quantityRule;let count=0,adds=0,changes=[];
  const context=await browser.newContext({viewport:{width,height},javaScriptEnabled:js,reducedMotion,isMobile:mobile,hasTouch:mobile});
@@ -111,8 +111,8 @@ for(const [name,engine,options,width,height] of [['desktop',chromium,chromeOptio
    await page.locator('#purchase').evaluate(el=>el.scrollIntoView());await page.waitForTimeout(150);
    await page.screenshot({path:`artifacts/shop-art-${name.replaceAll(' ','-')}.png`});
    const shop=page.locator('.purchase-section--flavour');
-   const bounds=await shop.evaluate(el=>({top:el.getBoundingClientRect().top+scrollY,height:el.offsetHeight,gallery:el.querySelector('.purchase-gallery').getBoundingClientRect().toJSON(),copy:el.querySelector(innerWidth<900?'.purchase-copy h2':'.purchase-copy').getBoundingClientRect().toJSON(),border:getComputedStyle(el).borderTopWidth}));
-   assert.equal(bounds.border,'0px');assert.ok(Math.abs(bounds.gallery.width-width)<2);
+   const bounds=await shop.evaluate(el=>({top:el.getBoundingClientRect().top+scrollY,width:el.getBoundingClientRect().width,height:el.offsetHeight,gallery:el.querySelector('.purchase-gallery').getBoundingClientRect().toJSON(),copy:el.querySelector(innerWidth<900?'.purchase-copy h2':'.purchase-copy').getBoundingClientRect().toJSON(),border:getComputedStyle(el).borderTopWidth}));
+   assert.equal(bounds.border,'0px');assert.ok(Math.abs(bounds.gallery.width-bounds.width)<2,JSON.stringify(bounds));
    if(width<900){assert.ok(bounds.gallery.height<=280);assert.ok(bounds.copy.bottom<=bounds.gallery.top+1);}
    else {
     assert.ok(bounds.copy.height<height-80,JSON.stringify(bounds.copy));
@@ -301,7 +301,7 @@ test('TRAYN Nutrition website naming and Shopify amount formatting retain fracti
   const renderer=createRenderer({currency});renderer.globals.product.variants[0].price=amount;
   renderer.globals.shop.name='Trayn Nutrition';renderer.globals.page_title='Trayn Nutrition';
   const html=await renderer.renderPage();
-  assert.match(html,/<title>TRAYN Nutrition<\/title>/);
+  assert.match(html,/<title>Whey Protein \| TRAYN Nutrition<\/title>/);
   assert.match(html,/<meta property="og:site_name" content="TRAYN Nutrition">/);
   assert.equal(html.match(/data-product-price>([\s\S]*?)<\/p>/)[1].trim(),expected);
  }

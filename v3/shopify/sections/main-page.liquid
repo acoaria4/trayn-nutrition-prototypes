@@ -1,2 +1,2 @@
-<section class="simple-page section-shell"><h1>{{ page.title | escape }}</h1><div class="rte">{{ page.content }}</div></section>
+<section class="simple-page section-shell"><h1>{{ page.title | escape }}</h1>{% if page.content != blank %}<div class="rte">{{ page.content }}</div>{% elsif page.handle == 'contact' and shop.email != blank %}<div class="rte"><p>For product enquiries and customer support.</p><p><a href="mailto:{{ shop.email | escape }}">{{ shop.email | escape }}</a></p></div>{% endif %}<a class="study-link" href="{{ routes.root_url }}">Return to TRAYN ↗</a></section>
 {% schema %}{"name":"Page","settings":[]}{% endschema %}

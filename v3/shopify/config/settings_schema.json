@@ -1,4 +1,5 @@
 [
  {"name":"theme_info","theme_name":"TRAYN Slipstream","theme_version":"0.1.0","theme_author":"TRAYN Nutrition","theme_documentation_url":"https://shopify.dev/docs/storefronts/themes","theme_support_url":"https://traynnutrition.com"},
- {"name":"Featured product","settings":[{"type":"product","id":"featured_product","label":"Featured product","info":"Uses Shopify prices, variants and availability. Packaging artwork is a separate reference."}]}
+ {"name":"Featured product","settings":[{"type":"product","id":"featured_product","label":"Featured product","info":"Uses Shopify prices, variants and availability. Packaging artwork is a separate reference."}]},
+ {"name":"Search and sharing","settings":[{"type":"text","id":"home_seo_title","label":"Homepage title override","info":"Optional. Otherwise keeps Shopify's homepage search title, with a category fallback for a brand-only title."},{"type":"textarea","id":"home_seo_description","label":"Homepage search description","default":"Explore TRAYN Nutrition, Belgian Chocolate whey, product information and the TRAYN mindset.","info":"Use verified facts only. Shopify's store search description takes priority when set."},{"type":"image_picker","id":"social_share_image","label":"Brand sharing image","info":"Fallback for pages without a resource or Shopify sharing image. Use approved artwork; ideally 1200 × 630 px."}]}
 ]

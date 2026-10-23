@@ -1,0 +1,10 @@
+/* Supporting pages only. The campaign layout and motion bundle stay unchanged. */
+.seo-product-details{padding-block:48px;max-width:1100px;margin-inline:auto;border-top:1px solid #ffffff25}
+.seo-detail+.seo-detail{margin-top:40px}.seo-detail h2,.seo-editorial h2{font:800 clamp(28px,4vw,44px)/1.1 Barlow,Impact,sans-serif;margin:0 0 20px;text-transform:uppercase}
+.seo-detail .rte,.seo-editorial .rte{color:var(--silver);line-height:1.8}.seo-detail th,.seo-detail td{padding:12px;border-bottom:1px solid #ffffff25;text-align:left}
+.seo-product-nav{display:flex;flex-wrap:wrap;gap:16px 28px;padding-block:24px 48px;border-top:1px solid #ffffff25;font-size:13px;color:var(--silver)}
+.seo-product-nav a,.seo-breadcrumb a{display:inline-flex;align-items:center;min-height:24px;text-decoration:underline;text-underline-offset:4px}
+.seo-breadcrumb{display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--silver);margin-bottom:28px}
+.seo-editorial>img{width:100%;height:auto;margin-block:28px}.seo-editorial>p{color:var(--silver);font-size:13px}.seo-article-list article{padding-block:28px;border-bottom:1px solid #ffffff25}.seo-article-list article>p{color:var(--silver)}
+.seo-editorial .rte{overflow-wrap:anywhere}.seo-editorial .rte h2{color:var(--white);margin-top:40px}.seo-editorial .study-link{margin-top:28px}
+@media(max-width:599px){.seo-product-details{padding-block:32px}.seo-product-nav{padding-block:24px 32px}.seo-detail+.seo-detail{margin-top:32px}}

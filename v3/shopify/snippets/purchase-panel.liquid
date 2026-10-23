@@ -18,7 +18,7 @@
 {% if purchase_image != blank %}
 <figure>{{ purchase_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: image_loading, fetchpriority: image_priority, alt: purchase_product.title }}</figure>
 {% elsif purchase_product.media.size > 0 %}
-{% for media in purchase_product.media %}<figure>{% if media.media_type == 'image' %}{{ media.preview_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: 'lazy', alt: media.alt }}{% else %}{{ media | media_tag: image_size: '900x', controls: true, preload: 'none' }}{% endif %}</figure>{% endfor %}
+{% for media in purchase_product.media %}{% assign media_loading = 'lazy' %}{% assign media_priority = 'auto' %}{% if forloop.first and is_main %}{% assign media_loading = 'eager' %}{% assign media_priority = 'high' %}{% endif %}{% assign media_alt = media.alt | default: purchase_product.title %}<figure>{% if media.media_type == 'image' %}{{ media.preview_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: media_loading, fetchpriority: media_priority, alt: media_alt }}{% else %}{{ media | media_tag: image_size: '900x', controls: true, preload: 'none' }}{% endif %}</figure>{% endfor %}
 {% elsif purchase_product.handle == 'trayn-whey-rich-chocolate' %}{% render 'purchase-art', image_loading: image_loading, image_priority: image_priority %}
 {% else %}<div class="purchase-image-pending"><img src="{{ 'trayn-logo-256.webp' | asset_url }}" width="740" height="440" alt="TRAYN Nutrition"><p>{{ purchase_product.title | escape }}</p></div>{% endif %}
 </div>
@@ -41,6 +41,7 @@
 {% if shipping_note != blank %}<p class="purchase-delivery">{{ shipping_note | escape | newline_to_br }}</p>{% endif %}
 <p class="purchase-tax">{% if cart.taxes_included %}Taxes included. {% endif %}Shipping calculated at checkout.</p>
 {% if shop.refund_policy.body != blank %}<a class="purchase-policy" href="{{ shop.refund_policy.url }}">Returns policy ↗</a>{% endif %}
+{% if is_main and shop.shipping_policy.body != blank %}<a class="purchase-policy" href="{{ shop.shipping_policy.url }}">Shipping policy ↗</a>{% endif %}
 {% unless is_main %}<a class="study-link" href="{{ purchase_product.url }}">View product details <span aria-hidden="true">↗</span></a>{% endunless %}
 {% else %}<p class="purchase-description">Explore the TRAYN collection.</p><a class="study-link" href="{{ routes.all_products_collection_url }}">View all products <span aria-hidden="true">↗</span></a>{% endif %}
 </div>

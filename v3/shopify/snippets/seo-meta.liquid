@@ -1,0 +1,62 @@
+{% doc %}
+  Renders search and sharing metadata using merchant content, with factual fallbacks.
+{% enddoc %}
+{%- assign brand_name = 'general.brand_name' | t -%}
+{%- assign seo_title = page_title | replace: '&amp;', '&' | replace: shop.name, brand_name | replace: 'Trayn Nutrition', brand_name -%}
+{%- assign seo_description = page_description | strip_html | strip -%}
+{%- assign og_type = 'website' -%}
+{%- if request.page_type == 'index' -%}
+  {%- if settings.home_seo_title != blank -%}{%- assign seo_title = settings.home_seo_title -%}{%- elsif page_title == shop.name -%}{%- assign seo_title = 'Whey Protein | TRAYN Nutrition' -%}{%- endif -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = settings.home_seo_description | default: 'Explore TRAYN Nutrition, Belgian Chocolate whey, product information and the TRAYN mindset.' -%}{%- endif -%}
+{%- elsif request.page_type == 'product' -%}
+  {%- assign og_type = 'product' -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = product.description | strip_html | strip -%}{%- endif -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = product.title | append: ' from TRAYN Nutrition. View product details, current price and availability.' -%}{%- endif -%}
+{%- elsif request.page_type == 'collection' -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = collection.description | strip_html | strip -%}{%- endif -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = collection.title | append: ' from TRAYN Nutrition. Explore the collection and view current product availability.' -%}{%- endif -%}
+{%- elsif request.page_type == 'article' -%}
+  {%- assign og_type = 'article' -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = article.excerpt_or_content | strip_html | strip -%}{%- endif -%}
+{%- elsif request.page_type == 'blog' -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = blog.title | append: ' — articles from TRAYN Nutrition.' -%}{%- endif -%}
+{%- elsif request.page_type == 'page' -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = page.content | strip_html | strip -%}{%- endif -%}
+  {%- if page.handle == 'contact' and seo_description == blank -%}{%- assign seo_description = 'Contact TRAYN Nutrition for product enquiries and customer support.' -%}{%- endif -%}
+{%- endif -%}
+{%- if seo_title == blank -%}{%- assign seo_title = brand_name -%}{%- endif -%}
+{%- unless seo_title contains brand_name -%}{%- assign seo_title = seo_title | append: ' — ' | append: brand_name -%}{%- endunless -%}
+{%- if current_page > 1 -%}{%- assign seo_title = seo_title | append: ' — Page ' | append: current_page -%}{%- endif -%}
+{%- if seo_description == blank -%}{%- assign seo_description = seo_title | append: '. Information from TRAYN Nutrition.' -%}{%- endif -%}
+{%- assign seo_description = seo_description | strip_newlines | truncate: 160 -%}
+{%- assign social_image = page_image | default: settings.social_share_image -%}
+{%- if social_image != blank -%}
+  {%- assign twitter_card = 'summary_large_image' -%}
+  {%- assign social_path = social_image | image_url: width: 1200 -%}
+  {%- assign social_alt = social_image.alt | default: seo_title -%}
+{%- else -%}
+  {%- assign twitter_card = 'summary' -%}
+  {%- assign social_path = 'trayn-logo-256.webp' | asset_url -%}
+  {%- assign social_alt = brand_name -%}
+{%- endif -%}
+{%- capture social_url -%}{%- render 'absolute-url', url: social_path -%}{%- endcapture -%}
+<title>{{ seo_title | escape }}</title>
+<meta name="description" content="{{ seo_description | escape }}">
+<link rel="canonical" href="{{ canonical_url | escape }}">
+<meta property="og:site_name" content="{{ brand_name | escape }}">
+<meta property="og:title" content="{{ seo_title | escape }}">
+<meta property="og:description" content="{{ seo_description | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:url" content="{{ canonical_url | escape }}">
+<meta property="og:image" content="{{ social_url | escape }}">
+<meta property="og:image:secure_url" content="{{ social_url | escape }}">
+<meta property="og:image:alt" content="{{ social_alt | escape }}">
+<meta name="twitter:card" content="{{ twitter_card }}">
+<meta name="twitter:title" content="{{ seo_title | escape }}">
+<meta name="twitter:description" content="{{ seo_description | escape }}">
+<meta name="twitter:image" content="{{ social_url | escape }}">
+{%- if request.page_type == 'search' or request.page_type == 'cart' or request.page_type == '404' -%}
+<meta name="robots" content="noindex, follow">
+{%- elsif request.page_type == 'blog' and blog.articles_count == 0 -%}
+<meta name="robots" content="noindex, follow">
+{%- endif -%}

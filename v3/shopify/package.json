@@ -8,6 +8,7 @@
     "check": "node scripts/check.mjs",
     "verify:baseline": "node scripts/verify-live-baseline.mjs",
     "test": "node --test tests/*.test.mjs",
+    "test:seo": "node --test tests/seo.test.mjs",
     "preview": "node scripts/preview.mjs",
     "package": "node scripts/package.mjs",
     "theme:check": "shopify theme check",
@@ -15,6 +16,7 @@
     "theme:push": "shopify theme push --unpublished --store trayn-nutrition.myshopify.com"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "^1.55.0",
     "@shopify/cli": "^4.8.0",
     "esbuild": "^0.25.0",

@@ -1,0 +1,11 @@
+{% doc %}
+  Makes a Shopify resource or asset URL absolute without changing its destination.
+  @param {string} url - Resource or asset URL.
+{% enddoc %}
+{%- assign first_two = url | slice: 0, 2 -%}
+{%- assign first_one = url | slice: 0, 1 -%}
+{%- if url contains '://' -%}{{- url -}}
+{%- elsif first_two == '//' -%}https:{{- url -}}
+{%- elsif first_one == '/' -%}{{- shop.url -}}{{- url -}}
+{%- elsif url != blank -%}{{- shop.url -}}/{{- url -}}
+{%- endif -%}

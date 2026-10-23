@@ -1,6 +1,6 @@
 # TRAYN v3 — next-run implementation queue
 
-Read-only baseline: 23 October 2026. Nothing in this queue has been implemented.
+Audit baseline: 23 October 2026. Theme-side fixes are now prepared locally on `codex/v3-seo-audit-fixes`; see [implementation status](SEO_FIXES_2026_10_23.md). Nothing has been uploaded or published. The table below remains the original dependency queue; product facts, native product media/descriptions, policies and account checks remain pending as detailed in [PRODUCT_INPUT_REQUIRED.md](PRODUCT_INPUT_REQUIRED.md).
 
 | Order | Priority | Work | Depends on | Completion check |
 |---|---|---|---|---|
