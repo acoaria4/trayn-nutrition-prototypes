@@ -31,6 +31,10 @@ for(const [name,engine,options,width] of [['desktop',chromium,chromeOptions,1440
    await page.waitForFunction(()=>document.querySelector('.hero-story').dataset.scrollDistance==='2040');
    assert.equal(await page.locator('html.lenis').count(),width>=900?1:0);
    await page.waitForFunction(()=>document.querySelector('.hero-stream img')?.naturalWidth>0);
+   await page.evaluate(()=>document.fonts.ready);
+   const headline=await page.locator('.hero-opening h1').evaluate(el=>{const range=document.createRange();range.selectNodeContents(el);const rect=range.getBoundingClientRect();return {left:rect.left,right:rect.right,viewport:innerWidth};});
+   assert.ok(headline.left>=0&&headline.right<=headline.viewport,'Hero copy must remain inside the viewport');
+   if(name==='laptop'||name==='phone'){await mkdir('artifacts',{recursive:true});await page.screenshot({path:`artifacts/homepage-premium-${name}.png`});}
    assert.equal(await page.locator('.pin-spacer').count(),width>=900?2:1);
    await page.locator('[data-study-inspect]').click();
    await page.getByRole('button',{name:'Back Label',exact:true}).click();
@@ -301,7 +305,7 @@ test('TRAYN Nutrition website naming and Shopify amount formatting retain fracti
   const renderer=createRenderer({currency});renderer.globals.product.variants[0].price=amount;
   renderer.globals.shop.name='Trayn Nutrition';renderer.globals.page_title='Trayn Nutrition';
   const html=await renderer.renderPage();
-  assert.match(html,/<title>Whey Protein \| TRAYN Nutrition<\/title>/);
+  assert.match(html,/<title>Premium Whey Protein \| TRAYN Nutrition<\/title>/);
   assert.match(html,/<meta property="og:site_name" content="TRAYN Nutrition">/);
   assert.equal(html.match(/data-product-price>([\s\S]*?)<\/p>/)[1].trim(),expected);
  }

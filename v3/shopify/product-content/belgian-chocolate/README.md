@@ -28,6 +28,8 @@ Expressed through restrained, confident copy: “For those who expect more” an
 
 The original campaign headlines, section order, black/silver/red identity, compiled campaign CSS/JavaScript and motion modules remain intact. Populating native media no longer replaces the homepage chocolate scene: the full media gallery is for the product page. Homepage buying controls stay in their existing layout.
 
+The later [premium homepage copy pass](../../docs/HOMEPAGE_COPY_2026_10_24.md) updates supporting text and the packaging heading. The owner retained FUEL YOUR POTENTIAL for the hero. Campaign structure, styles and motion remain unchanged.
+
 ## Review
 
 - Product: <http://127.0.0.1:4184/products/trayn-whey-rich-chocolate>

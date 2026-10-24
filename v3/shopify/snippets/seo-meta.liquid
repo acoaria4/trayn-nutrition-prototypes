@@ -6,8 +6,8 @@
 {%- assign seo_description = page_description | strip_html | strip -%}
 {%- assign og_type = 'website' -%}
 {%- if request.page_type == 'index' -%}
-  {%- if settings.home_seo_title != blank -%}{%- assign seo_title = settings.home_seo_title -%}{%- elsif page_title == shop.name -%}{%- assign seo_title = 'Whey Protein | TRAYN Nutrition' -%}{%- endif -%}
-  {%- if seo_description == blank -%}{%- assign seo_description = settings.home_seo_description | default: 'Explore TRAYN Nutrition, Belgian Chocolate whey, product information and the TRAYN mindset.' -%}{%- endif -%}
+  {%- if settings.home_seo_title != blank -%}{%- assign seo_title = settings.home_seo_title -%}{%- elsif page_title == shop.name -%}{%- assign seo_title = 'Premium Whey Protein | TRAYN Nutrition' -%}{%- endif -%}
+  {%- if seo_description == blank -%}{%- assign seo_description = settings.home_seo_description | default: 'Premium Belgian Chocolate whey protein concentrate for those who expect more. Explore TRAYN Nutrition, the pack, ingredients and nutrition.' -%}{%- endif -%}
 {%- elsif request.page_type == 'product' -%}
   {%- assign og_type = 'product' -%}
   {%- if seo_description == blank -%}{%- assign seo_description = product.description | strip_html | strip -%}{%- endif -%}
