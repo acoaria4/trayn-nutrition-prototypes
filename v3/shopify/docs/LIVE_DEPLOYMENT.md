@@ -1,3 +1,9 @@
+# SEO and premium retail publication — 24 October 2026
+
+Published theme **192865665312 — TRAYN V3 — SEO and Premium Retail** at https://traynnutrition.com/. The previous theme **192621379872** is retained unpublished for rollback. The approved Belgian Chocolate native description, search fields and three retail images are deployed; real price/inventory and other products are preserved. Desktop/phone motion, gallery, native Product schema and public rendering checks pass. Final public Lighthouse SEO scores are **100/100** for home and product. Policies and future-flavour catalogue decisions remain pending.
+
+See [the complete release and verification record](SHOPIFY_RELEASE_2026_10_24.md). This supersedes the historical deployment entries below.
+
 # Silver identity publication — 17 October 2026
 
 Published theme: `192621379872`, TRAYN V3 — Silver Identity, at https://traynnutrition.com/. The previous live theme `192617939232`, TRAYN V3 — Phone Motion, is confirmed unpublished and retained for rollback.

@@ -1,5 +1,7 @@
 # Belgian Chocolate — local retail review, 24 October 2026
 
+**Deployment update:** the owner subsequently requested Shopify deployment on 24 October 2026. The prepared description, search fields and all three images are now entered in the existing native product record, and theme `192865665312` is published. Actual price and inventory were preserved. See [the deployment record](../../docs/SHOPIFY_RELEASE_2026_10_24.md). The preparation/verification notes below describe the original local review stage; their historical “not uploaded” statements are superseded by this update.
+
 This folder prepares the current Belgian Chocolate product for review. It does not update Shopify.
 
 ## Prepared content

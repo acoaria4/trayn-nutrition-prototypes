@@ -10,12 +10,11 @@ The manufacturer areas in the website's back-pouch and enlarged-label images sta
 
 Vanilla, Café Mocha and Cookies & Cream are **coming soon**. They are not part of the current product presentation. Do not add them to the homepage or local review catalogue, infer launch dates, reuse chocolate facts for them or make them purchasable. No product information for these future flavours is needed to complete the current Belgian Chocolate content.
 
-## Implementation still pending, without further product approval
+## Product implementation completed; catalogue decisions remain
 
-- **Prepared locally:** the Belgian Chocolate product description, ordered front/back/label media, alternative text and search copy are in [the retail review package](../product-content/belgian-chocolate/README.md). The local HTTP preview loads them. No more product facts/images are needed from the owner for this SKU.
-- Enter the prepared description/media into native product records only after a later explicit store-change request. Those native fields remain unchanged from the audit snapshot; theme upload alone will not populate them. Preserve actual dynamic prices, stock and currency.
-- Verify native Product schema after the native description/media are entered in a separately authorized Shopify review environment. The local serializer remains an approximation.
-- Review existing collection links against the coming-soon decision before release. The audit found future-flavour URLs accessible through the sitemap/collections even though they are not featured on the homepage. Hiding or unpublishing native records and sitemap changes are later store actions, not completed local fixes.
+- **Deployed after the owner's explicit request on 24 October 2026:** the Belgian Chocolate product description, ordered front/back/label media, alternative text and search copy from [the retail review package](../product-content/belgian-chocolate/README.md) are in the existing native Shopify product. Actual price, inventory, product identity and status are unchanged. No more product facts/images are needed from the owner for this SKU.
+- Native gallery, description and Product structured data were checked in Shopify, alongside the preserved homepage design and motion. See [the deployment record](SHOPIFY_RELEASE_2026_10_24.md). The local serializer remains an approximation.
+- **Visibility resolved in a subsequent explicit request:** Vanilla, Café Mocha and Cookies & Cream are unpublished from Online Store; public collections and the product sitemap list only Belgian Chocolate. Their product records and Point of Sale publication are preserved. See [visibility verification](FLAVOUR_VISIBILITY_2026_10_24.md).
 
 ## Business information still needed
 
@@ -32,4 +31,4 @@ The theme links real native policies when they exist. No missing policy has been
 - Should News become a real blog, or should its unused store record be removed later? The local templates exist; empty blogs are noindex.
 - Should the generic “Home page” collection be kept, renamed or consolidated? Current-product navigation must not promote the future flavours.
 
-Search Console, Merchant Center, analytics, native Shopify rendering, indexing and field performance remain later account/release checks. All current work stays local; do not upload, publish or change Shopify records without a subsequent request.
+Search Console, Merchant Center, analytics, indexing and field performance remain separate account checks. The owner authorized the Shopify release and subsequently hid the three future flavours. Future unrelated store changes still require their own task authorization. Missing policies and blog/collection content cleanup remain pending.
