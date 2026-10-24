@@ -98,3 +98,27 @@ test('canonical product URLs stay canonical in breadcrumb markup and dangerous t
  assert.equal(breadcrumb.itemListElement.at(-1).item,'https://theme.test/products/trayn-whey-rich-chocolate');
  assert.match(html,/Fixture &lt;\/script&gt; &amp; (?:&quot;|&#34;)quoted(?:&quot;|&#34;)/);
 });
+
+test('prepared retail content carries the exact approved tables and ordered media into product schema',async()=>{
+ const renderer=createRenderer({retailContent:true});renderer.globals.shop.url='https://theme.test';
+ const p=renderer.globals.product,html=await renderer.renderPage('product'),schema=jsonLd(html).find(item=>item['@type']==='Product');
+ assert.equal(p.media.length,3);assert.match(schema.image,/front-retail.webp$/);
+ assert.match(schema.description,/23 g protein \(dry basis\)/);assert.match(schema.description,/Contains milk/);
+ assert.match(html,/retail-product-detail/);assert.doesNotMatch(html,/not an approved retail specification|pouch concept/);
+ const label=await readFile('sections/trayn-label-artwork.liquid','utf8');
+ const tables=[...label.matchAll(/<table>[\s\S]*?<\/table>/g)].map(m=>m[0].replaceAll(/ data-basis="[^"]*"/g,''));
+ assert.equal(tables.length,4);for(const table of tables)assert.ok(p.description.includes(table),'Original label table must be preserved exactly');
+ assert.ok(p.media.slice(1).every(m=>m.preview_image.src.includes('manufacturer-blank')));
+ assert.equal(p.variants[0].available,false);assert.equal(p.variants[0].price,329900);
+ assert.match(meta(html,'description'),/dry basis/);assert.doesNotMatch(meta(html,'description'),/certified|lab-tested|isolate/i);
+ const collection=await renderer.renderPage('collection');assert.doesNotMatch(collection,/Vanilla|Mocha|Cookies/);
+});
+
+test('populating native product content preserves the homepage purchase scene and keeps details below product controls',async()=>{
+ const bare=createRenderer(),retail=createRenderer({retailContent:true});
+ const section=html=>html.match(/<section class="purchase-section[\s\S]*?<\/section>/)?.[0];
+ assert.equal(section(await retail.renderPage('index')),section(await bare.renderPage('index')));
+ const html=await retail.renderPage('product'),purchase=section(html);
+ assert.match(purchase,/23 g protein/);assert.doesNotMatch(purchase,/<table>|retail-product-detail/);
+ assert.ok(html.indexOf('retail-product-detail')>html.indexOf('data-add-button'));
+});

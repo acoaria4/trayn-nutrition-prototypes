@@ -1,4 +1,14 @@
 /* Supporting pages only. The campaign layout and motion bundle stay unchanged. */
+.retail-gallery{min-width:0;border:0;padding:0;margin:0;display:grid;grid-template-columns:repeat(var(--media-count),minmax(0,1fr));gap:12px}
+.purchase-gallery>.retail-gallery{grid-column:1/-1}
+.retail-gallery-legend,.retail-media-control{position:absolute;width:1px;height:1px;padding:0;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+.retail-media-panel{display:none;grid-row:1;grid-column:1/-1;height:clamp(360px,48vw,680px);background:#111!important}
+.retail-media-control:checked+label+figure{display:block}.retail-media-panel>a{display:block;height:100%}.retail-media-panel img{height:100%;max-height:none;object-fit:contain}
+.retail-media-thumb{grid-row:2;display:grid;justify-items:center;gap:8px;padding:10px 6px;border:1px solid #ffffff25;cursor:pointer;color:var(--silver);font-size:11px;letter-spacing:.08em;text-transform:uppercase;min-width:0}
+.retail-media-thumb img{height:72px;max-width:100%;object-fit:contain}.retail-media-control:checked+label{border-color:var(--white);color:var(--white)}.retail-media-control:focus-visible+label{outline:2px solid var(--white);outline-offset:4px}
+.purchase-description{line-height:1.65}.purchase-description p{margin:0 0 16px}.purchase-description strong{color:var(--white)}
+.retail-product-detail{border-top:1px solid #ffffff25}.retail-product-detail:last-child{border-bottom:1px solid #ffffff25}.retail-product-detail summary{cursor:pointer;padding:22px 0;min-height:44px;color:var(--white);font-weight:700}.retail-detail-body{padding-bottom:28px}.retail-detail-body h3,.retail-detail-body h4{color:var(--white)}.retail-detail-body table{width:100%;min-width:460px;border-collapse:collapse}.retail-detail-body caption{text-align:left;color:var(--white);padding-block:16px;font-weight:700}.retail-detail-body ul,.retail-detail-body ol{padding-left:24px}
+.retail-detail-body table{font-size:14px}.retail-detail-body thead{background:#1b1b1b;color:var(--white)}.retail-detail-body thead th{font-size:12px}.retail-detail-body .table-scroll:focus-visible{outline:2px solid var(--white);outline-offset:4px}
 .seo-product-details{padding-block:48px;max-width:1100px;margin-inline:auto;border-top:1px solid #ffffff25}
 .seo-detail+.seo-detail{margin-top:40px}.seo-detail h2,.seo-editorial h2{font:800 clamp(28px,4vw,44px)/1.1 Barlow,Impact,sans-serif;margin:0 0 20px;text-transform:uppercase}
 .seo-detail .rte,.seo-editorial .rte{color:var(--silver);line-height:1.8}.seo-detail th,.seo-detail td{padding:12px;border-bottom:1px solid #ffffff25;text-align:left}

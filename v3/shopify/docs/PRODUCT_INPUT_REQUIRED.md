@@ -12,8 +12,8 @@ Vanilla, Café Mocha and Cookies & Cream are **coming soon**. They are not part 
 
 ## Implementation still pending, without further product approval
 
-- Prepare the native Belgian Chocolate product description and media from the confirmed existing content. Native Shopify description/media were empty in the audit snapshot; owner confirmation resolves permission to use the assets, but does not populate those fields by itself.
-- Populate the local content review, then stage the exact native product updates for a later separately authorized store change. Preserve actual dynamic prices, stock and currency.
+- **Prepared locally:** the Belgian Chocolate product description, ordered front/back/label media, alternative text and search copy are in [the retail review package](../product-content/belgian-chocolate/README.md). The local HTTP preview loads them. No more product facts/images are needed from the owner for this SKU.
+- Enter the prepared description/media into native product records only after a later explicit store-change request. Those native fields remain unchanged from the audit snapshot; theme upload alone will not populate them. Preserve actual dynamic prices, stock and currency.
 - Verify native Product schema after the native description/media are entered in a separately authorized Shopify review environment. The local serializer remains an approximation.
 - Review existing collection links against the coming-soon decision before release. The audit found future-flavour URLs accessible through the sitemap/collections even though they are not featured on the homepage. Hiding or unpublishing native records and sitemap changes are later store actions, not completed local fixes.
 

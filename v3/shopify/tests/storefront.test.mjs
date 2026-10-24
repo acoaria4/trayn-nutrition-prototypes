@@ -5,8 +5,8 @@ import { chromium,webkit } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {createRenderer} from '../scripts/preview.mjs';
 const chromeOptions={...(process.env.PLAYWRIGHT_CHROME_PATH?{executablePath:process.env.PLAYWRIGHT_CHROME_PATH}:process.platform==='darwin'?{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'}:process.platform==='win32'?{channel:'chrome'}:{}),headless:true};
-async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference',mobile=false,quantityRule={min:1,increment:1,max:null}}={}) {
- const renderer=createRenderer({available});renderer.globals.product.variants[0].quantity_rule=quantityRule;let count=0,adds=0,changes=[];
+async function mockPage(browser,{width=1280,available=true,failAdd=false,failSection=false,pageType='index',js=true,height=844,reducedMotion='no-preference',mobile=false,retailContent=false,quantityRule={min:1,increment:1,max:null}}={}) {
+ const renderer=createRenderer({available,retailContent});renderer.globals.product.variants[0].quantity_rule=quantityRule;let count=0,adds=0,changes=[];
  const context=await browser.newContext({viewport:{width,height},javaScriptEnabled:js,reducedMotion,isMobile:mobile,hasTouch:mobile});
  const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const setCart=()=>{const cart={item_count:count,total_price:count*329900,currency:{iso_code:'INR'},cart_level_discount_applications:[],items:count?[{key:'test-key:abc',product:{title:'TRAYN Whey Belgian Chocolate',handle:'trayn-whey-rich-chocolate',has_only_default_variant:true},variant:{title:'Default Title',quantity_rule:quantityRule},quantity:count,url:'/products/trayn-whey-rich-chocolate',final_line_price:count*329900,properties:[],line_level_discount_allocations:[]}]:[]};Object.assign(renderer.globals.cart,cart);return cart;};
@@ -364,6 +364,41 @@ for(const [name,engine,options,width,height] of [['Chrome phone',chromium,chrome
    assert.equal(await page.locator('.hero-pin').evaluate(el=>getComputedStyle(el).position),'sticky');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
    assert.deepEqual(errors,[]);
+  }finally{await browser.close();}
+ });
+}
+
+for(const [name,engine,options,width]of [['desktop',chromium,chromeOptions,1280],['Chrome phone',chromium,chromeOptions,390],['WebKit phone',webkit,{headless:true},390]]) {
+ test(`prepared retail product: ${name} gallery keyboard control, details and accessibility`,async()=>{
+  const browser=await engine.launch(options);
+  try{
+   const {page,errors}=await mockPage(browser,{pageType:'product',retailContent:true,width,height:900,available:false});
+   await page.waitForFunction(()=>document.querySelector('.retail-media-panel img')?.naturalWidth>0);
+   const gallerySize=await page.locator('.retail-gallery').evaluate(el=>({gallery:el.getBoundingClientRect().width,parent:el.parentElement.getBoundingClientRect().width}));
+   assert.ok(Math.abs(gallerySize.gallery-gallerySize.parent)<2,'Gallery must fill the available product column on every viewport');
+   assert.equal(await page.locator('.retail-media-panel:visible').count(),1);
+   assert.match(await page.locator('.retail-media-panel:visible img').getAttribute('src'),/front-retail/);
+   const radios=page.getByRole('radio');await radios.nth(0).focus();await page.keyboard.press('ArrowRight');
+   assert.ok(await radios.nth(1).isChecked());
+   assert.match(await page.locator('.retail-media-panel:visible img').getAttribute('src'),/back-manufacturer-blank/);
+   await page.keyboard.press('ArrowRight');assert.ok(await radios.nth(2).isChecked());
+   assert.match(await page.locator('.retail-media-panel:visible img').getAttribute('src'),/label-manufacturer-blank/);
+   await radios.nth(0).focus();await page.keyboard.press('Space');
+   await page.evaluate(()=>window.scrollTo(0,0));await page.evaluate(()=>document.fonts.ready);
+   await mkdir('artifacts',{recursive:true});await page.screenshot({path:`artifacts/retail-product-${name.replaceAll(' ','-')}.png`});
+   await page.locator('.retail-product-detail summary').first().click();
+   assert.ok(await page.locator('.retail-product-detail').first().evaluate(el=>el.open));
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+   assert.deepEqual((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations,[]);
+   assert.deepEqual(errors,[]);
+   if(name==='desktop'){
+    const nojs=await mockPage(browser,{pageType:'product',retailContent:true,js:false,available:false,width:390});
+    await nojs.page.getByRole('radio').nth(0).focus();await nojs.page.keyboard.press('ArrowRight');
+    assert.ok(await nojs.page.getByRole('radio').nth(1).isChecked());
+    await nojs.page.locator('.retail-product-detail summary').last().click();
+    assert.ok(await nojs.page.locator('.retail-product-detail').last().evaluate(el=>el.open));
+    await nojs.context.close();
+   }
   }finally{await browser.close();}
  });
 }

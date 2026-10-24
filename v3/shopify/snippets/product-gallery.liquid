@@ -1,0 +1,18 @@
+{% doc %}
+  Renders native product media with keyboard-operable radio thumbnail controls.
+  @param {product} gallery_product - Product whose native media is displayed.
+  @param {string} gallery_id - Unique section identifier.
+{% enddoc %}
+<fieldset class="retail-gallery" style="--media-count: {{ gallery_product.media.size }}">
+<legend class="retail-gallery-legend">Product images</legend>
+{% for media in gallery_product.media %}
+{% assign media_alt = media.alt | default: gallery_product.title %}
+{% assign media_loading = 'lazy' %}{% assign media_priority = 'auto' %}{% if forloop.first %}{% assign media_loading = 'eager' %}{% assign media_priority = 'high' %}{% endif %}
+<input class="retail-media-control" type="radio" name="gallery-{{ gallery_id }}" id="media-{{ gallery_id }}-{{ forloop.index }}" aria-label="{{ media_alt | escape }}" aria-controls="media-panel-{{ gallery_id }}-{{ forloop.index }}" {% if forloop.first %}checked{% endif %}>
+<label class="retail-media-thumb" for="media-{{ gallery_id }}-{{ forloop.index }}">{{ media.preview_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: '' }}<span>View {{ forloop.index }}</span></label>
+<figure class="retail-media-panel" id="media-panel-{{ gallery_id }}-{{ forloop.index }}">
+{% if media.media_type == 'image' %}<a href="{{ media.preview_image | image_url: width: 2711 }}" target="_blank" rel="noopener noreferrer" aria-label="Open full image: {{ media_alt | escape }}">{{ media.preview_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: media_loading, fetchpriority: media_priority, alt: media_alt }}</a>{% else %}{{ media | media_tag: image_size: '900x', controls: true, preload: 'none' }}{% endif %}
+</figure>
+{% endfor %}
+</fieldset>
+

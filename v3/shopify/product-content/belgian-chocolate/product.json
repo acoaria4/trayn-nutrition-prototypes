@@ -1,0 +1,41 @@
+{
+  "status": "local_review_only",
+  "handle": "trayn-whey-rich-chocolate",
+  "title": "TRAYN Whey Belgian Chocolate",
+  "description_file": "description.html",
+  "seo": {
+    "title": "Belgian Chocolate Whey Protein Concentrate, 500 g",
+    "description": "TRAYN Belgian Chocolate whey protein concentrate. 23 g protein (dry basis) per approx. 33 g serving. 500 g pack, 15 servings. View ingredients and nutrition."
+  },
+  "media": [
+    {
+      "position": 1,
+      "source_file": "../../assets/belgian-chocolate-wpc-front-retail.webp",
+      "alt": "TRAYN Belgian Chocolate whey protein concentrate, 500 g — front pack",
+      "sha256": "58b22dee653024fa614c3ce374ea0e1ee4aa39a2017f8deee1589b54c67ede8e",
+      "master_file": "front-retail-master.webp"
+    },
+    {
+      "position": 2,
+      "source_file": "../../assets/belgian-chocolate-wpc-back-manufacturer-blank.webp",
+      "alt": "TRAYN Belgian Chocolate whey protein concentrate, 500 g — back pack; manufacturer details blank",
+      "sha256": "3bac0f7d9d1d50b7186c1edad9e90de8386aabb21d242d17b2c842d934eb9350"
+    },
+    {
+      "position": 3,
+      "source_file": "../../assets/belgian-chocolate-wpc-label-manufacturer-blank.webp",
+      "alt": "TRAYN Belgian Chocolate product label — nutrition, ingredients and directions; manufacturer details blank",
+      "sha256": "2b722fefb2607a88158e6c30015a5cbb796d234110b94a49f3bd2aeb967206c9"
+    }
+  ],
+  "source_approval": "Owner confirmed existing site information and images on 24 October 2026",
+  "positioning": "Elite, premium, no compromise on quality. Brand aspiration; no new testing, purity, sourcing or superiority claims.",
+  "manufacturer_image_area": "Keep blank per owner instruction",
+  "exclude_from_changes": [
+    "price",
+    "inventory",
+    "availability",
+    "publication",
+    "other flavours"
+  ]
+}

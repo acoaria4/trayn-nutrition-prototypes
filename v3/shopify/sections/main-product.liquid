@@ -1,4 +1,5 @@
 {% render 'purchase-panel', purchase_product: product, section_id: section.id, is_main: true, shipping_note: section.settings.shipping_note, purchase_image: section.settings.purchase_image %}
+{% if product.description contains '<!-- TRAYN product details -->' %}{% assign retail_details = product.description | split: '<!-- TRAYN product details -->' | last %}<section class="seo-product-details seo-detail section-shell" aria-label="Product information"><div class="rte">{{ retail_details }}</div></section>{% endif %}
 {% capture json_lt_escape %}{% raw %}\u003c{% endraw %}{% endcapture %}<script type="application/ld+json">{{ product | structured_data | replace: '<', json_lt_escape }}</script>
 {% capture approved_details %}{% for block in section.blocks %}{% if block.settings.approved and block.settings.product.id == product.id and block.settings.content != blank %}<div class="seo-detail" {{ block.shopify_attributes }}><h2>{{ block.settings.heading | default: 'Product information' | escape }}</h2><div class="rte">{{ block.settings.content }}</div></div>{% endif %}{% endfor %}{% endcapture %}
 {% assign approved_details = approved_details | strip %}

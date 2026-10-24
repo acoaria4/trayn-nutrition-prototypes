@@ -12,11 +12,14 @@
 {% if is_main %}{% assign image_loading = 'eager' %}{% assign image_priority = 'high' %}{% endif %}
 {% assign form_id = 'purchase-' | append: section_id %}
 {% assign flavour_scene = false %}
-{% if purchase_product.handle == 'trayn-whey-rich-chocolate' and purchase_image == blank and purchase_product.media.size == 0 %}{% assign flavour_scene = true %}{% endif %}
+{% if purchase_product.handle == 'trayn-whey-rich-chocolate' and purchase_image == blank %}{% if is_main != true or purchase_product.media.size == 0 %}{% assign flavour_scene = true %}{% endif %}{% endif %}
 <section class="purchase-section section-shell{% if flavour_scene %} purchase-section--flavour{% endif %}" id="purchase" tabindex="-1" aria-labelledby="purchase-title-{{ section_id }}" data-purchase>
 <div class="purchase-gallery">
 {% if purchase_image != blank %}
 <figure>{{ purchase_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: image_loading, fetchpriority: image_priority, alt: purchase_product.title }}</figure>
+{% elsif flavour_scene %}{% render 'purchase-art', image_loading: image_loading, image_priority: image_priority %}
+{% elsif is_main and purchase_product.media.size > 0 %}
+{% render 'product-gallery', gallery_product: purchase_product, gallery_id: section_id %}
 {% elsif purchase_product.media.size > 0 %}
 {% for media in purchase_product.media %}{% assign media_loading = 'lazy' %}{% assign media_priority = 'auto' %}{% if forloop.first and is_main %}{% assign media_loading = 'eager' %}{% assign media_priority = 'high' %}{% endif %}{% assign media_alt = media.alt | default: purchase_product.title %}<figure>{% if media.media_type == 'image' %}{{ media.preview_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 900px) 45vw, 90vw', loading: media_loading, fetchpriority: media_priority, alt: media_alt }}{% else %}{{ media | media_tag: image_size: '900x', controls: true, preload: 'none' }}{% endif %}</figure>{% endfor %}
 {% elsif purchase_product.handle == 'trayn-whey-rich-chocolate' %}{% render 'purchase-art', image_loading: image_loading, image_priority: image_priority %}
@@ -27,7 +30,7 @@
 <span>{{ 'products.flavour_image.title_second' | t }}</span></h2>{% else %}<h2 id="purchase-title-{{ section_id }}">{% if purchase_product != blank %}{{ purchase_product.title | escape }}{% else %}FUEL YOUR<br><span>POTENTIAL.</span>{% endif %}</h2>{% endif %}
 {% if purchase_product != blank %}
 <p class="purchase-price" data-product-price>{% render 'price', amount: current_variant.price %}</p>
-{% if purchase_product.description != blank %}<div class="purchase-description rte">{{ purchase_product.description }}</div>{% endif %}
+{% if purchase_product.description != blank and flavour_scene == false %}{% assign purchase_summary = purchase_product.description | split: '<!-- TRAYN product details -->' | first %}<div class="purchase-description rte">{{ purchase_summary }}</div>{% endif %}
 {% form 'product', purchase_product, id: form_id, class: 'purchase-form', data-product-form: '', data-requires-selling-plan: purchase_product.requires_selling_plan %}
 {% if purchase_product.requires_selling_plan %}<p>Subscription purchase options are not available in this theme preview.</p>{% endif %}
 <label for="variant-{{ section_id }}" {% if purchase_product.has_only_default_variant %}hidden{% endif %}>{% if purchase_product.has_only_default_variant %}Product{% else %}Choose an option{% endif %}</label>
