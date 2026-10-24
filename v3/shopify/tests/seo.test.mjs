@@ -2,10 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createRenderer} from '../scripts/preview.mjs';
+import {parseShopifyJson} from '../scripts/shopify-json.mjs';
 
 const jsonLd=html=>[...html.matchAll(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/g)].map(match=>JSON.parse(match[1]));
 const meta=(html,name)=>html.match(new RegExp(`<meta (?:name|property)="${name}" content="([^"]*)"`))?.[1];
 const make=()=>{const renderer=createRenderer();renderer.globals.shop.url='https://theme.test';return renderer;};
+
+test('homepage schema defaults and fallback both describe whey protein while retaining the campaign H1',async()=>{
+ const renderer=make();
+ const schema=parseShopifyJson(await readFile('config/settings_schema.json','utf8'));
+ const descriptionSetting=schema.flatMap(group=>group.settings||[]).find(setting=>setting.id==='home_seo_description');
+ const fallback=await renderer.renderPage('index');
+ renderer.globals.settings.home_seo_description=descriptionSetting.default;
+ const withDefaults=await renderer.renderPage('index');
+ for(const html of [fallback,withDefaults]){
+  assert.match(meta(html,'description'),/whey protein concentrate/i);
+  assert.match(meta(html,'og:description'),/whey protein concentrate/i);
+  assert.match(html,/<h1>FUEL YOUR<br><span>POTENTIAL\.<\/span><\/h1>/);
+ }
+ assert.equal(meta(withDefaults,'description'),meta(fallback,'description'));
+ renderer.globals.settings.home_seo_description='Approved merchant-specific homepage summary.';
+ assert.equal(meta(await renderer.renderPage('index'),'description'),'Approved merchant-specific homepage summary.');
+});
 
 test('every native landing template emits descriptions, canonical URLs and sharing metadata',async()=>{
  for(const type of ['index','product','collection','page','blog','article','cart','search','404']){

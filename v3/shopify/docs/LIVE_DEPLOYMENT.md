@@ -1,3 +1,9 @@
+# Refined header and SEO copy publication — 24 October 2026
+
+Published theme **192866746656 — TRAYN V3 — Refined Header and SEO** at https://traynnutrition.com/ after the owner approved the local preview. The previous theme **192865665312** remains unpublished for rollback. Header/navigation, homepage category wording, metadata defaults and FAQ copy are updated; **FUEL YOUR POTENTIAL**, campaign CSS/JavaScript, animations, label facts, product data and the Belgian-Chocolate-only public catalogue are preserved. All 73 uploaded files match the prepared release; hosted desktop/phone checks pass before and after publication.
+
+See [the complete refinement and deployment record](HEADER_SEO_REFINEMENT_2026_10_24.md). No new PageAudit score is claimed. This supersedes the historical deployment entries below.
+
 # SEO and premium retail publication — 24 October 2026
 
 Published theme **192865665312 — TRAYN V3 — SEO and Premium Retail** at https://traynnutrition.com/. The previous theme **192621379872** is retained unpublished for rollback. The approved Belgian Chocolate native description, search fields and three retail images are deployed; real price/inventory and other products are preserved. Desktop/phone motion, gallery, native Product schema and public rendering checks pass. Final public Lighthouse SEO scores are **100/100** for home and product. Policies and future-flavour catalogue decisions remain pending.

@@ -9,6 +9,7 @@
 <link rel="icon" href="{{ 'favicon.png' | asset_url }}" type="image/png">
 {{ 'barlow-800.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
 {{ 'trayn.css' | asset_url | stylesheet_tag }}
+{{ 'header-refinement.css' | asset_url | stylesheet_tag }}
 {% unless request.page_type == 'index' %}{{ 'seo-content.css' | asset_url | stylesheet_tag }}{% endunless %}
 {{ content_for_header }}
 <script src="{{ 'trayn.js' | asset_url }}" defer></script>
