@@ -1,5 +1,7 @@
 # TRAYN v3 — next-run implementation queue
 
+**24 October update:** the owner confirmed the existing site information and images as actual retail information. Belgian Chocolate product approval is resolved; the other flavours are coming soon and should not be added to the current product presentation. The original queue below is historical. Use [current remaining inputs](PRODUCT_INPUT_REQUIRED.md) and [retail confirmation](RETAIL_CONFIRMATION_2026_10_24.md) for the updated scope. Native product description/media still need preparation and later separately authorized entry; no live changes are authorized.
+
 Audit baseline: 23 October 2026. Theme-side fixes are now prepared locally on `codex/v3-seo-audit-fixes`; see [implementation status](SEO_FIXES_2026_10_23.md). Nothing has been uploaded or published. The table below remains the original dependency queue; product facts, native product media/descriptions, policies and account checks remain pending as detailed in [PRODUCT_INPUT_REQUIRED.md](PRODUCT_INPUT_REQUIRED.md).
 
 | Order | Priority | Work | Depends on | Completion check |

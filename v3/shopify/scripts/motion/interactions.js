@@ -193,20 +193,20 @@ function inspector() {
   const views = {
     front: {
       src: document.querySelector('[data-study-view="front"]').href,
-      alt: "TRAYN Belgian Chocolate 500 g front pouch concept",
-      caption: "Front pouch visualisation. Packaging concept.",
+      alt: "TRAYN Belgian Chocolate 500 g front pack",
+      caption: "Belgian Chocolate 500 g front pack.",
     },
     back: {
       src: document.querySelector('[data-study-view="back"]').href,
-      alt: "TRAYN Belgian Chocolate 500 g back pouch visualisation",
+      alt: "TRAYN Belgian Chocolate 500 g back pack",
       caption:
-        "Back pouch visualisation. Use Back Label or the original PDF to read the supplied artwork.",
+        "Belgian Chocolate 500 g back pack. Open Back Label to read the product information.",
     },
     label: {
       src: labelSource.dataset.inspectorLabelImage,
       alt: "Belgian Chocolate WPC back-label artwork; manufacturer details intentionally blank",
       caption:
-        "Back-label visualisation; manufacturer details intentionally blank. Transcribed information is not an approved retail specification.",
+        "Belgian Chocolate product label. Manufacturer details intentionally blank.",
     },
   };
   let opener;
