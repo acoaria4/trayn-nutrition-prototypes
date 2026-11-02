@@ -22,3 +22,6 @@ Thumbs.db
 Desktop.ini
 .idea/
 .vscode/
+
+# Separate Sites source checkout; never include its nested repository.
+/sites/trayn-nutrition-v2/

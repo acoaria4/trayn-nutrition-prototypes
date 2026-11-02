@@ -1,0 +1,76 @@
+{
+  "approved_cap": 60,
+  "expected_total": 52,
+  "opening_balance": 551.25,
+  "currency": "Higgsfield credits",
+  "jobs": [
+    {
+      "index": 0,
+      "name": "preparation-landscape",
+      "id": "480fd016-092b-4ed2-8445-c4f47d9a984c",
+      "model": "cinematic_studio_2_5",
+      "quoted_credits": 2,
+      "status": "completed"
+    },
+    {
+      "index": 1,
+      "name": "preparation-portrait",
+      "id": "d30d1d68-70e7-49f8-af3f-46bf1206c997",
+      "model": "cinematic_studio_2_5",
+      "quoted_credits": 2,
+      "status": "completed"
+    },
+    {
+      "index": 2,
+      "name": "effort-wide",
+      "id": "bd1b3a30-4492-4589-ab48-4985fcab7b16",
+      "model": "cinematic_studio_2_5",
+      "quoted_credits": 2,
+      "status": "completed"
+    },
+    {
+      "index": 3,
+      "name": "effort-phone",
+      "id": "f47e8a42-6a9f-4540-94f9-8187b107287b",
+      "model": "cinematic_studio_2_5",
+      "quoted_credits": 2,
+      "status": "completed"
+    },
+    {
+      "index": 4,
+      "name": "flavour-wide",
+      "id": "7802fd2c-988b-4965-8c52-94cb63b34c9a",
+      "model": "cinematic_studio_2_5",
+      "quoted_credits": 2,
+      "status": "completed"
+    },
+    {
+      "index": 5,
+      "name": "flavour-phone",
+      "id": "f78fd5f6-f935-4f73-a8e6-f5ef3366dc73",
+      "model": "cinematic_studio_2_5",
+      "quoted_credits": 2,
+      "status": "completed"
+    },
+    {
+      "index": 6,
+      "name": "training-wide",
+      "id": "56a56fb6-84f3-4864-b3fa-6f9d075084c4",
+      "model": "cinematic_studio_3_0",
+      "quoted_credits": 20,
+      "status": "completed"
+    },
+    {
+      "index": 7,
+      "name": "training-phone",
+      "id": "2bafa5b5-6c8b-4d2a-b88c-cb84fa2a4fa5",
+      "model": "cinematic_studio_3_0",
+      "quoted_credits": 20,
+      "status": "completed"
+    }
+  ],
+  "quoted_total": 52,
+  "closing_balance": 499.25,
+  "actual_credits_spent": 52,
+  "unused_reserve": 8
+}

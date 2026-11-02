@@ -1,0 +1,23 @@
+{
+  "name": "trayn-v4-the-work",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4184",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4184",
+    "check": "node --check src/main.js && node --check src/scene.js && node --check src/motion.js && node --check scripts/test-browser.mjs && node --check scripts/browser-options.mjs && node --check scripts/verify-static.mjs",
+    "test": "node scripts/test-browser.mjs",
+    "test:hosting:static": "node scripts/verify-static.mjs"
+  },
+  "dependencies": {
+    "gsap": "3.13.0",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.0",
+    "@playwright/test": "1.64.1",
+    "vite": "8.3.5"
+  }
+}
