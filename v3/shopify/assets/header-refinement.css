@@ -1,0 +1,91 @@
+/* Header refinement: keep campaign dimensions and motion styles intact. */
+.study-header .desktop-navigation {
+  align-items: center;
+  gap: clamp(28px, 3.5vw, 52px);
+}
+.study-header .desktop-navigation a {
+  min-height: 44px;
+  color: var(--silver);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .025em;
+  white-space: nowrap;
+  transition: color 160ms ease;
+}
+.study-header .desktop-navigation .header-shop {
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 16px;
+  min-width: 100px;
+  border: 1px solid #ffffff35;
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+.header-shop-arrow { flex: none; color: var(--red-accent); }
+.study-header .desktop-navigation a::after {
+  left: 50%;
+  right: auto;
+  bottom: 1px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  transform: translateX(-50%) scale(0);
+  transition: transform 160ms var(--ease-out);
+}
+.study-header .desktop-navigation a[aria-current="location"] { color: var(--white); }
+.study-header .desktop-navigation a[aria-current="location"]::after { transform: translateX(-50%) scale(1); }
+.study-header .desktop-navigation .header-shop::after { display: none; }
+.study-header .desktop-navigation .header-shop[aria-current="location"] { border-color: #ffffff70; }
+.study-header .cart-link {
+  gap: 10px;
+  color: var(--silver);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .025em;
+}
+.study-header .cart-link > span {
+  min-width: 12px;
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.study-header nav a:focus-visible,
+.study-header .cart-link:focus-visible,
+.study-header .site-menu summary:focus-visible { outline: 2px solid var(--white); outline-offset: 5px; }
+@media (hover: hover) and (pointer: fine) {
+  .study-header .desktop-navigation a:hover,
+  .study-header .cart-link:hover { color: var(--white); }
+  .study-header .desktop-navigation .header-shop:hover { border-color: #ffffff85; background: #ffffff08; }
+}
+@media (min-width: 900px) {
+  .study-header .header-actions { padding-left: 26px; border-left: 1px solid #ffffff25; }
+}
+@media (max-width: 1100px) and (min-width: 900px) {
+  .study-header .desktop-navigation { gap: 28px; }
+}
+@media (max-width: 899px) {
+  .study-header .header-actions { gap: 20px; }
+  .study-header .site-menu { padding-left: 20px; border-left: 1px solid #ffffff25; }
+  .study-header .site-menu summary { gap: 18px; font-size: 12px; font-weight: 500; }
+  .study-header .site-menu nav { padding-block: 12px 20px; background: var(--black); box-shadow: 0 20px 32px #0006; }
+  .study-header .site-menu nav a {
+    justify-content: space-between;
+    min-height: 64px;
+    border-bottom: 1px solid #ffffff20;
+    color: var(--silver);
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -.025em;
+  }
+  .study-header .site-menu nav .header-shop { color: var(--white); }
+  .study-header .site-menu nav .header-shop-arrow { width: 16px; height: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .study-header .desktop-navigation a,
+  .study-header .desktop-navigation a::after { transition: none; }
+}

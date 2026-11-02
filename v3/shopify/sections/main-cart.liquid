@@ -1,0 +1,2 @@
+<section class="cart-page section-shell"><p class="eyebrow">TRAYN Nutrition</p><h1>YOUR CART<span>.</span></h1><form action="{{ routes.cart_url }}" method="post">{% render 'cart-items', id_prefix: 'page' %}{% if cart.item_count > 0 %}<div class="cart-page-actions"><button type="submit" name="update" class="outline-button">Update Cart</button><button type="submit" name="checkout" class="buy-button">Checkout ↗</button></div>{% endif %}</form></section>
+{% schema %}{"name":"Cart","settings":[]}{% endschema %}

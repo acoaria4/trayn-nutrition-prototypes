@@ -1,5 +1,6 @@
 node_modules/
 dist/
+output/
 .cache/
 .vite/
 test-results/
@@ -21,3 +22,6 @@ Thumbs.db
 Desktop.ini
 .idea/
 .vscode/
+
+# Separate Sites source checkout; never include its nested repository.
+/sites/trayn-nutrition-v2/

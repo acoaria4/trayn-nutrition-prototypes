@@ -1,0 +1,12 @@
+{% doc %}
+  Identifies the real brand and website. Does not infer addresses or certifications.
+{% enddoc %}
+{%- assign brand_name = 'general.brand_name' | t -%}
+{%- capture json_lt_escape -%}{% raw %}\u003c{% endraw %}{%- endcapture -%}
+{%- assign logo_path = 'trayn-logo-256.webp' | asset_url -%}
+{%- capture logo_url -%}{%- render 'absolute-url', url: logo_path -%}{%- endcapture -%}
+{%- assign organization_id = shop.url | append: '/#organization' -%}
+{%- assign website_id = shop.url | append: '/#website' -%}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":{{ organization_id | json | replace: '<', json_lt_escape }},"name":{{ brand_name | json | replace: '<', json_lt_escape }},"url":{{ shop.url | json }},"logo":{{ logo_url | json }}{% if shop.email != blank %},"email":{{ shop.email | json | replace: '<', json_lt_escape }}{% endif %}},{"@type":"WebSite","@id":{{ website_id | json }},"url":{{ shop.url | json }},"name":{{ brand_name | json | replace: '<', json_lt_escape }},"publisher":{"@id":{{ organization_id | json }}}}]}
+</script>

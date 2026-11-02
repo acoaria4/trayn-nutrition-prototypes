@@ -1,0 +1,18 @@
+{% doc %}
+  Renders native cart rows, quantity rules and Shopify-calculated totals.
+  @param {string} [id_prefix] - Separates cart page input IDs from drawer input IDs.
+{% enddoc %}
+{% if cart.item_count == 0 %}
+<div class="cart-empty"><p>{{ 'cart.empty' | t }}</p><a href="{{ routes.root_url }}#purchase" class="buy-button" data-cart-continue><span>{% if settings.featured_product.handle == 'trayn-whey-rich-chocolate' %}{{ 'cart.shop_flavour' | t }}{% else %}{{ 'cart.shop_collection' | t }}{% endif %}</span><span aria-hidden="true">↗</span></a></div>
+{% else %}
+<ul class="cart-items">{% for item in cart.items %}<li class="cart-item">
+{% if item.image %}<a class="cart-item-media" href="{{ item.url }}">{{ item.image | image_url: width: 240 | image_tag: loading: 'lazy', widths: '120, 240', sizes: '96px', alt: item.image.alt }}</a>{% elsif item.product.handle == 'trayn-whey-rich-chocolate' %}<a class="cart-item-media cart-item-media--flavour" href="{{ item.url }}"><img src="{{ 'belgian-chocolate-flavour-flow-960.webp' | asset_url }}" width="1536" height="1024" loading="lazy" alt="{{ 'cart.flavour_art' | t }}"></a>{% endif %}
+<div class="cart-item-copy"><a href="{{ item.url }}">{{ item.product.title | escape }}</a>{% unless item.product.has_only_default_variant %}<p>{{ item.variant.title | escape }}</p>{% endunless %}{% if item.selling_plan_allocation %}<p>{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>{% endif %}
+{% for property in item.properties %}{% assign first_character = property.first | slice: 0 %}{% if property.last != blank and first_character != '_' %}<p>{{ property.first | escape }}: {{ property.last | escape }}</p>{% endif %}{% endfor %}
+<p class="cart-item-price">{% render 'price', amount: item.final_line_price %}</p>{% for allocation in item.line_level_discount_allocations %}<p>{{ allocation.discount_application.title | escape }}: −{{ allocation.amount | money }}</p>{% endfor %}
+{% capture quantity_id %}cart-quantity-{{ id_prefix | default: 'drawer' }}-{{ forloop.index }}{% endcapture %}
+{% capture quantity_label %}{{ 'cart.quantity' | t }} — {{ item.product.title }}{% endcapture %}
+<label for="{{ quantity_id }}">{{ 'cart.quantity' | t }}</label><div class="cart-line-actions">{% render 'quantity-control', input_id: quantity_id, input_name: 'updates[]', quantity: item.quantity, minimum: 0, increment: item.variant.quantity_rule.increment, maximum: item.variant.quantity_rule.max, line_key: item.key, line_minimum: item.variant.quantity_rule.min, label: quantity_label %}<a href="{{ item.url_to_remove }}" data-cart-remove data-key="{{ item.key | escape }}">{{ 'cart.remove' | t }}</a></div>
+</div></li>{% endfor %}</ul>
+<div class="cart-totals">{% for discount in cart.cart_level_discount_applications %}<p>{{ discount.title | escape }} <span>−{{ discount.total_allocated_amount | money }}</span></p>{% endfor %}<p>{{ 'cart.subtotal' | t }} <strong>{% render 'price', amount: cart.total_price %}</strong></p><small>{% if cart.taxes_included %}Taxes included. {% endif %}Shipping calculated at checkout.</small></div>
+{% endif %}

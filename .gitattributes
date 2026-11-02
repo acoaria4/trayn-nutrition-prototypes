@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Keep the live Shopify snapshot stable across Windows and Unix checkouts.
+v3/shopify/** text=auto eol=lf

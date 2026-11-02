@@ -1,0 +1,10 @@
+{% doc %}
+  Formats a Shopify amount for the active currency without redundant INR decimals.
+  @param {number} amount - Shopify price in its native subunit representation.
+{% enddoc %}
+{%- assign active_currency = cart.currency.iso_code | default: shop.currency -%}
+{%- if active_currency == 'INR' -%}
+  {{- amount | money_without_trailing_zeros -}}
+{%- else -%}
+  {{- amount | money_with_currency -}}
+{%- endif -%}

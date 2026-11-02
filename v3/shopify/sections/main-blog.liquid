@@ -1,0 +1,10 @@
+<section class="simple-page section-shell seo-editorial">
+<nav class="seo-breadcrumb" aria-label="Breadcrumb"><a href="{{ routes.root_url }}">Home</a><span aria-hidden="true">/</span><span aria-current="page">{{ blog.title | escape }}</span></nav>
+<h1>{{ blog.title | escape }}</h1>
+{% paginate blog.articles by 6 %}
+<div class="seo-article-list">{% for entry in blog.articles %}<article><h2><a href="{{ entry.url }}">{{ entry.title | escape }}</a></h2><p><time datetime="{{ entry.published_at | date: '%Y-%m-%d' }}">{{ entry.published_at | date: '%d %B %Y' }}</time></p>{% if entry.excerpt != blank %}<div class="rte">{{ entry.excerpt }}</div>{% else %}<p>{{ entry.content | strip_html | truncatewords: 40 }}</p>{% endif %}<a class="study-link" href="{{ entry.url }}">Read article ↗</a></article>{% else %}<p>No articles published yet.</p>{% endfor %}</div>
+{{ paginate | default_pagination }}
+{% endpaginate %}
+<a class="study-link" href="{{ routes.all_products_collection_url }}">Explore the shop ↗</a>
+</section>
+{% schema %}{"name":"Blog","settings":[]}{% endschema %}

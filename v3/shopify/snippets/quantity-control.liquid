@@ -1,0 +1,17 @@
+{% doc %}
+  Renders a native quantity input with progressively enhanced adjustment buttons.
+  @param {string} input_id - Unique input ID.
+  @param {string} input_name - Native form field name.
+  @param {number} quantity - Current quantity.
+  @param {number} minimum - Lowest allowed input value, including zero for removal.
+  @param {number} increment - Shopify quantity increment.
+  @param {string} label - Accessible group and input name.
+  @param {number} [maximum] - Optional Shopify quantity maximum.
+  @param {string} [line_key] - Cart line key for Ajax updates.
+  @param {number} [line_minimum] - Cart variant minimum before removal.
+{% enddoc %}
+<div class="quantity-stepper" data-quantity-stepper role="group" aria-label="{{ label | escape }}">
+<button type="button" class="quantity-button" data-quantity-adjust="-1" aria-controls="{{ input_id }}" aria-label="{{ 'products.product.decrease_quantity' | t }}" hidden>−</button>
+<input id="{{ input_id }}" name="{{ input_name }}" type="number" value="{{ quantity }}" min="{{ minimum }}" step="{{ increment | default: 1 }}" {% if maximum != null %}max="{{ maximum }}"{% endif %} inputmode="numeric" aria-label="{{ label | escape }}" {% if line_key != blank %}data-cart-quantity data-key="{{ line_key | escape }}" data-line-minimum="{{ line_minimum | default: 1 }}" data-minimum-label="{{ 'products.product.minimum_quantity' | t | escape }}"{% endif %}>
+<button type="button" class="quantity-button" data-quantity-adjust="1" aria-controls="{{ input_id }}" aria-label="{{ 'products.product.increase_quantity' | t }}" hidden>+</button>
+</div>
